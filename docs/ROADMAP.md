@@ -1,0 +1,266 @@
+# PostForge Roadmap
+
+High-level milestone roadmap for building PostForge from the current auth foundation to a production-ready Markdown blog platform.
+
+---
+
+## Current milestone: M0 — Foundation complete ✅
+
+**Status:** Done
+
+| Deliverable | State |
+|-------------|-------|
+| Next.js App Router + TypeScript | ✅ |
+| PostgreSQL via Docker | ✅ |
+| Drizzle ORM configured | ✅ |
+| `@tgoliveira/secure-auth` integrated | ✅ |
+| Auth schema migrated | ✅ |
+| Auth UI pages and API routes | ✅ |
+| `createSecureAuth` composition root | ✅ |
+| Project documentation | ✅ (this docs set) |
+
+**Next:** Begin M1 — Blog domain foundation.
+
+---
+
+## M1 — Blog domain foundation
+
+**Target:** Schema, services, and utilities — no UI.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 1.1 | Blog schema | `posts`, `categories`, `tags`, `post_tags`, `assets`, `post_revisions`, `redirects`, `analytics_events`, `post_daily_stats`, `blog_settings` |
+| 1.2 | Migrations | `drizzle/0001_*.sql` applied; auth tables untouched |
+| 1.3 | Core services | Post CRUD, publish/unpublish/schedule, slug utils, reading time |
+| 1.4 | Markdown pipeline | Sanitized render → `contentHtmlCache` |
+| 1.5 | Session helper | `requireAdminSession()` wrapping secure-auth |
+| 1.6 | Unit tests | Slug, validation, publish rules |
+
+**Exit gate:** Integration test can create, update, and publish a post via service layer.
+
+**Estimated scope:** Small — backend only, highest priority.
+
+---
+
+## M2 — Public blog
+
+**Target:** Reader-facing site for published content.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 2.1 | Public routes | Home, `/blog`, `/blog/[slug]`, tags, categories |
+| 2.2 | Search | PostgreSQL FTS, published only |
+| 2.3 | SEO | Meta tags, OG, Twitter cards, JSON-LD |
+| 2.4 | Feeds | RSS, sitemap, robots.txt |
+| 2.5 | Redirects | Middleware for slug/GitHub Pages URLs |
+| 2.6 | 404 | Friendly not-found page |
+
+**Exit gate:** Seed a published post; visible on home, blog, search, RSS, and sitemap. Draft invisible.
+
+**Depends on:** M1
+
+---
+
+## M3 — Admin publishing
+
+**Target:** Full content management for authenticated admins.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 3.1 | Admin shell | Layout, nav, auth guard |
+| 3.2 | Post list | Filters, search, status badges |
+| 3.3 | Post project | Create, edit, autosave, revisions |
+| 3.4 | Editor | Markdown textarea, live preview |
+| 3.5 | Lifecycle | Publish, unpublish, schedule, archive, duplicate |
+| 3.6 | Feature/pin | Toggle featured and pinned posts |
+| 3.7 | Scheduler | Cron endpoint for scheduled posts |
+
+**Exit gate:** E2E flow — login → create → write → publish → visible publicly → unpublish → hidden.
+
+**Depends on:** M1, M2 (for public verification)
+
+---
+
+## M4 — Images and assets
+
+**Target:** Post-specific image management.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 4.1 | StorageProvider | Interface + LocalStorageProvider |
+| 4.2 | Upload API | Validated multipart upload per post |
+| 4.3 | Image library | Admin UI per post project |
+| 4.4 | Editor integration | Insert image, copy URL, alt text |
+| 4.5 | Cover/OG | Select cover and OG images |
+
+**Exit gate:** Upload image → insert in Markdown → preview → publish → image visible on public post.
+
+**Depends on:** M3
+
+---
+
+## M5 — Analytics
+
+**Target:** Privacy-conscious view tracking and admin reports.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 5.1 | View ingestion | Public endpoint, no raw IP |
+| 5.2 | Daily aggregation | `post_daily_stats` |
+| 5.3 | Admin reports | Dashboard + per-post stats |
+| 5.4 | Retention | Cleanup old raw events |
+
+**Exit gate:** View a post → admin shows incremented count.
+
+**Depends on:** M2 (public post page)
+
+---
+
+## M6 — GitHub Pages migration
+
+**Target:** Import existing static blog content.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 6.1 | Import parser | Frontmatter, slug, date, tags |
+| 6.2 | Image mapping | Detect, copy, report broken refs |
+| 6.3 | Redirect creation | URL continuity |
+| 6.4 | Import UI | Dry-run + commit + report |
+
+**Exit gate:** Sample GitHub Pages export imports with report; redirects work.
+
+**Depends on:** M1, M4 (for images)
+
+---
+
+## M7 — Production hardening
+
+**Target:** Production-ready quality and operations.
+
+| # | Milestone | Key deliverables |
+|---|-----------|------------------|
+| 7.1 | Test coverage | Unit, integration, E2E, security |
+| 7.2 | Audit logging | Content action audit trail |
+| 7.3 | Accessibility | WCAG basics on public + admin |
+| 7.4 | Performance | Index review, caching, image optimization |
+| 7.5 | Operations | Backup/export, deployment docs |
+| 7.6 | Security review | XSS, upload, draft leakage, admin protection |
+
+**Exit gate:** All acceptance criteria in [POSTFORGE_TDR.md §20](./POSTFORGE_TDR.md#20-acceptance-criteria-production-ready-mvp) checked.
+
+**Depends on:** M2–M6
+
+---
+
+## Timeline visualization
+
+```
+M0 Foundation     ████████████████████  DONE
+M1 Domain         ░░░░░░░░░░░░░░░░░░░░  NEXT
+M2 Public blog    ░░░░░░░░░░░░░░░░░░░░
+M3 Admin          ░░░░░░░░░░░░░░░░░░░░
+M4 Images         ░░░░░░░░░░░░░░░░░░░░
+M5 Analytics      ░░░░░░░░░░░░░░░░░░░░
+M6 Migration      ░░░░░░░░░░░░░░░░░░░░
+M7 Hardening      ░░░░░░░░░░░░░░░░░░░░
+```
+
+No calendar dates assigned — phases are sequential with some parallelism possible between M2 and M3 after M1 completes.
+
+---
+
+## Parallelism opportunities
+
+| Can run in parallel | After |
+|---------------------|-------|
+| M2 (public pages) + M3 (admin shell) | M1 |
+| M5 (analytics) + M4 (images) | M2 + M3 respectively |
+| M6 (migration) | M1; full value after M4 |
+
+---
+
+## Scope boundaries (reminder)
+
+### In scope
+
+Everything in M1–M7 above.
+
+### Explicitly out of scope
+
+| Item | Reason |
+|------|--------|
+| Auth reimplementation | Owned by secure-auth |
+| PostForge `users` table | Use package `users` |
+| MDX support | MVP uses Markdown only |
+| Multi-tenant / multi-author RBAC | Single admin for MVP |
+| Comments | Not in product vision |
+| External search engines | PostgreSQL FTS sufficient for MVP |
+| Real-time collaboration | Not required |
+
+---
+
+## Risk register
+
+| Risk | Phase | Mitigation |
+|------|-------|------------|
+| Scope creep into auth | All | Review against boundary doc before each PR |
+| Draft leakage | M2, M3 | `publishedOnly` filter + tests |
+| XSS | M1, M2 | Mandatory sanitization |
+| Storage on serverless | M4 | Env-driven provider selection |
+| Migration data loss | M6 | Dry-run + import report |
+| Scheduler missed runs | M3 | Idempotent job; admin manual publish fallback |
+
+---
+
+## Decision log
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-06 | Use `@tgoliveira/secure-auth` for all auth | Avoid security debt; package already integrated |
+| 2026-06 | No PostForge `users` table | Single source of truth for user identity |
+| 2026-06 | Markdown only (no MDX) | Simpler, safer MVP |
+| 2026-06 | PostgreSQL FTS for search | No extra infrastructure for MVP |
+| 2026-06 | LocalStorageProvider first | Matches local Docker dev; VPS v1 |
+| 2026-06 | Post Project = workspace, not table | One `posts` row; related assets/revisions |
+
+---
+
+## Open questions
+
+Track unresolved decisions. Default action if not decided before implementation:
+
+| # | Question | Default | Blocking phase |
+|---|----------|---------|----------------|
+| 1 | Single admin or RBAC? | Any authenticated user = admin | M3 |
+| 2 | `blog_audit_logs` needed? | Defer; use secure-auth audit first | M7 |
+| 3 | Autosave revision throttle? | Max 1 revision per 5 minutes | M3 |
+| 4 | Image max size? | 5 MB | M4 |
+| 5 | Analytics dedup? | Optional `visitorHash`; skip for MVP if tight | M5 |
+| 6 | Import: zip upload vs CLI? | CLI/script for MVP; UI later | M6 |
+| 7 | Deployment target? | Decide before M4 (affects storage) | M4 |
+
+---
+
+## Recommended next step
+
+**Start M1 — Phase 1: Blog domain foundation.**
+
+First concrete tasks:
+
+1. Create `src/modules/posts/schema.ts` with `posts` table referencing `users.id`
+2. Create remaining module schemas per [DOMAIN_MODEL.md](./DOMAIN_MODEL.md)
+3. Aggregate in `src/db/blog-schema.ts` and update `src/db/schema.ts`
+4. Run `npm run db:generate` and `npm run db:migrate`
+5. Implement `posts/repository.ts` and `posts/service.ts`
+6. Write slug + publish unit tests
+
+Do not start public or admin UI until M1 exit gate passes.
+
+---
+
+## Related documents
+
+- [POSTFORGE_TDR.md](./POSTFORGE_TDR.md) — full requirements
+- [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) — detailed task checklists
+- [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — database design
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — code structure
