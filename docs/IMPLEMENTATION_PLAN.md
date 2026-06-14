@@ -94,9 +94,14 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [ ] Integrate render into `updatePost` and `publishPost`
 - [ ] Cache `contentHtmlCache` on save
 
-### 1.7 Session helper
+### 1.7 Admin authorization helper
 
-- [ ] `src/lib/auth/session.ts` — `requireAdminSession()` using secure-auth
+- [ ] `src/lib/auth/session.ts` — `requireAdminSession()`:
+  - Check valid secure-auth session (authentication)
+  - Check `session.user.email` matches `ADMIN_EMAIL` (authorization)
+  - Redirect to login if unauthenticated; return 403 if authenticated but not authorized
+- [ ] Add `ADMIN_EMAIL` to `src/lib/env.ts` and `.env.example`
+- [ ] Unit test: authorized email passes; other emails forbidden
 
 ### 1.8 Tests (Phase 1)
 
@@ -162,11 +167,12 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 ## Phase 3 — Admin publishing
 
-**Goal:** Authenticated admin can manage posts end-to-end.
+**Goal:** Authorized admin (`ADMIN_EMAIL`) can manage posts end-to-end.
 
 ### 3.1 Admin shell
 
-- [ ] `src/app/admin/layout.tsx` — auth guard via `requireAdminSession()`
+- [ ] `src/app/admin/layout.tsx` — auth guard via `requireAdminSession()` (session + `ADMIN_EMAIL`)
+- [ ] Return 403 for authenticated non-admin users
 - [ ] Admin navigation component
 - [ ] `/admin` dashboard — post counts by status, recent activity
 
@@ -179,6 +185,8 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [ ] `/admin/posts/[id]/revisions` — history + restore
 
 ### 3.3 API routes
+
+All `/api/admin/*` routes must call `requireAdminSession()` before handling requests.
 
 - [ ] `POST /api/admin/posts` — create
 - [ ] `GET/PATCH/DELETE /api/admin/posts/[id]`
@@ -214,8 +222,10 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 ### 3.7 Tests (Phase 3)
 
 - [ ] Integration: schedule → cron → published
-- [ ] E2E: login → create → publish → view public → unpublish
+- [ ] E2E: login as `ADMIN_EMAIL` → create → publish → view public → unpublish
 - [ ] Security: unauthenticated `/admin` redirects to login
+- [ ] Security: authenticated non-`ADMIN_EMAIL` user gets 403 on `/admin` and `/api/admin/*`
+- [ ] Security: cron endpoint requires `CRON_SECRET`, not user session
 
 **Phase 3 exit criteria:** Full publish lifecycle works through admin UI.
 
@@ -274,7 +284,9 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 ### 5.1 Ingestion
 
-- [ ] `POST /api/analytics/view` — record view (public, rate-limited)
+- [ ] `POST /api/analytics/view` — record view (public, no user session)
+- [ ] Rate-limit endpoint (per IP / visitor hash)
+- [ ] Validate: `postId` exists and post is published
 - [ ] Capture: postId, referrer, deviceType, countryCode (optional)
 - [ ] `visitorHash` for dedup — no raw IP
 - [ ] Fire-and-forget from post detail page (client or edge)
@@ -378,7 +390,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 - [ ] Backup/export script for posts (JSON + assets)
 - [ ] Document deployment for VPS vs Vercel
-- [ ] Update `.env.example` with all blog vars
+- [ ] Update `.env.example` with all blog vars including `ADMIN_EMAIL`
 
 **Phase 7 exit criteria:** All acceptance criteria in [POSTFORGE_TDR.md §20](./POSTFORGE_TDR.md#20-acceptance-criteria-production-ready-mvp) met.
 

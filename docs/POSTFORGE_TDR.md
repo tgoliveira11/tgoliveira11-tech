@@ -36,7 +36,7 @@ PostForge is a focused **personal publishing platform** for Markdown-based blog 
 
 ### Target user
 
-A single author (or small team sharing one admin account via secure-auth) who wants full control over a personal blog without maintaining a static-site generator pipeline.
+A single author who wants full control over a personal blog without maintaining a static-site generator pipeline. For MVP, exactly one configured admin email (`ADMIN_EMAIL`) may access publishing features; other authenticated users may exist via secure-auth but cannot access `/admin`.
 
 ---
 
@@ -133,9 +133,10 @@ PostForge **already exists** as a working Next.js application. The following is 
 
 1. **Do not create a PostForge `users` table.** Reference `users.id` from the package schema.
 2. **Do not modify** `@tgoliveira/secure-auth` schema or migrations.
-3. **Do not duplicate** auth logic — use `secureAuth` session/API for admin protection.
+3. **Do not duplicate auth logic** — authentication (login, sessions) comes from `secureAuth`; **authorization** for admin features is PostForge-owned.
 4. **Do not build** custom login, register, passkey, or 2FA flows.
 5. PostForge FK columns (`createdBy`, `updatedBy`, `authorId`, `actorUserId`) reference package `users.id`.
+6. **Do not add roles to the secure-auth `users` table.** Future RBAC uses PostForge-owned tables only.
 
 See [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) for table-level detail and [ARCHITECTURE.md](./ARCHITECTURE.md) for code organization.
 
@@ -196,9 +197,53 @@ Unpublished posts must be excluded from: listing, search, RSS, sitemap, tag/cate
 
 ## 5. Admin area requirements
 
-Admin routes live under `src/app/admin/` (recommended). **All admin routes require an authenticated secure-auth session.**
+Admin routes live under `src/app/admin/` (recommended). **All admin routes require PostForge admin authorization** — not merely an authenticated session.
 
-Use existing secure-auth session capabilities (NextAuth session via `secureAuth`) — no custom auth middleware.
+### Authentication vs authorization
+
+| Layer | Owner | Responsibility |
+|-------|-------|----------------|
+| **Authentication** | `@tgoliveira/secure-auth` | Login, sessions, identity (`users` table) |
+| **Authorization** | PostForge | Who may access `/admin` and `/api/admin/*` |
+
+A user may be **authenticated** (valid secure-auth session) but **not authorized** (email does not match `ADMIN_EMAIL`). Authenticated non-admin users must receive 403 Forbidden on admin routes — not admin access.
+
+### MVP admin authorization
+
+PostForge admin access is restricted to a configured `ADMIN_EMAIL` environment variable.
+
+```bash
+ADMIN_EMAIL=you@example.com
+```
+
+Admin route protection must check **both**:
+
+1. Valid secure-auth session (user is authenticated)
+2. Session user email matches `ADMIN_EMAIL` (user is authorized)
+
+Implement via `requireAdminSession()` in `src/lib/auth/session.ts` (see [ARCHITECTURE.md](./ARCHITECTURE.md)).
+
+### Endpoint authorization rules
+
+| Route pattern | Auth required | Authorization |
+|---------------|---------------|---------------|
+| Public pages (`/`, `/blog/*`, `/search`, etc.) | No | None |
+| `/admin/*` | Yes (secure-auth session) | `ADMIN_EMAIL` match |
+| `/api/admin/*` | Yes (secure-auth session) | `ADMIN_EMAIL` match |
+| `/admin/posts/[id]/preview` | Yes | `ADMIN_EMAIL` match **or** valid secure preview token (future) |
+| `/api/cron/*` | No user session | `CRON_SECRET` header/param |
+| `/api/analytics/view` | No user session | Public; rate-limited and validated |
+
+### Future: multi-author RBAC
+
+If multiple authors or editors are needed post-MVP:
+
+- Implement PostForge-owned RBAC via a separate table such as `blog_user_roles` or `admin_members`
+- Reference package `users.id` as FK — do **not** modify the secure-auth `users` table
+- Do **not** create a new `users` table
+- `ADMIN_EMAIL` remains a bootstrap fallback or is superseded by role checks
+
+---
 
 ### Pages and flows
 
@@ -445,9 +490,10 @@ Posts with `status = scheduled` AND `scheduledAt <= now()` are published by a cr
 
 ### Endpoint security
 
-- Protected by `CRON_SECRET` header or query param
+- Protected by `CRON_SECRET` header or query param — **not** user session
 - Reject requests without valid secret
 - Rate-limit or IP-allowlist if exposed publicly
+- No `ADMIN_EMAIL` or secure-auth session required
 
 ### Job behavior
 
@@ -491,6 +537,12 @@ Posts with `status = scheduled` AND `scheduledAt <= now()` are published by a cr
 - Referrer (when `Referer` header present)
 - Device type (coarse: mobile/desktop/tablet from UA)
 - Country (optional, from edge header if available — e.g. Vercel `x-vercel-ip-country`)
+
+### Ingestion
+
+- `POST /api/analytics/view` — record view (public, no user session)
+- Must be **rate-limited** and **validated** (valid `postId`, published post only)
+- Capture: postId, referrer, deviceType, countryCode (optional)
 
 ### Privacy
 
@@ -633,6 +685,10 @@ See [ROADMAP.md](./ROADMAP.md) and [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLA
 ### Security tests
 
 - Unauthenticated access to `/admin/*` → redirect to login
+- Authenticated user with non-`ADMIN_EMAIL` → 403 on `/admin/*` and `/api/admin/*`
+- Authenticated `ADMIN_EMAIL` user → admin access granted
+- Cron endpoint rejects requests without valid `CRON_SECRET`
+- Analytics endpoint rate-limited; rejects invalid `postId` or unpublished posts
 - Upload: reject oversize, wrong MIME, path traversal filenames
 - Markdown: XSS payloads sanitized
 - Invalid slug input rejected
@@ -642,7 +698,8 @@ See [ROADMAP.md](./ROADMAP.md) and [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLA
 
 ## 20. Acceptance criteria (production-ready MVP)
 
-- [ ] Admin can log in using secure-auth
+- [ ] Admin can log in using secure-auth with `ADMIN_EMAIL` account
+- [ ] Non-admin authenticated users cannot access `/admin` (403)
 - [ ] Admin can create a post project
 - [ ] Admin can write Markdown content
 - [ ] Admin can upload images for a post
@@ -670,6 +727,7 @@ See [ROADMAP.md](./ROADMAP.md) and [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLA
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | Accidental auth reimplementation | High — security debt | Enforce boundary in code review; only use `secureAuth` APIs |
+| Unauthorized admin access | High | `ADMIN_EMAIL` check on all `/admin` and `/api/admin/*` routes |
 | XSS via Markdown | High | Mandatory sanitization; no MDX; no raw HTML |
 | Draft leakage | High | Central `publishedOnly` query filter; integration tests |
 | Local storage on serverless | High — data loss | Document deployment matrix; env flag for storage provider |
@@ -684,7 +742,7 @@ See [ROADMAP.md](./ROADMAP.md) and [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLA
 
 | # | Question | Default if unresolved |
 |---|----------|----------------------|
-| 1 | Single admin vs role-based access? | Single admin (any authenticated user) for MVP |
+| 1 | ~~Single admin vs role-based access?~~ | **Resolved:** `ADMIN_EMAIL` for MVP; PostForge-owned RBAC table post-MVP |
 | 2 | `blog_audit_logs` vs secure-auth `audit_events`? | Start with secure-auth audit; add blog audit only if gaps found |
 | 3 | Asset storage path on VPS? | `{STORAGE_ROOT}/posts/{postId}/{filename}` |
 | 4 | Max upload size? | 5 MB images, configurable via env |
@@ -694,6 +752,7 @@ See [ROADMAP.md](./ROADMAP.md) and [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLA
 | 8 | Pagination size? | 12 posts per page |
 | 9 | Default OG image? | Site-wide fallback in `blog_settings` |
 | 10 | GitHub Pages base URL pattern? | Configurable in import wizard |
+| 11 | Secure preview token format? | Defer; MVP preview requires `ADMIN_EMAIL` session |
 
 ---
 

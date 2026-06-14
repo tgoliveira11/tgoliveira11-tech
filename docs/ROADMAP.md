@@ -33,7 +33,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 1.2 | Migrations | `drizzle/0001_*.sql` applied; auth tables untouched |
 | 1.3 | Core services | Post CRUD, publish/unpublish/schedule, slug utils, reading time |
 | 1.4 | Markdown pipeline | Sanitized render → `contentHtmlCache` |
-| 1.5 | Session helper | `requireAdminSession()` wrapping secure-auth |
+| 1.5 | Admin authorization | `requireAdminSession()` — secure-auth session + `ADMIN_EMAIL` check |
 | 1.6 | Unit tests | Slug, validation, publish rules |
 
 **Exit gate:** Integration test can create, update, and publish a post via service layer.
@@ -63,11 +63,11 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ## M3 — Admin publishing
 
-**Target:** Full content management for authenticated admins.
+**Target:** Full content management for the configured admin (`ADMIN_EMAIL`).
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 3.1 | Admin shell | Layout, nav, auth guard |
+| 3.1 | Admin shell | Layout, nav, session + `ADMIN_EMAIL` guard |
 | 3.2 | Post list | Filters, search, status badges |
 | 3.3 | Post project | Create, edit, autosave, revisions |
 | 3.4 | Editor | Markdown textarea, live preview |
@@ -75,7 +75,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 3.6 | Feature/pin | Toggle featured and pinned posts |
 | 3.7 | Scheduler | Cron endpoint for scheduled posts |
 
-**Exit gate:** E2E flow — login → create → write → publish → visible publicly → unpublish → hidden.
+**Exit gate:** E2E flow — login as `ADMIN_EMAIL` → create → write → publish → visible publicly → unpublish → hidden. Non-admin authenticated user receives 403.
 
 **Depends on:** M1, M2 (for public verification)
 
@@ -192,7 +192,7 @@ Everything in M1–M7 above.
 | Auth reimplementation | Owned by secure-auth |
 | PostForge `users` table | Use package `users` |
 | MDX support | MVP uses Markdown only |
-| Multi-tenant / multi-author RBAC | Single admin for MVP |
+| Multi-tenant / multi-author RBAC | Deferred; MVP uses `ADMIN_EMAIL`; future `blog_user_roles` table |
 | Comments | Not in product vision |
 | External search engines | PostgreSQL FTS sufficient for MVP |
 | Real-time collaboration | Not required |
@@ -204,6 +204,7 @@ Everything in M1–M7 above.
 | Risk | Phase | Mitigation |
 |------|-------|------------|
 | Scope creep into auth | All | Review against boundary doc before each PR |
+| Unauthorized admin access | M3 | `ADMIN_EMAIL` check on all admin routes |
 | Draft leakage | M2, M3 | `publishedOnly` filter + tests |
 | XSS | M1, M2 | Mandatory sanitization |
 | Storage on serverless | M4 | Env-driven provider selection |
@@ -221,6 +222,8 @@ Everything in M1–M7 above.
 | 2026-06 | Markdown only (no MDX) | Simpler, safer MVP |
 | 2026-06 | PostgreSQL FTS for search | No extra infrastructure for MVP |
 | 2026-06 | LocalStorageProvider first | Matches local Docker dev; VPS v1 |
+| 2026-06 | Admin authorization via `ADMIN_EMAIL` | Auth from secure-auth; authorization is PostForge-owned; single admin for MVP |
+| 2026-06 | Future RBAC via `blog_user_roles` | Do not modify secure-auth `users` table |
 | 2026-06 | Post Project = workspace, not table | One `posts` row; related assets/revisions |
 
 ---
@@ -231,7 +234,7 @@ Track unresolved decisions. Default action if not decided before implementation:
 
 | # | Question | Default | Blocking phase |
 |---|----------|---------|----------------|
-| 1 | Single admin or RBAC? | Any authenticated user = admin | M3 |
+| 1 | ~~Single admin or RBAC?~~ | **Resolved:** `ADMIN_EMAIL` for MVP | — |
 | 2 | `blog_audit_logs` needed? | Defer; use secure-auth audit first | M7 |
 | 3 | Autosave revision throttle? | Max 1 revision per 5 minutes | M3 |
 | 4 | Image max size? | 5 MB | M4 |

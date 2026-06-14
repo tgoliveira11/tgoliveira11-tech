@@ -218,7 +218,7 @@ modules/{domain}/
 
 ```
 POST /api/admin/posts/[id]/publish
-  → route.ts: verify session (secure-auth)
+  → route.ts: requireAdminSession() — session + ADMIN_EMAIL
   → posts/service.publishPost(id, session.user.id)
     → validation: post exists, status allows publish
     → markdown/render: update contentHtmlCache
@@ -240,25 +240,55 @@ POST /api/admin/posts/[id]/publish
 export const secureAuth = createSecureAuth({ db, ... });
 ```
 
+### Authentication vs authorization
+
+| Layer | Owner | Mechanism |
+|-------|-------|-----------|
+| Authentication | `@tgoliveira/secure-auth` | Login, sessions, `users` identity |
+| Authorization | PostForge | `ADMIN_EMAIL` env check for admin routes |
+
+Authentication proves who the user is. Authorization decides whether that user may access PostForge admin features. These are separate concerns — do not conflate them.
+
 ### Admin route protection
 
-Create a thin session helper — **not** custom auth logic:
+Create a thin session helper — **authentication** from secure-auth, **authorization** from PostForge:
 
 ```typescript
 // src/lib/auth/session.ts (to implement)
 import { getServerSession } from "next-auth";
+import { redirect, forbidden } from "next/navigation";
 import { secureAuth } from "./secure-auth";
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
 export async function requireAdminSession() {
   const session = await getServerSession(secureAuth.getAuthOptions());
+
   if (!session?.user?.id) {
     redirect("/login?callbackUrl=/admin");
   }
+
+  const email = session.user.email?.trim().toLowerCase();
+  if (!ADMIN_EMAIL || !email || email !== ADMIN_EMAIL) {
+    forbidden(); // 403 — authenticated but not authorized
+  }
+
   return session;
 }
 ```
 
-Use in `admin/layout.tsx` or per-page. MVP: any authenticated user is an admin.
+Use in `admin/layout.tsx`, all `/api/admin/*` route handlers, and preview routes (MVP).
+
+**MVP rule:** A user may be authenticated but still not authorized. Only the configured `ADMIN_EMAIL` may access admin features.
+
+### Future RBAC
+
+If multiple authors/editors are needed:
+
+- Add PostForge-owned table: `blog_user_roles` or `admin_members`
+- FK to package `users.id` — do **not** modify secure-auth `users` table
+- Do **not** create a new `users` table
+- `requireAdminSession()` evolves to check role membership instead of (or in addition to) `ADMIN_EMAIL`
 
 ### User ID for ownership
 
@@ -276,6 +306,19 @@ import { users } from "@/db/schema"; // package-owned
 - Password reset flow (exists)
 - Passkey/2FA setup (exists at `/settings/security`)
 - Custom `users` table or user registration API
+
+---
+
+## Endpoint authorization matrix
+
+| Route pattern | Session | Authorization |
+|---------------|---------|---------------|
+| Public pages | Not required | None |
+| `/admin/*` | secure-auth session | `ADMIN_EMAIL` match |
+| `/api/admin/*` | secure-auth session | `ADMIN_EMAIL` match |
+| Preview routes (`/admin/posts/[id]/preview`) | secure-auth session | `ADMIN_EMAIL` match or secure preview token (future) |
+| `/api/cron/*` | Not required | `CRON_SECRET` |
+| `/api/analytics/view` | Not required | Public; rate-limited + validated |
 
 ---
 
@@ -374,6 +417,7 @@ Prefer middleware for performance on high-traffic paths.
 
 | Variable | Purpose | Default |
 |----------|---------|---------|
+| `ADMIN_EMAIL` | Email allowed to access `/admin` and `/api/admin/*` | **required** in prod |
 | `STORAGE_PROVIDER` | `local` \| `s3` \| `r2` | `local` |
 | `STORAGE_LOCAL_ROOT` | Local upload directory | `./storage` |
 | `STORAGE_MAX_UPLOAD_BYTES` | Max file size | `5242880` (5 MB) |
@@ -389,7 +433,12 @@ Auth env vars remain in `.env.example` (already documented). Blog vars will be a
 
 | Concern | Approach |
 |---------|----------|
-| Admin access | secure-auth session required |
+| Authentication | secure-auth session via `secureAuth` |
+| Admin authorization | `ADMIN_EMAIL` match after session check |
+| Public pages | No authentication required |
+| Preview routes | `ADMIN_EMAIL` session or secure preview token (future) |
+| Cron endpoints | `CRON_SECRET` — no user session |
+| Analytics ingestion | Public; rate-limited; validate `postId` and published status |
 | Public data | `publishedOnly` filter on all queries |
 | XSS | rehype-sanitize on Markdown HTML |
 | File uploads | MIME + extension + size validation; safe filenames |
