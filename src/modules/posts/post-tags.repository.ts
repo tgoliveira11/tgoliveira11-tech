@@ -1,5 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { postTags } from "./posts.schema";
 import { tags } from "@/modules/tags/tags.schema";
 import type { Tag } from "@/modules/tags/tags.types";

@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { assets } from "./assets.schema";
 import type { Asset, CreateAssetMetadataInput, NewAsset } from "./assets.types";
 

@@ -1,5 +1,5 @@
 import { asc, eq } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { tags } from "./tags.schema";
 import type { NewTag, Tag } from "./tags.types";
 

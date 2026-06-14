@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { blogSettings } from "@/modules/settings/blog-settings.schema";
 import { readEnv } from "@/lib/env";
 

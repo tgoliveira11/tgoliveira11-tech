@@ -1,5 +1,5 @@
 import { and, desc, eq, ilike, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
 import { postRevisions, posts } from "./posts.schema";

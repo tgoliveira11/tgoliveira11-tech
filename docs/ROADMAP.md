@@ -4,19 +4,21 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## Current milestone: M5 — Analytics complete ✅
+## Current milestone: M6 — GitHub Pages migration complete ✅
 
 **Status:** Done
 
 | Deliverable | State |
 |-------------|-------|
-| Write-time daily aggregation into `post_daily_stats` | ✅ |
-| Public `POST /api/analytics/post-view` (validated, rate-limited) | ✅ |
-| Admin `/admin/analytics` dashboard | ✅ |
-| Per-post `/admin/analytics/posts/[id]` reports | ✅ |
-| Privacy-friendly aggregates (no raw IP in UI or schema) | ✅ |
+| CLI importer (`npm run import:github-pages`) | ✅ |
+| Dry-run + import modes | ✅ |
+| Frontmatter parsing (gray-matter) | ✅ |
+| Local image copy + Markdown rewrite | ✅ |
+| Redirect planning/creation | ✅ |
+| Import JSON reports | ✅ |
+| Admin `/admin/import` guidance page | ✅ |
 
-**Next:** Begin M6 — GitHub Pages migration.
+**Next:** Begin M7 — Hardening.
 
 ---
 
@@ -131,20 +133,22 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## M6 — GitHub Pages migration
+## M6 — GitHub Pages migration ✅
 
-**Target:** Import existing static blog content.
+**Status:** Done
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 6.1 | Import parser | Frontmatter, slug, date, tags |
-| 6.2 | Image mapping | Detect, copy, report broken refs |
-| 6.3 | Redirect creation | URL continuity |
-| 6.4 | Import UI | Dry-run + commit + report |
+| 6.1 | Import parser | `gray-matter`, slug/permalink/date/tags |
+| 6.2 | Image mapping | Local copy + Markdown rewrite; remote preserved |
+| 6.3 | Redirect creation | 301 from legacy paths to `/blog/[slug]` |
+| 6.4 | Import tooling | CLI dry-run/import + `/admin/import` guidance |
 
-**Exit gate:** Sample GitHub Pages export imports with report; redirects work.
+**Exit gate:** Legacy Markdown folder imports as drafts with JSON report; redirects planned/created. ✅
 
-**Depends on:** M1, M4 (for images)
+**Depends on:** M1, M4 (images)
+
+**See:** [GITHUB_PAGES_MIGRATION.md](./GITHUB_PAGES_MIGRATION.md)
 
 ---
 
@@ -176,8 +180,8 @@ M2 Public blog    ████████████████████  
 M3 Admin          ████████████████████  DONE
 M4 Images         ████████████████████  DONE
 M5 Analytics      ████████████████████  DONE
-M6 Migration      ░░░░░░░░░░░░░░░░░░░░  NEXT
-M7 Hardening      ░░░░░░░░░░░░░░░░░░░░
+M6 Migration      ████████████████████  DONE
+M7 Hardening      ░░░░░░░░░░░░░░░░░░░░  NEXT
 ```
 
 No calendar dates assigned — phases are sequential with some parallelism possible between M2 and M3 after M1 completes.
@@ -261,7 +265,7 @@ Track unresolved decisions. Default action if not decided before implementation:
 
 ## Recommended next step
 
-**Start M6 — GitHub Pages migration.**
+**Start M7 — Production hardening.**
 
 First concrete tasks:
 

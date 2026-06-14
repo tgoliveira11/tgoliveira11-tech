@@ -1,5 +1,5 @@
 import { asc, eq } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { categories } from "./categories.schema";
 import type { Category, NewCategory } from "./categories.types";
 

@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gt, lt, sql } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
 import { assets } from "@/modules/assets/assets.schema";

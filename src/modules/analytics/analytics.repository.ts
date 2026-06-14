@@ -1,5 +1,5 @@
 import { and, desc, eq, gte, sql } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { posts } from "@/modules/posts/posts.schema";
 import { analyticsEvents, postDailyStats } from "./analytics.schema";
 import type { NewAnalyticsEvent, PostDailyStat, TrackPostViewInput } from "./analytics.types";

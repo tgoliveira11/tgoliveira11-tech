@@ -1,5 +1,5 @@
 import { asc, eq } from "drizzle-orm";
-import { db } from "@/db/client";
+import { db } from "@/db/get-db";
 import { redirects } from "./redirects.schema";
 import type { NewRedirect, Redirect } from "./redirects.types";
 

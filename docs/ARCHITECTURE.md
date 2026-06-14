@@ -166,6 +166,11 @@ src/
 │   │   ├── analytics.helpers.ts      # UTC ranges, referrer normalization
 │   │   ├── analytics.query-helpers.ts
 │   │   └── rate-limit.ts             # in-memory hashed client key (MVP)
+│   ├── import/                      # M6 GitHub Pages migration
+│   │   ├── github-pages-importer.ts
+│   │   ├── github-pages-parser.ts
+│   │   ├── github-pages-images.ts
+│   │   └── github-pages-report.ts
 │   ├── redirects/
 │   │   └── ...
 │   ├── markdown/
@@ -330,6 +335,7 @@ import { users } from "@/db/schema"; // package-owned
 | `/api/analytics/post-view` | Not required | Public; rate-limited + validated (published posts only) |
 | `/admin/analytics` | secure-auth session | `ADMIN_EMAIL` match |
 | `/admin/analytics/posts/[id]` | secure-auth session | `ADMIN_EMAIL` match |
+| `/admin/import` | secure-auth session | `ADMIN_EMAIL` match |
 
 ---
 

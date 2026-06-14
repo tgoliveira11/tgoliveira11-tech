@@ -28,7 +28,7 @@ const {
   };
 });
 
-vi.mock("@/db/client", () => ({
+vi.mock("@/db/get-db", () => ({
   db: {
     insert: insertMock,
     select: selectMock,
