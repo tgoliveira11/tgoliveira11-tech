@@ -1,0 +1,1 @@
+export * from "@tgoliveira/secure-auth/drizzle/schema";
