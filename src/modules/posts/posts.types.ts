@@ -13,8 +13,15 @@ export type AdminPostListFilters = {
   featured?: boolean;
   pinned?: boolean;
   search?: string;
+  sort?: "updatedAt" | "publishedAt";
   limit?: number;
   offset?: number;
+};
+
+export type AdminPostBundle = {
+  post: Post;
+  category: import("@/modules/categories/categories.types").Category | null;
+  tagIds: string[];
 };
 
 export type PublishedPostListOptions = {

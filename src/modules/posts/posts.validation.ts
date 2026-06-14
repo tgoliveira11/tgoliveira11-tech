@@ -32,6 +32,9 @@ export const updatePostSchema = z.object({
   canonicalUrl: z.string().max(500).nullable().optional(),
   ogTitle: z.string().max(300).nullable().optional(),
   ogDescription: z.string().max(500).nullable().optional(),
+  featured: z.boolean().optional(),
+  pinned: z.boolean().optional(),
+  pinnedPriority: z.number().int().min(0).max(1000).optional(),
   createRevision: z.boolean().optional(),
 });
 

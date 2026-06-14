@@ -74,19 +74,17 @@ src/
 │   │   ├── sitemap.xml/route.ts
 │   │   └── robots.txt/route.ts
 │   │
-│   ├── admin/                       # Protected — requires session
-│   │   ├── layout.tsx               # Admin shell + auth guard
+│   ├── admin/                       # Protected — ADMIN_EMAIL session
+│   │   ├── layout.tsx               # Admin shell + requireAdminSession()
+│   │   ├── forbidden.tsx            # 403 for non-admin users
 │   │   ├── page.tsx                 # Dashboard
-│   │   ├── posts/
-│   │   │   ├── page.tsx             # Post list
-│   │   │   ├── new/page.tsx
-│   │   │   └── [id]/
-│   │   │       ├── page.tsx         # Post project workspace
-│   │   │       ├── preview/page.tsx
-│   │   │       └── revisions/page.tsx
-│   │   ├── settings/page.tsx
-│   │   ├── analytics/page.tsx
-│   │   └── import/page.tsx
+│   │   └── posts/
+│   │       ├── page.tsx             # Post list + filters
+│   │       ├── new/page.tsx
+│   │       └── [id]/
+│   │           ├── page.tsx         # Redirect → edit
+│   │           ├── edit/page.tsx
+│   │           └── preview/page.tsx
 │   │
 │   ├── api/
 │   │   ├── auth/                    # EXISTS — secure-auth wrappers
@@ -217,17 +215,18 @@ modules/{domain}/
 ### Example flow: publish post
 
 ```
-POST /api/admin/posts/[id]/publish
-  → route.ts: requireAdminSession() — session + ADMIN_EMAIL
+PostEditorForm → publishPostAction(postId)
+  → admin-posts.actions.ts: requireAdminSession() — session + ADMIN_EMAIL
   → posts/service.publishPost(id, session.user.id)
-    → validation: post exists, status allows publish
+    → validation: post exists, publishable title/slug/content
     → markdown/render: update contentHtmlCache
     → posts/repository.update(status, publishedAt)
     → post_revisions/repository.create(snapshot)
-    → revalidation: revalidatePath('/'), revalidatePath('/blog/[slug]')
-    → audit: log event
-  → route.ts: return updated post
+    → revalidatePublicPaths(slug)
+  → client router.refresh()
 ```
+
+Admin mutations use **Server Actions** (`src/modules/posts/admin-posts.actions.ts`), not `/api/admin/*` route handlers. REST admin API can be added later if needed for external clients.
 
 ---
 

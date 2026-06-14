@@ -4,20 +4,22 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## Current milestone: M2 — Public blog complete ✅
+## Current milestone: M3 — Admin publishing complete ✅
 
 **Status:** Done
 
 | Deliverable | State |
 |-------------|-------|
-| Public routes (home, blog, tags, categories, search) | ✅ |
-| SEO (metadata, OG, Twitter, JSON-LD) | ✅ |
-| RSS, sitemap, robots.txt | ✅ |
-| Post view analytics endpoint | ✅ |
-| Published-only visibility enforced | ✅ |
-| Redirect check on `/blog/[slug]` | ✅ (partial — see M6) |
+| Protected admin shell (`/admin`) | ✅ |
+| Dashboard with post counts | ✅ |
+| Post list with filters | ✅ |
+| Draft create/edit + Markdown preview | ✅ |
+| Publish/unpublish/schedule/archive/duplicate | ✅ |
+| Featured/pin controls | ✅ |
+| Category/tag assignment | ✅ |
+| Server Actions + revalidation | ✅ |
 
-**Next:** Begin M3 — Admin publishing.
+**Next:** Begin M4 — Images and assets.
 
 ---
 
@@ -75,23 +77,23 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## M3 — Admin publishing
+## M3 — Admin publishing ✅
 
-**Target:** Full content management for the configured admin (`ADMIN_EMAIL`).
+**Status:** Done
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 3.1 | Admin shell | Layout, nav, session + `ADMIN_EMAIL` guard |
-| 3.2 | Post list | Filters, search, status badges |
-| 3.3 | Post project | Create, edit, autosave, revisions |
-| 3.4 | Editor | Markdown textarea, live preview |
+| 3.1 | Admin shell | Layout, nav, session + `ADMIN_EMAIL` guard, 403 page |
+| 3.2 | Post list | Filters, search, status badges, lifecycle actions |
+| 3.3 | Post editor | Create, edit, manual save, category/tag assignment |
+| 3.4 | Preview | Admin-only sanitized Markdown preview |
 | 3.5 | Lifecycle | Publish, unpublish, schedule, archive, duplicate |
 | 3.6 | Feature/pin | Toggle featured and pinned posts |
-| 3.7 | Scheduler | Cron endpoint for scheduled posts |
+| 3.7 | Mutations | Server Actions with `requireAdminSession()` |
 
-**Exit gate:** E2E flow — login as `ADMIN_EMAIL` → create → write → publish → visible publicly → unpublish → hidden. Non-admin authenticated user receives 403.
+**Exit gate:** Login as `ADMIN_EMAIL` → create → publish → visible publicly → unpublish → hidden. ✅
 
-**Depends on:** M1, M2 (for public verification)
+**Deferred:** Autosave, revisions UI, scheduler cron, admin tag filter, `/api/admin/*` REST routes.
 
 ---
 
@@ -172,8 +174,8 @@ High-level milestone roadmap for building PostForge from the current auth founda
 M0 Foundation     ████████████████████  DONE
 M1 Domain         ████████████████████  DONE
 M2 Public blog    ████████████████████  DONE
-M3 Admin          ░░░░░░░░░░░░░░░░░░░░  NEXT
-M4 Images         ░░░░░░░░░░░░░░░░░░░░
+M3 Admin          ████████████████████  DONE
+M4 Images         ░░░░░░░░░░░░░░░░░░░░  NEXT
 M5 Analytics      ░░░░░░░░░░░░░░░░░░░░
 M6 Migration      ░░░░░░░░░░░░░░░░░░░░
 M7 Hardening      ░░░░░░░░░░░░░░░░░░░░
@@ -260,17 +262,17 @@ Track unresolved decisions. Default action if not decided before implementation:
 
 ## Recommended next step
 
-**Start M3 — Admin publishing.**
+**Start M4 — Images and assets.**
 
 First concrete tasks:
 
-1. Create `src/app/admin/layout.tsx` with `requireAdminSession()` guard
-2. Build `/admin` dashboard with post counts by status
-3. Implement `/admin/posts` list with filters
-4. Add `/admin/posts/new` and `/admin/posts/[id]` editor workspace
-5. Wire lifecycle API routes (`publish`, `unpublish`, `schedule`, etc.)
+1. Implement `StorageProvider` + `LocalStorageProvider`
+2. Add `POST /api/admin/posts/[id]/assets` upload endpoint
+3. Build admin image library UI per post
+4. Wire cover/OG asset selection in post editor
+5. Enable Markdown image insert (URL copy) in editor
 
-Public blog is live; use M2 routes to verify publish/unpublish flows during M3.
+Admin publishing is complete; use `/admin` to create content while building M4 upload UX.
 
 ---
 

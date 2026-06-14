@@ -1,8 +1,7 @@
 import "server-only";
 
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { ForbiddenError } from "@/lib/errors";
+import { forbidden, redirect } from "next/navigation";
 import { secureAuth } from "@/lib/auth/secure-auth";
 import { isAdminEmail } from "./is-admin-email";
 
@@ -23,8 +22,14 @@ export async function requireAdminSession() {
   }
 
   if (!isAdminEmail(user.email)) {
-    throw new ForbiddenError("Admin access required");
+    forbidden();
   }
 
-  return { ...session, user };
+  return {
+    ...session,
+    user: {
+      id: user.id,
+      email: user.email ?? null,
+    },
+  };
 }

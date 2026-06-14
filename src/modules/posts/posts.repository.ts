@@ -1,7 +1,9 @@
-import { and, desc, eq, ilike, isNotNull, lte, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { categories } from "@/modules/categories/categories.schema";
+import type { Category } from "@/modules/categories/categories.types";
 import { postRevisions, posts } from "./posts.schema";
-import type { AdminPostListFilters, PublishedPostListOptions } from "./posts.types";
+import type { AdminPostListFilters, PostStatus, PublishedPostListOptions } from "./posts.types";
 import type { NewPost, Post, PostRevision, RevisionType } from "./posts.types";
 
 export function publishedPostFilter(now = new Date()) {
@@ -75,19 +77,68 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
   if (filters.search) {
     const term = `%${filters.search}%`;
     conditions.push(
-      or(ilike(posts.title, term), ilike(posts.excerpt, term), ilike(posts.slug, term))!
+      or(
+        ilike(posts.title, term),
+        ilike(posts.excerpt, term),
+        ilike(posts.slug, term),
+        ilike(posts.contentMarkdown, term)
+      )!
     );
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  const orderBy =
+    filters.sort === "publishedAt"
+      ? [desc(posts.publishedAt), desc(posts.updatedAt)]
+      : [desc(posts.updatedAt)];
 
   return db
     .select()
     .from(posts)
     .where(whereClause)
-    .orderBy(desc(posts.updatedAt))
+    .orderBy(...orderBy)
     .limit(filters.limit ?? 50)
     .offset(filters.offset ?? 0);
+}
+
+export async function countPostsByStatus(): Promise<Record<PostStatus, number>> {
+  const rows = await db
+    .select({
+      status: posts.status,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(posts)
+    .groupBy(posts.status);
+
+  const counts: Record<PostStatus, number> = {
+    draft: 0,
+    scheduled: 0,
+    published: 0,
+    unpublished: 0,
+    archived: 0,
+  };
+
+  for (const row of rows) {
+    counts[row.status] = Number(row.count);
+  }
+
+  return counts;
+}
+
+export async function countAllPosts(): Promise<number> {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(posts);
+  return Number(row?.count ?? 0);
+}
+
+export async function findCategoryById(id: string): Promise<Category | undefined> {
+  const [row] = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+  return row;
+}
+
+export async function listCategoriesByIds(ids: string[]): Promise<Category[]> {
+  if (ids.length === 0) return [];
+  const unique = [...new Set(ids)];
+  return db.select().from(categories).where(inArray(categories.id, unique));
 }
 
 export async function listPublishedPosts(

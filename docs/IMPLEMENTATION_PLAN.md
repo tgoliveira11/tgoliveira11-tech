@@ -186,67 +186,94 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 ## Phase 3 — Admin publishing
 
+**Status:** ✅ Implemented
+
 **Goal:** Authorized admin (`ADMIN_EMAIL`) can manage posts end-to-end.
+
+### Implementation notes (M3)
+
+- Admin UI under `src/app/admin/` protected by `requireAdminSession()` in layout.
+- Non-admin authenticated users receive Next.js `forbidden()` → `src/app/admin/forbidden.tsx`.
+- Mutations use **Server Actions** in `src/modules/posts/admin-posts.actions.ts` (not `/api/admin/*` route handlers).
+- Tag assignment wired via `post-tags.repository.ts` + `tagIds` on create/update.
+- Dashboard stats via `getDashboardStats()` in `posts.service.ts`.
+- Public path revalidation via `revalidatePublicPaths()` after publish/unpublish/archive.
+- Manual **Save draft** only — autosave deferred.
+- Revisions page/history UI deferred (revisions still created on manual save, publish, unpublish).
+- Scheduler cron deferred to M3.6 follow-up (schedule UI sets status; auto-publish not wired).
+- Admin list tag filter deferred; category + search + status filters implemented.
+- Markdown editor: textarea + live sanitized preview (no toolbar, no image upload — M4).
+
+### Manual smoke flow
+
+1. Login as `ADMIN_EMAIL`
+2. Open `/admin`
+3. Create draft (New Post)
+4. Edit title/slug/content, assign category/tags, save
+5. Preview at `/admin/posts/[id]/preview`
+6. Publish
+7. Open `/blog/[slug]` — post visible
+8. Unpublish
+9. Confirm `/blog/[slug]` returns 404
 
 ### 3.1 Admin shell
 
-- [ ] `src/app/admin/layout.tsx` — auth guard via `requireAdminSession()` (session + `ADMIN_EMAIL`)
-- [ ] Return 403 for authenticated non-admin users
-- [ ] Admin navigation component
-- [ ] `/admin` dashboard — post counts by status, recent activity
+- [x] `src/app/admin/layout.tsx` — auth guard via `requireAdminSession()`
+- [x] Return 403 for authenticated non-admin users (`forbidden()` + `forbidden.tsx`)
+- [x] Admin navigation component
+- [x] `/admin` dashboard — post counts by status, recent activity
 
 ### 3.2 Post management
 
-- [ ] `/admin/posts` — list with filters (status, tag, category, search)
-- [ ] `/admin/posts/new` — create post project
-- [ ] `/admin/posts/[id]` — edit workspace
-- [ ] `/admin/posts/[id]/preview` — rendered preview
-- [ ] `/admin/posts/[id]/revisions` — history + restore
+- [x] `/admin/posts` — list with filters (status, category, search, sort)
+- [x] `/admin/posts/new` — create post project
+- [x] `/admin/posts/[id]/edit` — edit workspace
+- [x] `/admin/posts/[id]/preview` — rendered preview
+- [ ] `/admin/posts/[id]/revisions` — deferred (revisions stored; UI later)
 
-### 3.3 API routes
+### 3.3 Mutations (Server Actions)
 
-All `/api/admin/*` routes must call `requireAdminSession()` before handling requests.
+All actions call `requireAdminSession()` before handling requests.
 
-- [ ] `POST /api/admin/posts` — create
-- [ ] `GET/PATCH/DELETE /api/admin/posts/[id]`
-- [ ] `POST /api/admin/posts/[id]/publish`
-- [ ] `POST /api/admin/posts/[id]/unpublish`
-- [ ] `POST /api/admin/posts/[id]/schedule`
-- [ ] `POST /api/admin/posts/[id]/archive`
-- [ ] `POST /api/admin/posts/[id]/duplicate`
-- [ ] `PATCH /api/admin/posts/[id]/feature`
-- [ ] `PATCH /api/admin/posts/[id]/pin`
+- [x] `createDraftAction`
+- [x] `updatePostAction`
+- [x] `publishPostAction`
+- [x] `unpublishPostAction`
+- [x] `schedulePostAction`
+- [x] `archivePostAction`
+- [x] `duplicatePostAction`
+- [x] `markFeaturedAction`
+- [x] `pinPostAction`
+- [x] `previewMarkdownAction`
 
 ### 3.4 Editor (minimal MVP)
 
-- [ ] `markdown-editor.tsx` — textarea with toolbar (bold, italic, link, image, heading)
-- [ ] `markdown-preview.tsx` — live preview using same render pipeline
-- [ ] Autosave — debounced PATCH every 30s
-- [ ] Revision created on autosave (throttled)
+- [x] `markdown-editor.tsx` — textarea-based editor
+- [x] `markdown-preview.tsx` — live preview using same render pipeline
+- [ ] Autosave — deferred; manual Save draft with `createRevision: true`
+- [ ] Editor toolbar — deferred
 
 ### 3.5 Lifecycle UI
 
-- [ ] Status badges and action buttons (publish, unpublish, schedule, archive)
-- [ ] Schedule datetime picker
-- [ ] Featured/pin toggles
-- [ ] Category and tag selectors
+- [x] Status badges and action buttons (publish, unpublish, schedule, archive, duplicate)
+- [x] Schedule datetime picker
+- [x] Featured/pin toggles
+- [x] Category and tag selectors
 
 ### 3.6 Scheduler
 
-- [ ] `scheduler/publish-scheduled.ts` — service function
-- [ ] `GET /api/cron/publish-scheduled` — protected by `CRON_SECRET`
-- [ ] Idempotent batch publish
-- [ ] Log failures; revalidate on success
+- [ ] `scheduler/publish-scheduled.ts` — deferred
+- [ ] `GET /api/cron/publish-scheduled` — deferred
+- [x] Schedule UI sets `status = scheduled` with future `scheduledAt`
 
 ### 3.7 Tests (Phase 3)
 
-- [ ] Integration: schedule → cron → published
-- [ ] E2E: login as `ADMIN_EMAIL` → create → publish → view public → unpublish
-- [ ] Security: unauthenticated `/admin` redirects to login
-- [ ] Security: authenticated non-`ADMIN_EMAIL` user gets 403 on `/admin` and `/api/admin/*`
-- [ ] Security: cron endpoint requires `CRON_SECRET`, not user session
+- [x] Unit: admin validation, lifecycle visibility, pin schema, authorization email helper
+- [ ] Integration: schedule → cron → published — deferred
+- [ ] E2E: full admin flow — deferred (manual smoke documented above)
+- [ ] Security: route integration tests — deferred
 
-**Phase 3 exit criteria:** Full publish lifecycle works through admin UI.
+**Phase 3 exit criteria:** Full publish lifecycle works through admin UI. ✅
 
 ---
 

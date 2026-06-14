@@ -2,9 +2,11 @@ import { NotFoundError, ValidationError } from "@/lib/errors";
 import { renderMarkdownToHtml } from "@/modules/markdown/markdown-renderer";
 import * as redirectsService from "@/modules/redirects/redirects.service";
 import { calculateReadingTimeMinutes } from "./reading-time";
+import * as postTagsRepo from "./post-tags.repository";
 import * as repo from "./posts.repository";
 import { isValidSlug, normalizeSlug, publicPostPath, slugFromTitle } from "./slug";
 import type {
+  AdminPostBundle,
   AdminPostListFilters,
   Post,
   PublishedPostListOptions,
@@ -13,6 +15,7 @@ import {
   assertPublishablePost,
   assertScheduleDate,
   createPostSchema,
+  pinPostSchema,
   publishPostSchema,
   schedulePostSchema,
   updatePostSchema,
@@ -62,7 +65,7 @@ export async function createDraft(input: CreatePostInput, userId: string): Promi
   const baseSlug = parsed.slug ?? slugFromTitle(title);
   const slug = await ensureUniqueSlug(baseSlug);
 
-  return repo.insertPost({
+  const post = await repo.insertPost({
     title,
     slug,
     excerpt: parsed.excerpt ?? null,
@@ -72,6 +75,12 @@ export async function createDraft(input: CreatePostInput, userId: string): Promi
     createdBy: userId,
     updatedBy: userId,
   });
+
+  if (parsed.tagIds) {
+    await postTagsRepo.syncPostTags(post.id, parsed.tagIds);
+  }
+
+  return post;
 }
 
 export async function updateDraft(
@@ -100,6 +109,10 @@ export async function updateDraft(
   if (parsed.canonicalUrl !== undefined) updates.canonicalUrl = parsed.canonicalUrl;
   if (parsed.ogTitle !== undefined) updates.ogTitle = parsed.ogTitle;
   if (parsed.ogDescription !== undefined) updates.ogDescription = parsed.ogDescription;
+  if (parsed.featured !== undefined) updates.featured = parsed.featured;
+  if (parsed.pinned !== undefined) updates.pinned = parsed.pinned;
+  if (parsed.pinnedPriority !== undefined) updates.pinnedPriority = parsed.pinnedPriority;
+  if (parsed.pinned === false) updates.pinnedPriority = 0;
 
   let nextSlug = existing.slug;
   if (parsed.slug !== undefined) {
@@ -137,6 +150,14 @@ export async function updateDraft(
     });
   }
 
+  if (parsed.tagIds !== undefined) {
+    try {
+      await postTagsRepo.syncPostTags(updated.id, parsed.tagIds);
+    } catch (error) {
+      throw new ValidationError(error instanceof Error ? error.message : "Invalid tags");
+    }
+  }
+
   // Autosave revisions are deferred to Phase 3 editor work.
   return updated;
 }
@@ -167,6 +188,34 @@ export async function getPublishedBySlug(slug: string): Promise<Post> {
 
 export async function listAdminPosts(filters?: AdminPostListFilters): Promise<Post[]> {
   return repo.listAdminPosts(filters);
+}
+
+export async function getAdminPostBundle(id: string): Promise<AdminPostBundle> {
+  const post = await repo.findPostById(id);
+  if (!post) {
+    throw new NotFoundError("Post not found");
+  }
+
+  const [category, tagIds] = await Promise.all([
+    post.categoryId ? repo.findCategoryById(post.categoryId) : Promise.resolve(undefined),
+    postTagsRepo.getTagIdsForPost(post.id),
+  ]);
+
+  return {
+    post,
+    category: category ?? null,
+    tagIds,
+  };
+}
+
+export async function getDashboardStats() {
+  const [counts, total, recent] = await Promise.all([
+    repo.countPostsByStatus(),
+    repo.countAllPosts(),
+    repo.listAdminPosts({ limit: 8 }),
+  ]);
+
+  return { counts, total, recent };
 }
 
 export async function listPublishedPosts(options?: PublishedPostListOptions): Promise<Post[]> {
@@ -316,7 +365,7 @@ export async function duplicatePost(id: string, userId: string): Promise<Post> {
 
   const slug = await ensureUniqueSlug(`${existing.slug}-copy`);
 
-  return repo.insertPost({
+  const post = await repo.insertPost({
     title: `${existing.title} (Copy)`,
     slug,
     excerpt: existing.excerpt,
@@ -336,6 +385,13 @@ export async function duplicatePost(id: string, userId: string): Promise<Post> {
     createdBy: userId,
     updatedBy: userId,
   });
+
+  const tagIds = await postTagsRepo.getTagIdsForPost(existing.id);
+  if (tagIds.length > 0) {
+    await postTagsRepo.syncPostTags(post.id, tagIds);
+  }
+
+  return post;
 }
 
 export async function markFeatured(id: string, userId: string): Promise<Post> {
@@ -351,9 +407,10 @@ export async function unmarkFeatured(id: string, userId: string): Promise<Post> 
 }
 
 export async function pinPost(id: string, userId: string, input: PinPostInput = { pinnedPriority: 0 }): Promise<Post> {
+  const parsed = pinPostSchema.parse(input);
   const updated = await repo.updatePostById(id, {
     pinned: true,
-    pinnedPriority: input.pinnedPriority ?? 0,
+    pinnedPriority: parsed.pinnedPriority,
     updatedBy: userId,
   });
   if (!updated) throw new NotFoundError("Post not found");
