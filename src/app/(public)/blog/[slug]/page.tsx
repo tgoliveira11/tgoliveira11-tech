@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { PublicLayout } from "@/components/public/public-layout";
+import { PostImage } from "@/components/public/post-image";
 import { PostViewTracker } from "@/components/public/post-view-tracker";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { getPostHtmlContent } from "@/modules/public/post-content";
@@ -80,10 +81,13 @@ export default async function BlogPostPage({ params }: PageProps) {
             <p className="text-lg text-[var(--muted)]">{bundle.post.excerpt}</p>
           ) : null}
           {bundle.coverAsset ? (
-            <img
+            <PostImage
               src={bundle.coverAsset.publicUrl}
               alt={bundle.coverAsset.altText ?? bundle.post.title}
+              width={bundle.coverAsset.width}
+              height={bundle.coverAsset.height}
               className="max-h-96 w-full rounded-lg object-cover"
+              priority
             />
           ) : null}
           <div className="flex flex-wrap gap-2 text-sm">

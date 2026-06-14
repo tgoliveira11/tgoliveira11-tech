@@ -1,4 +1,5 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { readUploadLocalDir, readUploadPublicBaseUrl } from "@/lib/env";
 import { assertSafeStorageKey } from "@/modules/assets/assets.validation";
@@ -39,6 +40,11 @@ export class LocalStorageProvider implements StorageProvider {
   async delete(storageKey: string): Promise<void> {
     const filePath = this.resolvePath(storageKey);
     await rm(filePath, { force: true });
+  }
+
+  async read(storageKey: string): Promise<Buffer> {
+    const filePath = this.resolvePath(storageKey);
+    return readFile(filePath);
   }
 
   getPublicUrl(storageKey: string): string {

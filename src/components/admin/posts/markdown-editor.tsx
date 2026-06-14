@@ -1,18 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MarkdownPreview } from "./markdown-preview";
 
 export function MarkdownEditor({
   name,
   defaultValue,
   label = "Content (Markdown)",
+  onRegisterInsert,
 }: {
   name: string;
   defaultValue: string;
   label?: string;
+  onRegisterInsert?: (insert: (markdown: string) => void) => void;
 }) {
   const [value, setValue] = useState(defaultValue);
+
+  useEffect(() => {
+    if (!onRegisterInsert) return;
+    onRegisterInsert((markdown) => {
+      setValue((current) => {
+        const prefix = current.length === 0 || current.endsWith("\n") ? "" : "\n";
+        return `${current}${prefix}${markdown}\n`;
+      });
+    });
+  }, [onRegisterInsert]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">

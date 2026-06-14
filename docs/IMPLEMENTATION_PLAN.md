@@ -279,48 +279,69 @@ All actions call `requireAdminSession()` before handling requests.
 
 ## Phase 4 — Images/assets
 
+**Status:** ✅ Implemented
+
 **Goal:** Admin can upload images per post and insert them into Markdown.
+
+### Implementation notes (M4)
+
+- Storage uses existing `StorageProvider` + `LocalStorageProvider` with env vars `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES` (alias `UPLOAD_MAX_FILE_SIZE`).
+- Upload: `POST /api/admin/posts/[id]/assets` (multipart) → `uploadPostAsset()` in `assets.service.ts`.
+- Serving: `GET /api/assets/[...path]` streams files from local storage with cache headers.
+- Admin UI: `/admin/posts/[id]/assets` + embedded panel on edit page.
+- Cover/OG selection via server actions; ownership enforced in service layer (no DB FK on `coverAssetId`/`ogAssetId`).
+- Markdown insertion: **Option A** — Insert button appends to editor; Copy URL/Markdown also available.
+- SVG rejected (no sanitizer). Width/height deferred (no sharp/image-size dependency).
+- Public rendering uses `PostImage` (`next/image`, unoptimized when dimensions unknown).
+- Global media library (`/admin/media`) deferred — post-specific assets only.
+
+### Manual smoke flow
+
+1. Login as `ADMIN_EMAIL` → open draft post
+2. Upload image on assets page or editor panel
+3. Copy/Insert Markdown into content
+4. Set cover + OG image
+5. Save, preview, publish
+6. Verify public post card/detail + OG metadata
+7. Delete image — cover/OG cleared; Markdown refs not rewritten
 
 ### 4.1 Storage
 
-- [ ] `StorageProvider` interface
-- [ ] `LocalStorageProvider` implementation
-- [ ] Env config: `STORAGE_PROVIDER`, `STORAGE_LOCAL_ROOT`, `STORAGE_MAX_UPLOAD_BYTES`
+- [x] `StorageProvider` interface
+- [x] `LocalStorageProvider` implementation (+ `read()` for serving)
+- [x] Env config: `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`
+- [ ] `STORAGE_PROVIDER` env switch — deferred (hardcoded local for MVP)
 
 ### 4.2 Upload pipeline
 
-- [ ] `assets/service.ts` — `uploadAsset(postId, file, userId)`
-- [ ] Validate: MIME (image/jpeg, image/png, image/gif, image/webp), extension, size
-- [ ] Sanitize filename — strip path separators, limit length
-- [ ] Extract width/height (sharp or image-size)
-- [ ] `POST /api/admin/posts/[id]/assets` — multipart upload
+- [x] `uploadPostAsset()` in `assets.service.ts`
+- [x] Validate MIME (jpeg, png, gif, webp), extension, size; reject SVG
+- [x] Sanitize filename + uniquify per post
+- [x] SHA-256 hash stored
+- [ ] Width/height extraction — deferred
+- [x] `POST /api/admin/posts/[id]/assets` — multipart upload
 
 ### 4.3 Serving
 
-- [ ] `GET /api/assets/[id]` — stream file with correct Content-Type
-- [ ] Or static file route for local storage
+- [x] `GET /api/assets/[...path]` — stream file with Content-Type
 
 ### 4.4 Admin UI
 
-- [ ] `image-library.tsx` — grid of post assets
-- [ ] Upload dropzone
-- [ ] Copy URL button
-- [ ] Insert into Markdown button (`![alt](url)`)
-- [ ] Alt text / caption editing
-- [ ] Delete asset (with confirmation)
+- [x] `asset-grid.tsx`, `asset-upload-form.tsx`, metadata edit, delete
+- [x] Copy URL / Copy Markdown / Insert into editor
+- [x] Alt text / caption editing
 
 ### 4.5 Post cover and OG
 
-- [ ] Select cover image from library → `coverAssetId`
-- [ ] Select OG image → `ogAssetId`
+- [x] Cover/OG pickers → `coverAssetId` / `ogAssetId` with same-post validation
 
 ### 4.6 Tests (Phase 4)
 
-- [ ] Unit: filename sanitization, path traversal prevention
-- [ ] Integration: upload → insert in Markdown → render in preview
-- [ ] Security: reject .exe, oversize, `../../` filenames
+- [x] Unit: filename sanitization, upload validation, path traversal, LocalStorageProvider
+- [x] Unit: SEO fallback when assets missing
+- [ ] Integration: upload → preview → publish — deferred (manual smoke documented)
 
-**Phase 4 exit criteria:** Images work end-to-end in local development.
+**Phase 4 exit criteria:** Images work end-to-end in local development. ✅
 
 ---
 

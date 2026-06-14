@@ -26,7 +26,10 @@ export function readUploadPublicBaseUrl(): string {
 }
 
 export function readUploadMaxFileSizeBytes(): number {
-  const raw = readEnv("UPLOAD_MAX_FILE_SIZE_BYTES") ?? readEnv("STORAGE_MAX_UPLOAD_BYTES");
+  const raw =
+    readEnv("UPLOAD_MAX_FILE_SIZE_BYTES") ??
+    readEnv("UPLOAD_MAX_FILE_SIZE") ??
+    readEnv("STORAGE_MAX_UPLOAD_BYTES");
   if (!raw) return 5 * 1024 * 1024;
   const parsed = Number(raw);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 5 * 1024 * 1024;

@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useCallback, useState } from "react";
 import Link from "next/link";
+import type { Asset } from "@/modules/assets/assets.types";
 import type { AdminPostBundle } from "@/modules/posts/posts.types";
 import type { Category } from "@/modules/categories/categories.types";
 import type { Tag } from "@/modules/tags/tags.types";
@@ -9,6 +10,7 @@ import {
   type ActionResult,
   updatePostAction,
 } from "@/modules/posts/admin-posts.actions";
+import { PostAssetsPanel } from "@/components/admin/assets/post-assets-panel";
 import { AdminStatusBadge } from "../admin-status-badge";
 import { MarkdownEditor } from "./markdown-editor";
 import { PublishControls } from "./publish-controls";
@@ -24,14 +26,20 @@ export function PostEditorForm({
   bundle,
   categories,
   tags,
+  assets,
 }: {
   bundle: AdminPostBundle;
   categories: Category[];
   tags: Tag[];
+  assets: Asset[];
 }) {
   const { post, tagIds } = bundle;
   const boundAction = updatePostAction.bind(null, post.id);
   const [state, formAction, pending] = useActionState(boundAction, initialState);
+  const [insertMarkdown, setInsertMarkdown] = useState<((markdown: string) => void) | null>(null);
+  const registerInsert = useCallback((insert: (markdown: string) => void) => {
+    setInsertMarkdown(() => insert);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -42,6 +50,9 @@ export function PostEditorForm({
         ) : null}
         <Link href={`/admin/posts/${post.id}/preview`} className="text-sm text-[var(--primary)] underline">
           Open preview
+        </Link>
+        <Link href={`/admin/posts/${post.id}/assets`} className="text-sm text-[var(--primary)] underline">
+          Manage assets
         </Link>
         {post.status === "published" ? (
           <Link href={`/blog/${post.slug}`} className="text-sm text-[var(--primary)] underline" target="_blank" rel="noreferrer">
@@ -60,6 +71,15 @@ export function PostEditorForm({
           {state.message}
         </p>
       ) : null}
+
+      <PostAssetsPanel
+        postId={post.id}
+        postTitle={post.title}
+        assets={assets}
+        coverAssetId={post.coverAssetId}
+        ogAssetId={post.ogAssetId}
+        onInsertMarkdown={insertMarkdown ?? undefined}
+      />
 
       <form action={formAction} className="space-y-6">
         <input type="hidden" name="createRevision" value="true" />
@@ -94,7 +114,11 @@ export function PostEditorForm({
           />
         </label>
 
-        <MarkdownEditor name="contentMarkdown" defaultValue={post.contentMarkdown} />
+        <MarkdownEditor
+          name="contentMarkdown"
+          defaultValue={post.contentMarkdown}
+          onRegisterInsert={registerInsert}
+        />
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="block text-sm">

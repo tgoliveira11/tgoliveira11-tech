@@ -100,9 +100,10 @@ src/
 │   │   ├── assets/
 │   │   │   └── [id]/route.ts        # Serve uploaded files
 │   │   ├── analytics/
-│   │   │   └── view/route.ts        # Record post view (public)
-│   │   └── cron/
-│   │       └── publish-scheduled/route.ts
+│   │   │   └── post-view/route.ts     # Record post view (public)
+│   │   ├── admin/
+│   │   │   └── posts/[id]/assets/     # Multipart upload (admin)
+│   │   └── assets/[...path]/          # Serve local uploads (public)
 │   │
 │   ├── login/                       # EXISTS — secure-auth
 │   ├── register/                    # EXISTS — secure-auth

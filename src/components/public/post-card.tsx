@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PostImage } from "@/components/public/post-image";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import { publicPostPath } from "@/modules/posts/slug";
 
@@ -33,9 +34,11 @@ export function PostCard({ bundle }: { bundle: PublicPostBundle }) {
       {post.excerpt ? <p className="mt-3 text-[var(--muted)]">{post.excerpt}</p> : null}
 
       {coverAsset ? (
-        <img
+        <PostImage
           src={coverAsset.publicUrl}
           alt={coverAsset.altText ?? post.title}
+          width={coverAsset.width}
+          height={coverAsset.height}
           className="mt-4 max-h-64 w-full rounded-md object-cover"
         />
       ) : null}

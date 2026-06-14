@@ -4,22 +4,20 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## Current milestone: M3 — Admin publishing complete ✅
+## Current milestone: M4 — Images and assets complete ✅
 
 **Status:** Done
 
 | Deliverable | State |
 |-------------|-------|
-| Protected admin shell (`/admin`) | ✅ |
-| Dashboard with post counts | ✅ |
-| Post list with filters | ✅ |
-| Draft create/edit + Markdown preview | ✅ |
-| Publish/unpublish/schedule/archive/duplicate | ✅ |
-| Featured/pin controls | ✅ |
-| Category/tag assignment | ✅ |
-| Server Actions + revalidation | ✅ |
+| LocalStorageProvider upload/delete/serve | ✅ |
+| Post-specific asset upload API | ✅ |
+| Asset library UI per post | ✅ |
+| Cover/OG image selection | ✅ |
+| Markdown insert/copy | ✅ |
+| Public cover + OG rendering | ✅ |
 
-**Next:** Begin M4 — Images and assets.
+**Next:** Begin M5 — Analytics dashboard (aggregation + admin reports).
 
 ---
 
@@ -97,21 +95,21 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## M4 — Images and assets
+## M4 — Images and assets ✅
 
-**Target:** Post-specific image management.
+**Status:** Done
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 4.1 | StorageProvider | Interface + LocalStorageProvider |
-| 4.2 | Upload API | Validated multipart upload per post |
-| 4.3 | Image library | Admin UI per post project |
-| 4.4 | Editor integration | Insert image, copy URL, alt text |
-| 4.5 | Cover/OG | Select cover and OG images |
+| 4.1 | StorageProvider | LocalStorageProvider + env config |
+| 4.2 | Upload API | Multipart upload, validation, metadata |
+| 4.3 | Serving | `GET /api/assets/[...path]` |
+| 4.4 | Admin UI | Post asset library, insert/copy Markdown |
+| 4.5 | Cover/OG | Pickers with same-post ownership validation |
 
-**Exit gate:** Upload image → insert in Markdown → preview → publish → image visible on public post.
+**Exit gate:** Upload → insert in Markdown → publish → image visible on public post. ✅
 
-**Depends on:** M3
+**Deferred:** Global media library, S3/R2 provider, width/height extraction, SVG support.
 
 ---
 
@@ -175,8 +173,8 @@ M0 Foundation     ████████████████████  
 M1 Domain         ████████████████████  DONE
 M2 Public blog    ████████████████████  DONE
 M3 Admin          ████████████████████  DONE
-M4 Images         ░░░░░░░░░░░░░░░░░░░░  NEXT
-M5 Analytics      ░░░░░░░░░░░░░░░░░░░░
+M4 Images         ████████████████████  DONE
+M5 Analytics      ░░░░░░░░░░░░░░░░░░░░  NEXT
 M6 Migration      ░░░░░░░░░░░░░░░░░░░░
 M7 Hardening      ░░░░░░░░░░░░░░░░░░░░
 ```
@@ -262,17 +260,16 @@ Track unresolved decisions. Default action if not decided before implementation:
 
 ## Recommended next step
 
-**Start M4 — Images and assets.**
+**Start M5 — Analytics dashboard.**
 
 First concrete tasks:
 
-1. Implement `StorageProvider` + `LocalStorageProvider`
-2. Add `POST /api/admin/posts/[id]/assets` upload endpoint
-3. Build admin image library UI per post
-4. Wire cover/OG asset selection in post editor
-5. Enable Markdown image insert (URL copy) in editor
+1. Implement daily aggregation into `post_daily_stats`
+2. Add admin analytics dashboard UI
+3. Wire cron/retention for raw `analytics_events`
+4. Show per-post view counts in admin
 
-Admin publishing is complete; use `/admin` to create content while building M4 upload UX.
+Image upload and cover/OG selection are complete via `/admin/posts/[id]/assets`.
 
 ---
 

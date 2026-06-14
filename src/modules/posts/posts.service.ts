@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from "@/lib/errors";
+import { assertAssetBelongsToPost } from "@/modules/assets/assets.service";
 import { renderMarkdownToHtml } from "@/modules/markdown/markdown-renderer";
 import * as redirectsService from "@/modules/redirects/redirects.service";
 import { calculateReadingTimeMinutes } from "./reading-time";
@@ -113,6 +114,13 @@ export async function updateDraft(
   if (parsed.pinned !== undefined) updates.pinned = parsed.pinned;
   if (parsed.pinnedPriority !== undefined) updates.pinnedPriority = parsed.pinnedPriority;
   if (parsed.pinned === false) updates.pinnedPriority = 0;
+
+  if (parsed.coverAssetId !== undefined && parsed.coverAssetId) {
+    await assertAssetBelongsToPost(parsed.coverAssetId, id);
+  }
+  if (parsed.ogAssetId !== undefined && parsed.ogAssetId) {
+    await assertAssetBelongsToPost(parsed.ogAssetId, id);
+  }
 
   let nextSlug = existing.slug;
   if (parsed.slug !== undefined) {

@@ -1,10 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/modules/public/public-posts.repository", () => ({
+  findAssetById: vi.fn(async () => null),
+}));
+
 import type { BlogConfig } from "@/modules/public/blog-config";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import {
   buildBlogPostingJsonLd,
   buildPostMetadata,
   resolvePostSeo,
+  resolvePostSeoWithImages,
 } from "@/modules/public/seo";
 
 const config: BlogConfig = {
@@ -89,5 +95,15 @@ describe("seo helpers", () => {
     expect(metadata.title).toBe("Hello World");
     expect(jsonLd["@type"]).toBe("BlogPosting");
     expect(jsonLd.headline).toBe("Hello World");
+  });
+
+  it("falls back to defaultSeoImage when asset records are unavailable", async () => {
+    const bundle = makeBundle({
+      ogAssetId: "missing-og-asset",
+      coverAssetId: "missing-cover-asset",
+    });
+
+    const resolved = await resolvePostSeoWithImages({ bundle, config });
+    expect(resolved.ogImageUrl).toBe("https://example.com/default.png");
   });
 });
