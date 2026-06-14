@@ -24,92 +24,87 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 ## Phase 1 — Blog domain foundation
 
+**Status:** ✅ Implemented (migration `drizzle/0001_messy_goliath.sql`)
+
 **Goal:** PostForge-owned tables exist, migrations applied, core services callable from tests — no UI yet.
+
+### Implementation notes (M1)
+
+- Module schemas live at `src/modules/*/*.schema.ts` (not a separate `revisions-schema.ts`; `post_revisions` is in `posts.schema.ts`).
+- `publishedPostFilter()` lives in `posts.repository.ts` (not `posts/queries.ts`).
+- Slug utilities live in `src/modules/posts/slug.ts` (not `src/lib/slug.ts`).
+- Admin authorization: `src/modules/admin/authorization.ts` + `is-admin-email.ts` (not `src/lib/auth/session.ts`).
+- `blog_audit_logs` deferred; `blog_settings` implemented as key-value table.
+- `coverAssetId` / `ogAssetId` have **no database FK** to `assets` (avoids migration cycle); enforced in services.
+- Autosave revisions deferred to Phase 3 (comment in `posts.service.ts`).
+- DB integration tests deferred; unit tests cover slug, validation, visibility, markdown, admin email.
 
 ### 1.1 Schema and migrations
 
-- [ ] Create `src/modules/posts/schema.ts` — `posts` table
-- [ ] Create `src/modules/categories/schema.ts`
-- [ ] Create `src/modules/tags/schema.ts` — include `post_tags` join
-- [ ] Create `src/modules/assets/schema.ts`
-- [ ] Create `src/modules/posts/revisions-schema.ts` — `post_revisions`
-- [ ] Create `src/modules/redirects/schema.ts`
-- [ ] Create `src/modules/analytics/schema.ts` — `analytics_events`, `post_daily_stats`
-- [ ] Create `src/modules/settings/schema.ts` — `blog_settings`
-- [ ] (Optional) Create `src/modules/audit/schema.ts` — `blog_audit_logs`
-- [ ] Create `src/db/blog-schema.ts` — aggregate all module schemas
-- [ ] Update `src/db/schema.ts` — re-export auth + blog schemas
-- [ ] Add FK references to package `users.id` (import `users` from auth schema)
-- [ ] Run `npm run db:generate` → verify `drizzle/0001_*.sql`
-- [ ] Run `npm run db:migrate`
-- [ ] Verify auth tables unchanged in `db:studio`
+- [x] Create `src/modules/posts/posts.schema.ts` — `posts`, `post_tags`, `post_revisions`
+- [x] Create `src/modules/categories/categories.schema.ts`
+- [x] Create `src/modules/tags/tags.schema.ts`
+- [x] Create `src/modules/assets/assets.schema.ts`
+- [x] Create `src/modules/redirects/redirects.schema.ts`
+- [x] Create `src/modules/analytics/analytics.schema.ts` — `analytics_events`, `post_daily_stats`
+- [x] Create `src/modules/settings/blog-settings.schema.ts` — `blog_settings`
+- [ ] (Optional) `blog_audit_logs` — deferred
+- [x] Create `src/db/blog-schema.ts`
+- [x] Update `src/db/schema.ts`
+- [x] FK references to package `users.id`
+- [x] `npm run db:generate` → `drizzle/0001_messy_goliath.sql`
+- [x] `npm run db:migrate`
 
 **Acceptance:** All blog tables exist; `users` table untouched.
 
 ### 1.2 Types and validation
 
-- [ ] `post_status` enum in types
-- [ ] Zod schemas: `createPostSchema`, `updatePostSchema`, `publishPostSchema`
-- [ ] Zod schemas for categories, tags, assets, redirects
-- [ ] Export inferred types: `Post`, `CreatePostInput`, etc.
+- [x] `post_status`, `revision_type`, `analytics_event_type` enums
+- [x] Zod schemas for posts, categories, tags, assets, redirects
+- [x] Export inferred types
 
 ### 1.3 Utilities
 
-- [ ] `src/lib/slug.ts` — generate from title, normalize, handle collisions
-- [ ] `src/modules/markdown/reading-time.ts` — words-per-minute calculation
-- [ ] `src/lib/errors.ts` — `NotFoundError`, `ValidationError`, `ConflictError`
-- [ ] `src/lib/env.ts` — blog env vars (`STORAGE_PROVIDER`, etc.)
-- [ ] `src/modules/posts/queries.ts` — `publishedOnly` filter
+- [x] `src/modules/posts/slug.ts`
+- [x] `src/modules/posts/reading-time.ts`
+- [x] `src/lib/errors.ts`
+- [x] `src/lib/env.ts`
+- [x] `publishedPostFilter()` in `posts.repository.ts`
 
 ### 1.4 Repositories
 
-- [ ] `posts/repository.ts` — CRUD, `findPublishedBySlug`, `findScheduledReady`
-- [ ] `categories/repository.ts`
-- [ ] `tags/repository.ts` — include tag assignment
-- [ ] `assets/repository.ts`
-- [ ] `post_revisions/repository.ts`
-- [ ] `redirects/repository.ts`
-- [ ] `analytics/repository.ts`
-- [ ] `settings/repository.ts`
+- [x] `posts.repository.ts` (includes revisions)
+- [x] `categories.repository.ts`
+- [x] `tags.repository.ts`
+- [x] `assets.repository.ts`
+- [x] `redirects.repository.ts`
+- [x] `analytics.repository.ts`
+- [ ] `settings.repository.ts` — deferred (schema only for now)
 
 ### 1.5 Services
 
-- [ ] `posts/service.ts`:
-  - `createPost(userId)` — new draft with generated slug
-  - `updatePost(id, input, userId)`
-  - `publishPost(id, userId)`
-  - `unpublishPost(id, userId)`
-  - `schedulePost(id, scheduledAt, userId)`
-  - `archivePost(id, userId)`
-  - `duplicatePost(id, userId)`
-  - `toggleFeatured(id, userId)`
-  - `togglePinned(id, priority, userId)`
-- [ ] `categories/service.ts` — CRUD
-- [ ] `tags/service.ts` — CRUD + assign to post
-- [ ] `redirects/service.ts` — create/resolve
+- [x] `posts.service.ts` — full lifecycle
+- [x] `categories.service.ts`
+- [x] `tags.service.ts`
+- [x] `redirects.service.ts`
+- [x] `assets.service.ts` — metadata + StorageProvider
+- [x] `analytics.service.ts` — `trackPostView`, `getPostAnalyticsSummary`
 
 ### 1.6 Markdown (core only)
 
-- [ ] `markdown/render.ts` — Markdown → sanitized HTML
-- [ ] Integrate render into `updatePost` and `publishPost`
-- [ ] Cache `contentHtmlCache` on save
+- [x] `markdown-renderer.ts`, `markdown-sanitizer.ts`
+- [x] Integrated into `updateDraft` and `publishPost`
 
 ### 1.7 Admin authorization helper
 
-- [ ] `src/lib/auth/session.ts` — `requireAdminSession()`:
-  - Check valid secure-auth session (authentication)
-  - Check `session.user.email` matches `ADMIN_EMAIL` (authorization)
-  - Redirect to login if unauthenticated; return 403 if authenticated but not authorized
-- [ ] Add `ADMIN_EMAIL` to `src/lib/env.ts` and `.env.example`
-- [ ] Unit test: authorized email passes; other emails forbidden
+- [x] `src/modules/admin/authorization.ts` + `is-admin-email.ts`
+- [x] `ADMIN_EMAIL` in `src/lib/env.ts` and `.env.example`
+- [x] Unit tests for `isAdminEmail`
 
 ### 1.8 Tests (Phase 1)
 
-- [ ] Unit: slug generation
-- [ ] Unit: reading time
-- [ ] Unit: post validation schemas
-- [ ] Unit: publish rules (cannot publish without title)
-- [ ] Integration: create draft → update → publish
+- [x] Unit: slug, reading time, validation, publish/schedule rules, public visibility, markdown, admin email, asset validation
+- [ ] Integration: create draft → publish (deferred — needs test DB harness)
 
 **Phase 1 exit criteria:** Services work in tests; DB has blog tables; no UI required.
 

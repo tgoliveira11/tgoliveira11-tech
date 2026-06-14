@@ -31,17 +31,25 @@ Import `users` from `@tgoliveira/secure-auth/drizzle/schema` (already re-exporte
 
 ---
 
-## Schema organization (planned)
-
-When implemented, extend `src/db/schema.ts`:
+## Schema organization (implemented)
 
 ```typescript
-// src/db/schema.ts (future)
+// src/db/schema.ts
 export * from "@tgoliveira/secure-auth/drizzle/schema";
-export * from "./blog-schema"; // PostForge-owned tables
+export * from "./blog-schema";
 ```
 
-Blog migrations go to `drizzle/` (separate from auth migration `0000_*`). Use `drizzle-kit generate` after adding blog schema.
+Blog migrations: `drizzle/0001_messy_goliath.sql` (auth remains `0000_*`).
+
+### M1 implementation deviations
+
+| Doc | Implementation | Reason |
+|-----|----------------|--------|
+| `coverAssetId` / `ogAssetId` FK → `assets` | UUID columns without DB FK | Avoids posts ↔ assets migration cycle |
+| `redirects.fromPath` / `toPath` / `type` | `sourcePath`, `targetPath`, `statusCode` | Matches M1 task spec |
+| `blog_settings` singleton row | Key-value table (`key`, `value`) | Simpler MVP settings store |
+| `post_revisions` separate module | Defined in `posts.schema.ts` | Co-located with post domain |
+| `blog_audit_logs` | Not created | Deferred per optional scope |
 
 ---
 
@@ -93,7 +101,7 @@ Core blog content. One row = one blog post / post project.
 | `excerpt` | `text` | ❌ | Short summary for listings/SEO fallback |
 | `contentMarkdown` | `text` | ✅ | Source of truth; default `""` for new drafts |
 | `contentHtmlCache` | `text` | ❌ | Sanitized rendered HTML; rebuilt on save/publish |
-| `coverAssetId` | `uuid` | ❌ | FK → `assets.id` |
+| `coverAssetId` | `uuid` | ❌ | Logical ref → `assets.id` (no DB FK in M1) |
 | `status` | `post_status` | ✅ | Default `draft` |
 | `featured` | `boolean` | ✅ | Default `false` |
 | `pinned` | `boolean` | ✅ | Default `false` |
@@ -107,7 +115,7 @@ Core blog content. One row = one blog post / post project.
 | `canonicalUrl` | `text` | ❌ | Fallback: `/blog/{slug}` |
 | `ogTitle` | `text` | ❌ | Fallback: `seoTitle` or `title` |
 | `ogDescription` | `text` | ❌ | Fallback: `seoDescription` or `excerpt` |
-| `ogAssetId` | `uuid` | ❌ | FK → `assets.id`; fallback: `coverAssetId` |
+| `ogAssetId` | `uuid` | ❌ | Logical ref → `assets.id` (no DB FK in M1) |
 | `readingTimeMinutes` | `integer` | ❌ | Computed on save |
 | `createdBy` | `uuid` | ✅ | FK → `users.id` |
 | `updatedBy` | `uuid` | ✅ | FK → `users.id` |
