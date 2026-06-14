@@ -27,7 +27,7 @@ export function MarkdownPreview({ markdown }: { markdown: string }) {
   return (
     <div className="relative">
       {pending ? <p className="mb-2 text-xs text-[var(--muted)]">Updating preview…</p> : null}
-      <div className="prose min-h-48 rounded-md border border-[var(--border)] bg-white p-4" dangerouslySetInnerHTML={{ __html: html }} />
+      <div className="prose min-h-48 rounded-md border border-[var(--border)] bg-[var(--card)] p-4" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
 }

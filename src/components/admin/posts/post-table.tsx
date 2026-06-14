@@ -48,7 +48,7 @@ export function PostTable({
   return (
     <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]">
       <table className="min-w-full text-left text-sm">
-        <thead className="border-b border-[var(--border)] bg-slate-50 text-xs uppercase text-[var(--muted)]">
+        <thead className="border-b border-[var(--border)] bg-[var(--surface-subtle)] text-xs uppercase text-[var(--muted)]">
           <tr>
             <th className="px-3 py-2">Title</th>
             <th className="px-3 py-2">Status</th>

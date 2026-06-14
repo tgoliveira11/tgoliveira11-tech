@@ -21,7 +21,7 @@ export function ArchiveButton({ postId }: { postId: string }) {
           router.refresh();
         });
       }}
-      className="rounded-md border border-red-300 bg-white px-3 py-2 text-sm text-red-700 disabled:opacity-50"
+      className="rounded-md border border-red-300 bg-[var(--card)] px-3 py-2 text-sm text-red-700 disabled:opacity-50"
     >
       Archive post
     </button>

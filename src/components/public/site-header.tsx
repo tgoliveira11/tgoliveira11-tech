@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { BlogConfig } from "@/modules/public/blog-config";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export function SiteHeader({ config }: { config: BlogConfig }) {
   return (
@@ -11,30 +12,33 @@ export function SiteHeader({ config }: { config: BlogConfig }) {
           </Link>
           <p className="mt-1 text-sm text-[var(--muted)]">{config.description}</p>
         </div>
-        <nav aria-label="Main navigation">
-          <ul className="flex flex-wrap gap-4 text-sm font-medium">
-            <li>
-              <Link href="/blog" className="hover:text-[var(--primary)]">
-                Blog
-              </Link>
-            </li>
-            <li>
-              <Link href="/tags" className="hover:text-[var(--primary)]">
-                Tags
-              </Link>
-            </li>
-            <li>
-              <Link href="/categories" className="hover:text-[var(--primary)]">
-                Categories
-              </Link>
-            </li>
-            <li>
-              <Link href="/search" className="hover:text-[var(--primary)]">
-                Search
-              </Link>
-            </li>
-          </ul>
-        </nav>
+        <div className="flex flex-wrap items-center gap-3">
+          <nav aria-label="Main navigation">
+            <ul className="flex flex-wrap gap-4 text-sm font-medium">
+              <li>
+                <Link href="/blog" className="hover:text-[var(--primary)]">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link href="/tags" className="hover:text-[var(--primary)]">
+                  Tags
+                </Link>
+              </li>
+              <li>
+                <Link href="/categories" className="hover:text-[var(--primary)]">
+                  Categories
+                </Link>
+              </li>
+              <li>
+                <Link href="/search" className="hover:text-[var(--primary)]">
+                  Search
+                </Link>
+              </li>
+            </ul>
+          </nav>
+          <ThemeToggle compact />
+        </div>
       </div>
     </header>
   );

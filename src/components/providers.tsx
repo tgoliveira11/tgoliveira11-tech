@@ -5,6 +5,7 @@ import {
   SecureAuthUIProvider,
   type SecureAuthUIPublicConfig,
 } from "@tgoliveira/secure-auth/react";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 export function Providers({
   children,
@@ -17,7 +18,9 @@ export function Providers({
 
   return (
     <SessionProvider refetchInterval={refetchInterval > 0 ? refetchInterval : undefined}>
-      <SecureAuthUIProvider config={uiConfig}>{children}</SecureAuthUIProvider>
+      <ThemeProvider>
+        <SecureAuthUIProvider config={uiConfig}>{children}</SecureAuthUIProvider>
+      </ThemeProvider>
     </SessionProvider>
   );
 }

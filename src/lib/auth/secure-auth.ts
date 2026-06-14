@@ -9,6 +9,7 @@ const envConfig = buildSecureAuthConfigFromEnv({
   appName: "PostForge",
   appSlug: "postforge",
   baseUrl: "http://localhost:3000",
+  afterLoginPath: "/admin",
 });
 
 export const secureAuth = createSecureAuth({

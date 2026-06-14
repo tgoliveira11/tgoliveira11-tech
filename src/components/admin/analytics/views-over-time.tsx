@@ -19,7 +19,7 @@ export function ViewsOverTime({
           {points.map((point) => (
             <div key={point.date} className="grid grid-cols-[88px_1fr_48px] items-center gap-3 text-xs">
               <span className="text-[var(--muted)]">{point.date.slice(5)}</span>
-              <div className="h-3 rounded bg-slate-100">
+              <div className="h-3 rounded bg-[var(--surface-muted)]">
                 <div
                   className="h-3 rounded bg-[var(--primary)]"
                   style={{ width: `${Math.max(4, (point.views / maxViews) * 100)}%` }}

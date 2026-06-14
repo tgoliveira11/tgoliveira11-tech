@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { AdminSignOutButton } from "./admin-sign-out-button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { adminNavItems } from "@/modules/admin/admin-navigation";
 
 export function AdminHeader({ adminEmail }: { adminEmail: string }) {
@@ -11,17 +13,21 @@ export function AdminHeader({ adminEmail }: { adminEmail: string }) {
           </Link>
           <p className="text-sm text-[var(--muted)]">{adminEmail}</p>
         </div>
-        <nav aria-label="Admin quick links" className="flex flex-wrap gap-2 md:hidden">
-          {adminNavItems.slice(0, 4).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-md border border-[var(--border)] px-2 py-1 text-xs"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex flex-wrap items-center gap-2">
+          <nav aria-label="Admin quick links" className="flex flex-wrap gap-2 md:hidden">
+            {adminNavItems.slice(0, 4).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-md border border-[var(--border)] px-2 py-1 text-xs"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <ThemeToggle compact />
+          <AdminSignOutButton />
+        </div>
       </div>
     </header>
   );

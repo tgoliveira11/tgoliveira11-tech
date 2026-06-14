@@ -39,7 +39,7 @@ export function AssetCard({
 
   return (
     <article className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
-      <div className="aspect-video overflow-hidden rounded-md bg-slate-100">
+      <div className="aspect-video overflow-hidden rounded-md bg-[var(--surface-muted)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={asset.publicUrl} alt={asset.altText ?? asset.originalFilename} className="h-full w-full object-cover" />
       </div>
