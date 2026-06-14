@@ -16,7 +16,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 | 2 | Public blog | Reader-facing pages, SEO, RSS, sitemap |
 | 3 | Admin publishing | Dashboard, editor, preview, lifecycle actions |
 | 4 | Images/assets | Upload, library, insert into Markdown |
-| 5 | Analytics | View tracking, aggregates, admin dashboard |
+| 5 | Analytics | View tracking, aggregates, admin dashboard ✅ |
 | 6 | Migration | GitHub Pages import |
 | 7 | Hardening | Tests, audit, accessibility, performance |
 
@@ -88,7 +88,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] `tags.service.ts`
 - [x] `redirects.service.ts`
 - [x] `assets.service.ts` — metadata + StorageProvider
-- [x] `analytics.service.ts` — `trackPostView`, `getPostAnalyticsSummary`
+- [x] `analytics.service.ts` — `trackPostView`, blog/post summaries, breakdowns, write-time daily stats
 
 ### 1.6 Markdown (core only)
 
@@ -170,7 +170,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 - [x] `POST /api/analytics/post-view` — published posts only, no raw IP
 - [x] In-memory rate limiting per client key
-- [ ] Daily aggregation dashboard — deferred to M5
+- [x] Daily aggregation dashboard — M5 (write-time upsert to `post_daily_stats`)
 
 ### 2.7 Tests (Phase 2)
 
@@ -345,36 +345,40 @@ All actions call `requireAdminSession()` before handling requests.
 
 ---
 
-## Phase 5 — Analytics
+## Phase 5 — Analytics ✅
 
 **Goal:** Track post views and show admin reports.
 
 ### 5.1 Ingestion
 
-- [ ] `POST /api/analytics/view` — record view (public, no user session)
-- [ ] Rate-limit endpoint (per IP / visitor hash)
-- [ ] Validate: `postId` exists and post is published
-- [ ] Capture: postId, referrer, deviceType, countryCode (optional)
-- [ ] `visitorHash` for dedup — no raw IP
-- [ ] Fire-and-forget from post detail page (client or edge)
+- [x] `POST /api/analytics/post-view` — record view (public, no user session)
+- [x] Rate-limit endpoint (in-memory per hashed client key; document Redis/edge for production)
+- [x] Validate: `slug` or `postId`; post exists and is published
+- [x] Capture: postId, referrer, deviceType, coarse userAgentFamily, optional country, sessionHash
+- [x] `sessionHash` from hashed client key — no raw IP stored
+- [x] Fire-and-forget from public post page (`PostViewTracker`)
 
 ### 5.2 Aggregation
 
-- [ ] `analytics/service.ts` — `aggregateDaily(postId, date)`
-- [ ] Nightly cron or inline increment → `post_daily_stats`
-- [ ] Retention job — delete `analytics_events` older than N days
+- [x] Write-time aggregation (Option A): `trackPostViewEvent` upserts `post_daily_stats` for UTC date
+- [x] Approximate `uniqueViews` via distinct `sessionHash` per post per UTC day
+- [ ] Retention job — delete `analytics_events` older than N days (deferred)
 
 ### 5.3 Admin dashboard
 
-- [ ] `/admin/analytics` — total views, top posts, views over time chart
-- [ ] Per-post analytics on `/admin/posts/[id]` — today, 7d, 30d, total
+- [x] `/admin/analytics` — summary cards, top posts, views over time (CSS bars)
+- [x] `/admin/analytics/posts/[id]` — per-post summary, views by day, referrers, devices, recent views
+- [x] Optional redirect: `/admin/posts/[id]/analytics` → per-post analytics
+- [x] Admin nav includes Analytics
 
 ### 5.4 Tests (Phase 5)
 
-- [ ] Integration: view event → daily stat increment
-- [ ] Unit: no IP stored in event row
+- [x] Unit: write-time daily stat upsert (mocked repository)
+- [x] Unit: no IP column on analytics event payload
+- [x] Unit: public tracking rejects unpublished posts (service mock)
+- [x] Unit: summary, top posts, referrer/device grouping, empty data helpers
 
-**Phase 5 exit criteria:** Admin sees view counts per post and site-wide.
+**Phase 5 exit criteria:** Admin sees view counts per post and site-wide. ✅
 
 ---
 

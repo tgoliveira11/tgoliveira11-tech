@@ -273,21 +273,24 @@ Raw view events. Privacy-conscious design.
 |--------|------|----------|-------|
 | `id` | `uuid` | ✅ | PK |
 | `postId` | `uuid` | ✅ | FK → `posts.id` ON DELETE CASCADE |
-| `viewedAt` | `timestamptz` | ✅ | Default `now()` |
-| `referrer` | `text` | ❌ | Sanitized Referer header |
+| `eventType` | `enum` | ✅ | `post_view` (M5); other types reserved |
+| `occurredAt` | `timestamptz` | ✅ | Default `now()` |
+| `referrer` | `text` | ❌ | Raw Referer header; normalized in admin UI |
+| `userAgentFamily` | `text` | ❌ | Coarse token from User-Agent (not full string) |
 | `deviceType` | `text` | ❌ | `mobile` \| `desktop` \| `tablet` \| `unknown` |
-| `countryCode` | `text` | ❌ | ISO 3166-1 alpha-2, optional |
-| `visitorHash` | `text` | ❌ | Daily salted hash for dedup — **not** raw IP |
+| `country` | `text` | ❌ | Optional ISO country from edge header |
+| `sessionHash` | `text` | ❌ | Hashed client key for dedup — **not** raw IP |
 
 #### Indexes
 
-- `(postId, viewedAt desc)`
-- `(viewedAt)` — retention cleanup
+- `(postId, occurredAt)`
+- `(occurredAt)` — future retention cleanup
 
 #### Privacy rules
 
 - Never store raw IP
-- `visitorHash` = `hash(salt + ip + date)` if dedup needed; rotate salt daily
+- `sessionHash` comes from `getAnalyticsClientKey()` (hash of IP + UA + app secret); not displayed in admin UI
+- Admin breakdowns show normalized referrers and coarse device types only
 
 ---
 
@@ -299,17 +302,19 @@ Aggregated daily view counts for admin reports.
 |--------|------|----------|-------|
 | `postId` | `uuid` | ✅ | FK → `posts.id` ON DELETE CASCADE |
 | `date` | `date` | ✅ | UTC date |
-| `viewCount` | `integer` | ✅ | Default 0 |
-| `uniqueVisitorCount` | `integer` | ❌ | If dedup implemented |
+| `views` | `integer` | ✅ | Default 0 |
+| `uniqueViews` | `integer` | ✅ | Approximate distinct `sessionHash` per UTC day |
+| `topReferrers` | `jsonb` | ❌ | Reserved; referrers computed from raw events in M5 |
 
-#### Primary key
+#### Unique constraint
 
 - `(postId, date)`
 
-#### Aggregation
+#### Aggregation (M5)
 
-- Nightly job or inline increment on view
-- Admin dashboard reads from this table for charts
+- **Write-time (Option A):** each `trackPostViewEvent` upserts/increments the row for the current UTC date
+- Dashboard summaries and charts read primarily from this table
+- Raw events retained for referrer/device breakdowns until a retention job is added
 
 ---
 

@@ -13,6 +13,7 @@ describe("analytics rate limit", () => {
     const key = getAnalyticsClientKey(request);
     expect(key).toBeTruthy();
     expect(key).not.toContain("203.0.113.10");
+    expect(key).not.toContain("203");
   });
 
   it("rate limits repeated requests in memory", () => {

@@ -20,3 +20,45 @@ export type PostAnalyticsSummary = {
   viewsLast7Days: number;
   viewsLast30Days: number;
 };
+
+export type BlogAnalyticsSummary = PostAnalyticsSummary & {
+  postsWithViews: number;
+};
+
+export type DailyViewsPoint = {
+  date: string;
+  views: number;
+};
+
+export type TopPostAnalyticsRow = {
+  postId: string;
+  title: string;
+  slug: string;
+  status: string;
+  totalViews: number;
+  viewsLast7Days: number;
+};
+
+export type ReferrerBreakdownRow = {
+  referrer: string;
+  count: number;
+};
+
+export type DeviceBreakdownRow = {
+  deviceType: string;
+  count: number;
+};
+
+export type RecentViewRow = {
+  occurredAt: Date;
+  referrer: string | null;
+  deviceType: string | null;
+};
+
+export type PostAnalyticsDetail = {
+  summary: PostAnalyticsSummary;
+  viewsByDay: DailyViewsPoint[];
+  referrers: ReferrerBreakdownRow[];
+  devices: DeviceBreakdownRow[];
+  recentViews: RecentViewRow[];
+};

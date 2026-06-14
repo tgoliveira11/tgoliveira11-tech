@@ -121,7 +121,11 @@ src/
 │   │   ├── post-list-table.tsx
 │   │   ├── post-status-badge.tsx
 │   │   ├── post-filters.tsx
-│   │   └── analytics-chart.tsx
+│   │   └── analytics/               # M5 dashboard widgets
+│   │       ├── analytics-summary-cards.tsx
+│   │       ├── top-posts-table.tsx
+│   │       ├── views-over-time.tsx
+│   │       └── referrer-breakdown.tsx
 │   ├── editor/                      # Markdown editor
 │   │   ├── markdown-editor.tsx
 │   │   ├── markdown-preview.tsx
@@ -156,7 +160,12 @@ src/
 │   ├── categories/
 │   │   └── ... (same pattern)
 │   ├── analytics/
-│   │   └── ...
+│   │   ├── analytics.schema.ts
+│   │   ├── analytics.repository.ts   # events + write-time daily upsert
+│   │   ├── analytics.service.ts      # track + admin summaries
+│   │   ├── analytics.helpers.ts      # UTC ranges, referrer normalization
+│   │   ├── analytics.query-helpers.ts
+│   │   └── rate-limit.ts             # in-memory hashed client key (MVP)
 │   ├── redirects/
 │   │   └── ...
 │   ├── markdown/
@@ -318,7 +327,9 @@ import { users } from "@/db/schema"; // package-owned
 | `/api/admin/*` | secure-auth session | `ADMIN_EMAIL` match |
 | Preview routes (`/admin/posts/[id]/preview`) | secure-auth session | `ADMIN_EMAIL` match or secure preview token (future) |
 | `/api/cron/*` | Not required | `CRON_SECRET` |
-| `/api/analytics/view` | Not required | Public; rate-limited + validated |
+| `/api/analytics/post-view` | Not required | Public; rate-limited + validated (published posts only) |
+| `/admin/analytics` | secure-auth session | `ADMIN_EMAIL` match |
+| `/admin/analytics/posts/[id]` | secure-auth session | `ADMIN_EMAIL` match |
 
 ---
 
@@ -438,14 +449,17 @@ Auth env vars remain in `.env.example` (already documented). Blog vars will be a
 | Public pages | No authentication required |
 | Preview routes | `ADMIN_EMAIL` session or secure preview token (future) |
 | Cron endpoints | `CRON_SECRET` — no user session |
-| Analytics ingestion | Public; rate-limited; validate `postId` and published status |
+| Analytics ingestion | Public; rate-limited; validate slug/postId and published status; no raw IP stored |
+| Analytics admin UI | Aggregate counts only; session hashes never shown |
+| Analytics aggregation | Write-time upsert to `post_daily_stats` on each view (Option A) |
+| Analytics rate limit | In-memory per server instance; use Redis/edge/DB for multi-instance production |
 | Public data | `publishedOnly` filter on all queries |
 | XSS | rehype-sanitize on Markdown HTML |
 | File uploads | MIME + extension + size validation; safe filenames |
 | Path traversal | Storage keys generated server-side; never use raw user paths |
 | Cron endpoint | `CRON_SECRET` header validation |
 | CSRF | Next.js server actions / SameSite cookies (auth handled by secure-auth) |
-| Rate limiting | Auth rate limits via secure-auth; consider public analytics rate limit |
+| Rate limiting | Auth rate limits via secure-auth; public analytics uses in-memory hashed client key |
 
 ---
 

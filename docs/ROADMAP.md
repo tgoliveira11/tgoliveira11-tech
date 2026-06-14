@@ -4,20 +4,19 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## Current milestone: M4 — Images and assets complete ✅
+## Current milestone: M5 — Analytics complete ✅
 
 **Status:** Done
 
 | Deliverable | State |
 |-------------|-------|
-| LocalStorageProvider upload/delete/serve | ✅ |
-| Post-specific asset upload API | ✅ |
-| Asset library UI per post | ✅ |
-| Cover/OG image selection | ✅ |
-| Markdown insert/copy | ✅ |
-| Public cover + OG rendering | ✅ |
+| Write-time daily aggregation into `post_daily_stats` | ✅ |
+| Public `POST /api/analytics/post-view` (validated, rate-limited) | ✅ |
+| Admin `/admin/analytics` dashboard | ✅ |
+| Per-post `/admin/analytics/posts/[id]` reports | ✅ |
+| Privacy-friendly aggregates (no raw IP in UI or schema) | ✅ |
 
-**Next:** Begin M5 — Analytics dashboard (aggregation + admin reports).
+**Next:** Begin M6 — GitHub Pages migration.
 
 ---
 
@@ -71,7 +70,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Exit gate:** Seed a published post; visible on home, blog, search, RSS, and sitemap. Draft invisible. ✅
 
-**Deferred to later phases:** Related posts, middleware redirects, route integration tests, GIN indexes, analytics dashboard (M5).
+**Deferred to later phases:** Related posts, middleware redirects, route integration tests, GIN indexes.
 
 ---
 
@@ -113,20 +112,22 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## M5 — Analytics
+## M5 — Analytics ✅
 
-**Target:** Privacy-conscious view tracking and admin reports.
+**Status:** Done
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 5.1 | View ingestion | Public endpoint, no raw IP |
-| 5.2 | Daily aggregation | `post_daily_stats` |
-| 5.3 | Admin reports | Dashboard + per-post stats |
-| 5.4 | Retention | Cleanup old raw events |
+| 5.1 | View ingestion | `POST /api/analytics/post-view`, hashed client key, no raw IP |
+| 5.2 | Daily aggregation | Write-time upsert into `post_daily_stats` on each view |
+| 5.3 | Admin reports | `/admin/analytics`, `/admin/analytics/posts/[id]` |
+| 5.4 | Retention | Raw event cleanup deferred |
 
-**Exit gate:** View a post → admin shows incremented count.
+**Exit gate:** View a published post → admin dashboard shows incremented counts. ✅
 
 **Depends on:** M2 (public post page)
+
+**Limitations documented:** In-memory rate limit per instance; approximate unique views; raw events retained until future retention job.
 
 ---
 
@@ -174,8 +175,8 @@ M1 Domain         ████████████████████  
 M2 Public blog    ████████████████████  DONE
 M3 Admin          ████████████████████  DONE
 M4 Images         ████████████████████  DONE
-M5 Analytics      ░░░░░░░░░░░░░░░░░░░░  NEXT
-M6 Migration      ░░░░░░░░░░░░░░░░░░░░
+M5 Analytics      ████████████████████  DONE
+M6 Migration      ░░░░░░░░░░░░░░░░░░░░  NEXT
 M7 Hardening      ░░░░░░░░░░░░░░░░░░░░
 ```
 
@@ -260,7 +261,7 @@ Track unresolved decisions. Default action if not decided before implementation:
 
 ## Recommended next step
 
-**Start M5 — Analytics dashboard.**
+**Start M6 — GitHub Pages migration.**
 
 First concrete tasks:
 
