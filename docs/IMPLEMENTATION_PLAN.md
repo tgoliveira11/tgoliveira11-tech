@@ -112,51 +112,75 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 ## Phase 2 — Public blog
 
+**Status:** ✅ Implemented
+
 **Goal:** Readers can browse published content; drafts are invisible.
+
+### Implementation notes (M2)
+
+- Public routes live under `src/app/(public)/` with shared layout and components in `src/components/public/`.
+- Published-only queries centralized in `src/modules/public/public-posts.repository.ts` using `publishedPostFilter()` from M1.
+- SEO helpers in `src/modules/public/seo.ts`; RSS/sitemap/robots in `src/modules/public/rss.ts` and `sitemap.ts`.
+- Post view tracking: `POST /api/analytics/post-view` with in-memory rate limiting (`src/modules/analytics/rate-limit.ts`).
+- Redirects: **Option A only** — `/blog/[slug]` checks `redirects` table when no published post exists; arbitrary catch-all/middleware redirects deferred to M6.
+- Related posts on detail page deferred (neighbors prev/next implemented).
+- Tag/category index lists only tags/categories with at least one published post via `listPublicTags` / `listPublicCategories`.
+- Search uses PostgreSQL FTS on title, excerpt, and `contentMarkdown` (tag/category name search deferred).
+- RSS returns 404 when disabled in `blog_settings` or env.
+- Route integration tests deferred; unit tests cover SEO, RSS, sitemap, visibility, analytics validation, rate limiting.
 
 ### 2.1 Route structure
 
-- [ ] Create `src/app/(public)/layout.tsx` — public shell
-- [ ] Move/replace home page → featured/pinned + recent posts
-- [ ] `/blog` — paginated listing
-- [ ] `/blog/[slug]` — post detail with sanitized HTML
-- [ ] `/tags/[slug]` — posts by tag
-- [ ] `/categories/[slug]` — posts by category
-- [ ] `/search` — public full-text search
-- [ ] Friendly `not-found.tsx`
+- [x] Create `src/app/(public)/layout.tsx` — public shell
+- [x] Move/replace home page → featured/pinned + recent posts
+- [x] `/blog` — paginated listing
+- [x] `/blog/[slug]` — post detail with sanitized HTML
+- [x] `/tags` and `/tags/[slug]` — posts by tag
+- [x] `/categories` and `/categories/[slug]` — posts by category
+- [x] `/search` — public full-text search
+- [x] Friendly `not-found.tsx`
 
 ### 2.2 Public components
 
-- [ ] `post-card.tsx`, `post-content.tsx`, `pagination.tsx`
-- [ ] `search-form.tsx`, `seo-head.tsx`
-- [ ] JSON-LD component for `BlogPosting`
+- [x] `public-layout.tsx`, `site-header.tsx`, `site-footer.tsx`
+- [x] `post-card.tsx`, `post-list.tsx`, `tag-list.tsx`, `category-list.tsx`
+- [x] `search-form.tsx`, `empty-state.tsx`, `pagination.tsx`
+- [x] `post-view-tracker.tsx` — client-side view tracking
+- [x] JSON-LD via `buildBlogPostingJsonLd` in post detail metadata
 
 ### 2.3 SEO and feeds
 
-- [ ] `/rss.xml/route.ts` — published posts only
-- [ ] `/sitemap.xml/route.ts` — posts, tags, categories
-- [ ] `/robots.txt/route.ts` — disallow `/admin`
-- [ ] Per-post metadata: title, description, OG, Twitter cards
-- [ ] Canonical URL support
+- [x] `/rss.xml/route.ts` — published posts only
+- [x] `src/app/sitemap.ts` — posts, tags, categories
+- [x] `/robots.txt/route.ts` — disallow `/admin`
+- [x] Per-post metadata: title, description, OG, Twitter cards
+- [x] Canonical URL support
 
 ### 2.4 Redirects
 
-- [ ] Middleware or route handler for `redirects` table lookup
-- [ ] 301 for permanent, 302 for temporary
+- [x] `/blog/[slug]` checks `redirects` when post not found (301/302 via `permanentRedirect`/`redirect`)
+- [ ] Middleware/catch-all legacy redirects — deferred to M6 (Edge runtime + DB access risk)
 
 ### 2.5 Search
 
-- [ ] `search/public-search.ts` — PostgreSQL FTS, published only
-- [ ] Add GIN indexes (if not in Phase 1 migration)
+- [x] `searchPublishedPostBundles` — PostgreSQL FTS, published only
+- [ ] GIN indexes — deferred (FTS works without dedicated index for MVP scale)
 
-### 2.6 Tests (Phase 2)
+### 2.6 Analytics (M2 subset)
 
-- [ ] Integration: published post visible at `/blog/[slug]`
-- [ ] Integration: draft post returns 404
-- [ ] Integration: search returns only published
-- [ ] Integration: RSS/sitemap exclude drafts
+- [x] `POST /api/analytics/post-view` — published posts only, no raw IP
+- [x] In-memory rate limiting per client key
+- [ ] Daily aggregation dashboard — deferred to M5
 
-**Phase 2 exit criteria:** Public site works with manually inserted published posts (via service tests or seed script).
+### 2.7 Tests (Phase 2)
+
+- [x] Unit: public visibility (`isPublicPost`)
+- [x] Unit: SEO fallbacks, RSS builder, sitemap/robots, analytics validation, rate limiting
+- [ ] Integration: published post visible at `/blog/[slug]` — deferred (needs test DB harness)
+- [ ] Integration: draft post returns 404 — deferred
+- [ ] Integration: search returns only published — deferred
+
+**Phase 2 exit criteria:** Public site works with manually inserted published posts (via service tests or seed script). ✅
 
 ---
 

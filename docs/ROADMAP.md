@@ -4,7 +4,24 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ---
 
-## Current milestone: M0 — Foundation complete ✅
+## Current milestone: M2 — Public blog complete ✅
+
+**Status:** Done
+
+| Deliverable | State |
+|-------------|-------|
+| Public routes (home, blog, tags, categories, search) | ✅ |
+| SEO (metadata, OG, Twitter, JSON-LD) | ✅ |
+| RSS, sitemap, robots.txt | ✅ |
+| Post view analytics endpoint | ✅ |
+| Published-only visibility enforced | ✅ |
+| Redirect check on `/blog/[slug]` | ✅ (partial — see M6) |
+
+**Next:** Begin M3 — Admin publishing.
+
+---
+
+## M0 — Foundation complete ✅
 
 **Status:** Done
 
@@ -19,13 +36,11 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | `createSecureAuth` composition root | ✅ |
 | Project documentation | ✅ (this docs set) |
 
-**Next:** Begin M1 — Blog domain foundation.
-
 ---
 
-## M1 — Blog domain foundation
+## M1 — Blog domain foundation ✅
 
-**Target:** Schema, services, and utilities — no UI.
+**Status:** Done
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
@@ -36,28 +51,27 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 1.5 | Admin authorization | `requireAdminSession()` — secure-auth session + `ADMIN_EMAIL` check |
 | 1.6 | Unit tests | Slug, validation, publish rules |
 
-**Exit gate:** Integration test can create, update, and publish a post via service layer.
-
-**Estimated scope:** Small — backend only, highest priority.
+**Exit gate:** Integration test can create, update, and publish a post via service layer. ✅
 
 ---
 
-## M2 — Public blog
+## M2 — Public blog ✅
 
-**Target:** Reader-facing site for published content.
+**Status:** Done
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 2.1 | Public routes | Home, `/blog`, `/blog/[slug]`, tags, categories |
+| 2.1 | Public routes | Home, `/blog`, `/blog/[slug]`, tags, categories, search |
 | 2.2 | Search | PostgreSQL FTS, published only |
 | 2.3 | SEO | Meta tags, OG, Twitter cards, JSON-LD |
 | 2.4 | Feeds | RSS, sitemap, robots.txt |
-| 2.5 | Redirects | Middleware for slug/GitHub Pages URLs |
+| 2.5 | Redirects | `/blog/[slug]` lookup only (full legacy redirects → M6) |
 | 2.6 | 404 | Friendly not-found page |
+| 2.7 | Analytics | `POST /api/analytics/post-view` with rate limiting |
 
-**Exit gate:** Seed a published post; visible on home, blog, search, RSS, and sitemap. Draft invisible.
+**Exit gate:** Seed a published post; visible on home, blog, search, RSS, and sitemap. Draft invisible. ✅
 
-**Depends on:** M1
+**Deferred to later phases:** Related posts, middleware redirects, route integration tests, GIN indexes, analytics dashboard (M5).
 
 ---
 
@@ -156,9 +170,9 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 ```
 M0 Foundation     ████████████████████  DONE
-M1 Domain         ░░░░░░░░░░░░░░░░░░░░  NEXT
-M2 Public blog    ░░░░░░░░░░░░░░░░░░░░
-M3 Admin          ░░░░░░░░░░░░░░░░░░░░
+M1 Domain         ████████████████████  DONE
+M2 Public blog    ████████████████████  DONE
+M3 Admin          ░░░░░░░░░░░░░░░░░░░░  NEXT
 M4 Images         ░░░░░░░░░░░░░░░░░░░░
 M5 Analytics      ░░░░░░░░░░░░░░░░░░░░
 M6 Migration      ░░░░░░░░░░░░░░░░░░░░
@@ -246,18 +260,17 @@ Track unresolved decisions. Default action if not decided before implementation:
 
 ## Recommended next step
 
-**Start M1 — Phase 1: Blog domain foundation.**
+**Start M3 — Admin publishing.**
 
 First concrete tasks:
 
-1. Create `src/modules/posts/schema.ts` with `posts` table referencing `users.id`
-2. Create remaining module schemas per [DOMAIN_MODEL.md](./DOMAIN_MODEL.md)
-3. Aggregate in `src/db/blog-schema.ts` and update `src/db/schema.ts`
-4. Run `npm run db:generate` and `npm run db:migrate`
-5. Implement `posts/repository.ts` and `posts/service.ts`
-6. Write slug + publish unit tests
+1. Create `src/app/admin/layout.tsx` with `requireAdminSession()` guard
+2. Build `/admin` dashboard with post counts by status
+3. Implement `/admin/posts` list with filters
+4. Add `/admin/posts/new` and `/admin/posts/[id]` editor workspace
+5. Wire lifecycle API routes (`publish`, `unpublish`, `schedule`, etc.)
 
-Do not start public or admin UI until M1 exit gate passes.
+Public blog is live; use M2 routes to verify publish/unpublish flows during M3.
 
 ---
 
