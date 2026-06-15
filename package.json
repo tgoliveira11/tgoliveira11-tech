@@ -9,14 +9,25 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "audit": "npm audit",
+    "audit:prod": "npm audit --omit=dev",
+    "audit:ci": "npm audit --audit-level=moderate",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "import:github-pages": "tsx scripts/import-github-pages.ts"
   },
+  "overrides": {
+    "esbuild": "^0.28.1",
+    "postcss": "^8.5.10",
+    "uuid": "^11.1.1",
+    "drizzle-kit": {
+      "@esbuild-kit/esm-loader": "npm:tsx@^4.22.4"
+    }
+  },
   "dependencies": {
-    "@tgoliveira/secure-auth": "^0.1.4-internal",
-    "drizzle-orm": "^0.44.7",
+    "@tgoliveira/secure-auth": "^0.1.10-internal",
+    "drizzle-orm": "^0.45.2",
     "gray-matter": "^4.0.3",
     "next": "16.2.9",
     "next-auth": "^4.24.14",
