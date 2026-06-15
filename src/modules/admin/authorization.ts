@@ -3,7 +3,7 @@ import "server-only";
 import { getServerSession } from "next-auth";
 import { forbidden, redirect } from "next/navigation";
 import { ForbiddenError } from "@/lib/errors";
-import { secureAuth } from "@/lib/auth/secure-auth";
+import { getAuthOptions } from "@/lib/auth/auth-options";
 import { isAdminEmail } from "./is-admin-email";
 
 export { isAdminEmail } from "./is-admin-email";
@@ -14,8 +14,7 @@ type AdminUser = {
 };
 
 async function getAuthenticatedAdminUser(): Promise<AdminUser | null> {
-  const services = await secureAuth.getServices();
-  const session = await getServerSession(services.getAuthOptions());
+  const session = await getServerSession(await getAuthOptions());
 
   if (!session?.user) {
     return null;
@@ -34,8 +33,7 @@ async function getAuthenticatedAdminUser(): Promise<AdminUser | null> {
 }
 
 export async function requireAdminSession() {
-  const services = await secureAuth.getServices();
-  const session = await getServerSession(services.getAuthOptions());
+  const session = await getServerSession(await getAuthOptions());
 
   if (!session?.user) {
     redirect("/login?callbackUrl=/admin");

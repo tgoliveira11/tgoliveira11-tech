@@ -1,5 +1,6 @@
 import "server-only";
 import { createSecureAuth } from "@tgoliveira/secure-auth/next";
+import { APP_DEFAULTS } from "@/lib/auth/app-defaults";
 import { db } from "@/db/client";
 import { devEmailProvider } from "@/lib/email/dev-email-provider";
 import { buildSecureAuthConfigFromEnv } from "@/lib/env/secure-auth-from-env";
@@ -7,9 +8,9 @@ import { readEnv } from "@/lib/env/parse";
 import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
 
 const envConfig = buildSecureAuthConfigFromEnv({
-  appName: "PostForge",
-  appSlug: "postforge",
-  baseUrl: "http://localhost:3000",
+  appName: APP_DEFAULTS.name,
+  appSlug: APP_DEFAULTS.slug,
+  baseUrl: APP_DEFAULTS.baseUrl,
   afterLoginPath: "/admin",
 });
 

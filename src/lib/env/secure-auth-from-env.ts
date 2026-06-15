@@ -1,5 +1,6 @@
 import type { SecureAuthConfig } from "@tgoliveira/secure-auth";
 import type { PasswordPolicyEnforcement } from "@tgoliveira/secure-auth/client/password-policy";
+import { resolveAuthCookiePrefix } from "@/lib/auth/auth-cookie-prefix";
 import {
   readBooleanEnv,
   readEnumEnv,
@@ -42,7 +43,7 @@ export function buildSecureAuthConfigFromEnv(
   env: NodeJS.ProcessEnv = process.env
 ): SecureAuthEnvSlice {
   const appName = readEnv(env, "APP_NAME") ?? defaults.appName;
-  const appSlug = readEnv(env, "APP_SLUG") ?? defaults.appSlug;
+  const appSlug = resolveAuthCookiePrefix(env, defaults.appSlug);
   const baseUrl =
     readFirstEnv(env, ["APP_BASE_URL", "NEXTAUTH_URL"]) ?? defaults.baseUrl;
 

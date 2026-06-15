@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16
-    container_name: postforge-postgres
+    container_name: tgoliveira11-tech-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postforge
-      POSTGRES_PASSWORD: postforge
-      POSTGRES_DB: postforge
+      POSTGRES_USER: tgoliveira11_tech
+      POSTGRES_PASSWORD: tgoliveira11_tech
+      POSTGRES_DB: tgoliveira11_tech
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - postforge_postgres_data:/var/lib/postgresql/data
+      - tgoliveira11_tech_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postforge_postgres_data:
+  tgoliveira11_tech_postgres_data:
