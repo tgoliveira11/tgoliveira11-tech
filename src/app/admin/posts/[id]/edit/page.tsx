@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { AdminPageTitle } from "@/components/admin/admin-page-title";
 import { PostEditorForm } from "@/components/admin/posts/post-editor-form";
 import * as assetsService from "@/modules/assets/assets.service";
 import * as categoriesService from "@/modules/categories/categories.service";
@@ -27,9 +26,6 @@ export default async function AdminPostEditPage({ params }: PageProps) {
   ]);
 
   return (
-    <div>
-      <AdminPageTitle title="Edit Post" description={`Editing “${bundle.post.title}”`} />
-      <PostEditorForm bundle={bundle} categories={categories} tags={tags} assets={assets} />
-    </div>
+    <PostEditorForm bundle={bundle} categories={categories} tags={tags} assets={assets} />
   );
 }

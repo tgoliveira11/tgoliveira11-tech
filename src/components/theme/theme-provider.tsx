@@ -26,9 +26,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const stored = getStoredTheme() ?? "light";
     initialized.current = true;
-    setThemeState(stored);
     applyTheme(stored);
-    setReady(true);
+    queueMicrotask(() => {
+      setThemeState(stored);
+      setReady(true);
+    });
 
     function onStorage(event: StorageEvent) {
       if (event.key !== THEME_STORAGE_KEY || !event.newValue) {

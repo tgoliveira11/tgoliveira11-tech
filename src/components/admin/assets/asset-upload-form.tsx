@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function AssetUploadForm({ postId }: { postId: string }) {
+export function AssetUploadForm({ postId, compact = false }: { postId: string; compact?: boolean }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +37,36 @@ export function AssetUploadForm({ postId }: { postId: string }) {
     } finally {
       setPending(false);
     }
+  }
+
+  if (compact) {
+    return (
+      <form onSubmit={handleSubmit} className="space-y-3 rounded-md border border-[var(--border)] bg-[var(--surface-subtle)] p-3">
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium">Image file</span>
+          <input
+            type="file"
+            name="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            required
+            className="block w-full text-xs"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium">Alt text (optional)</span>
+          <input name="altText" className="w-full rounded-md border border-[var(--border)] px-2 py-1.5 text-sm" />
+        </label>
+        {error ? <p className="text-xs text-red-600">{error}</p> : null}
+        {message ? <p className="text-xs text-emerald-700">{message}</p> : null}
+        <button
+          type="submit"
+          disabled={pending}
+          className="w-full rounded-md bg-[var(--primary)] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {pending ? "Uploading…" : "Upload image"}
+        </button>
+      </form>
+    );
   }
 
   return (

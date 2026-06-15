@@ -1,0 +1,28 @@
+---
+description: PostForge admin UI/UX principles for editor and authoring surfaces
+globs: src/components/admin/**/*,src/app/admin/**/*
+alwaysApply: false
+---
+
+# PostForge UI/UX
+
+Read `docs/UI_UX_SKILL.md` before changing admin UI.
+
+## Post editor rules
+
+- Writing fields (title, slug, excerpt, contentMarkdown) go in the **main column**, first.
+- Save/publish actions go in a **sticky header** linked to `id="post-editor-form"`.
+- Assets go in a **compact sidebar panel**, never above the title.
+- Featured/pinned: **one Promotion card** in the form — no duplicate FeaturedControls/PinnedControls on the edit page.
+- SEO: collapsed by default with a completion hint in the summary.
+- Archive: **danger zone** at sidebar bottom only.
+- Publishing must **save form data first** (`intent=publish`) — never publish unsaved editor state from the editor page.
+- Preserve form field names expected by `parseUpdatePostFormData` / `updatePostAction`.
+- Do not clear `coverAssetId` / `ogAssetId` on save (omit from form).
+
+## Patterns
+
+- Use `EditorCard` for sidebar sections.
+- Use `AdminStatusBadge` for post status.
+- Show validation errors with `role="alert"`.
+- Prefer progressive disclosure over long scrolling forms.

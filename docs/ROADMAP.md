@@ -92,6 +92,8 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Exit gate:** Login as `ADMIN_EMAIL` → create → publish → visible publicly → unpublish → hidden. ✅
 
+**Editor UX (follow-up):** Post editor redesigned as a writing-first workspace — sticky header, two-column layout, compact assets sidebar, promotion/SEO/schedule cards. See `docs/UI_UX_SKILL.md`.
+
 **Deferred:** Autosave, revisions UI, scheduler cron, admin tag filter, `/api/admin/*` REST routes.
 
 ---

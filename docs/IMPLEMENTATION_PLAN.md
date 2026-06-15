@@ -246,12 +246,20 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] `pinPostAction`
 - [x] `previewMarkdownAction`
 
-### 3.4 Editor (minimal MVP)
+### 3.4 Editor (writing-first workspace)
 
-- [x] `markdown-editor.tsx` — textarea-based editor
-- [x] `markdown-preview.tsx` — live preview using same render pipeline
+- [x] `post-editor-form.tsx` — two-column layout: main writing column + metadata sidebar
+- [x] `editor-sticky-header.tsx` — back link, status badge, save/preview/publish always visible
+- [x] `markdown-editor.tsx` — Write / Preview / Split tabs, larger textarea, `contentMarkdown` preserved
+- [x] Sidebar cards: status, compact assets, taxonomy, promotion, SEO (collapsed), schedule, danger zone
+- [x] `docs/UI_UX_SKILL.md` + `.cursor/rules/postforge-ui-ux.mdc` — admin UI principles
 - [ ] Autosave — deferred; manual Save draft with `createRevision: true`
 - [ ] Editor toolbar — deferred
+- [ ] Inline tag creation — deferred (helper text points to tag management)
+
+**Save/publish safety (unchanged):** `updatePostAction` with `intent=publish` saves current form fields then publishes the same post ID. Cover/OG asset IDs are set via asset actions only and are not cleared on save.
+
+**Assets:** Large upload form removed from top of page; `compact-post-assets-panel.tsx` in sidebar with thumbnails, cover/OG pickers, and insert actions.
 
 ### 3.5 Lifecycle UI
 

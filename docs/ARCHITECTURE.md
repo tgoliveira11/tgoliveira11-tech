@@ -118,6 +118,18 @@ src/
 │   │   ├── search-form.tsx
 │   │   └── seo-head.tsx
 │   ├── admin/                       # Admin components
+│   │   ├── posts/
+│   │   │   ├── post-editor-form.tsx       # Main editor shell (form + sidebar)
+│   │   │   ├── editor-sticky-header.tsx   # Sticky save/preview/publish bar
+│   │   │   ├── markdown-editor.tsx        # Write / Preview / Split tabs
+│   │   │   ├── post-status-card.tsx       # Status, dates, public URL
+│   │   │   ├── post-taxonomy-card.tsx     # Category + tags (form= association)
+│   │   │   ├── post-promotion-card.tsx    # Featured / pinned (single card)
+│   │   │   ├── post-seo-card.tsx          # Collapsed SEO fields
+│   │   │   ├── post-publishing-card.tsx   # Schedule controls
+│   │   │   └── post-editor-danger-zone.tsx
+│   │   ├── assets/
+│   │   │   └── compact-post-assets-panel.tsx  # Sidebar assets (not top-of-page)
 │   │   ├── post-list-table.tsx
 │   │   ├── post-status-badge.tsx
 │   │   ├── post-filters.tsx
@@ -230,7 +242,8 @@ modules/{domain}/
 ### Example flow: publish post
 
 ```
-PostEditorForm → publishPostAction(postId)
+EditorStickyHeader (form="post-editor-form", intent=publish)
+  → updatePostAction(postId) — parseUpdatePostFormData saves fields first when intent=publish
   → admin-posts.actions.ts: requireAdminSession() — session + ADMIN_EMAIL
   → posts/service.publishPost(id, session.user.id)
     → validation: post exists, publishable title/slug/content
@@ -240,6 +253,8 @@ PostEditorForm → publishPostAction(postId)
     → revalidatePublicPaths(slug)
   → client router.refresh()
 ```
+
+Post editor layout: single main form (`id="post-editor-form"`) for title, slug, excerpt, content, taxonomy, promotion, and SEO. Sidebar fields use the HTML `form` attribute to associate with the main form. Assets, schedule, and archive use separate forms/actions. UI guidelines: `docs/UI_UX_SKILL.md`.
 
 Admin mutations use **Server Actions** (`src/modules/posts/admin-posts.actions.ts`), not `/api/admin/*` route handlers. REST admin API can be added later if needed for external clients.
 
