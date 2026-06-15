@@ -1,16 +1,46 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { readUploadMaxFileSizeBytes } from "@/lib/env";
+import { AssetDropzone } from "./asset-dropzone";
+import { assignFileToInput } from "./asset-upload.helpers";
 
-export function AssetUploadForm({ postId, compact = false }: { postId: string; compact?: boolean }) {
+const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
+
+export function AssetUploadForm({
+  postId,
+  compact = false,
+  maxSizeBytes = DEFAULT_MAX_BYTES,
+}: {
+  postId: string;
+  compact?: boolean;
+  maxSizeBytes?: number;
+}) {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const resolvedMaxSize = maxSizeBytes > 0 ? maxSizeBytes : DEFAULT_MAX_BYTES;
+
+  function resetForm() {
+    setSelectedFile(null);
+    formRef.current?.reset();
+    const fileInput = formRef.current?.querySelector('input[type="file"]');
+    if (fileInput instanceof HTMLInputElement) {
+      assignFileToInput(fileInput, null);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!selectedFile) {
+      setError("Choose an image file to upload.");
+      return;
+    }
+
     setPending(true);
     setError(null);
     setMessage(null);
@@ -30,7 +60,7 @@ export function AssetUploadForm({ postId, compact = false }: { postId: string; c
       }
 
       setMessage("Image uploaded");
-      form.reset();
+      resetForm();
       router.refresh();
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "Upload failed");
@@ -39,74 +69,70 @@ export function AssetUploadForm({ postId, compact = false }: { postId: string; c
     }
   }
 
+  const fields = (
+    <>
+      <AssetDropzone
+        selectedFile={selectedFile}
+        onFileChange={setSelectedFile}
+        maxSizeBytes={resolvedMaxSize}
+        disabled={pending}
+        error={error && !selectedFile ? error : null}
+      />
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium">Alt text (optional)</span>
+        <input
+          name="altText"
+          disabled={pending}
+          className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium">Caption (optional)</span>
+        <input
+          name="caption"
+          disabled={pending}
+          className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+        />
+      </label>
+      {error && selectedFile ? (
+        <p role="alert" className="text-sm text-red-600">
+          {error}
+        </p>
+      ) : null}
+      {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
+      <button
+        type="submit"
+        disabled={pending || !selectedFile}
+        className={`rounded-md bg-[var(--primary)] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50 ${
+          compact ? "w-full px-3 py-2 text-sm" : "px-4 py-2 text-sm"
+        }`}
+      >
+        {pending ? "Uploading…" : "Upload image"}
+      </button>
+    </>
+  );
+
   if (compact) {
     return (
-      <form onSubmit={handleSubmit} className="space-y-3 rounded-md border border-[var(--border)] bg-[var(--surface-subtle)] p-3">
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Image file</span>
-          <input
-            type="file"
-            name="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            required
-            className="block w-full text-xs"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Alt text (optional)</span>
-          <input name="altText" className="w-full rounded-md border border-[var(--border)] px-2 py-1.5 text-sm" />
-        </label>
-        {error ? <p className="text-xs text-red-600">{error}</p> : null}
-        {message ? <p className="text-xs text-emerald-700">{message}</p> : null}
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full rounded-md bg-[var(--primary)] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
-        >
-          {pending ? "Uploading…" : "Upload image"}
-        </button>
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
+        {fields}
       </form>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
+    <form ref={formRef} onSubmit={handleSubmit} className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
       <h2 className="text-sm font-semibold">Upload image</h2>
-      <p className="mt-1 text-xs text-[var(--muted)]">
-        JPEG, PNG, WebP, or GIF. SVG is not allowed. Max size uses UPLOAD_MAX_FILE_SIZE_BYTES.
-      </p>
-
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <label className="block text-sm md:col-span-2">
-          <span className="mb-1 block font-medium">Image file</span>
-          <input
-            type="file"
-            name="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            required
-            className="block w-full text-sm"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Alt text</span>
-          <input name="altText" className="w-full rounded-md border border-[var(--border)] px-3 py-2" />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Caption</span>
-          <input name="caption" className="w-full rounded-md border border-[var(--border)] px-3 py-2" />
-        </label>
-      </div>
-
-      {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-      {message ? <p className="mt-3 text-sm text-emerald-700">{message}</p> : null}
-
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-4 rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-      >
-        {pending ? "Uploading…" : "Upload"}
-      </button>
+      <div className="mt-4 space-y-3">{fields}</div>
     </form>
   );
+}
+
+/** Server components can pass the configured limit; client fallbacks use env or 5 MB default. */
+export function readAssetUploadMaxSizeBytes(): number {
+  try {
+    return readUploadMaxFileSizeBytes();
+  } catch {
+    return DEFAULT_MAX_BYTES;
+  }
 }

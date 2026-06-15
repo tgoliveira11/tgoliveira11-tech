@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PostEditorForm } from "@/components/admin/posts/post-editor-form";
+import { readUploadMaxFileSizeBytes } from "@/lib/env";
 import * as assetsService from "@/modules/assets/assets.service";
 import * as categoriesService from "@/modules/categories/categories.service";
 import * as postsService from "@/modules/posts/posts.service";
@@ -26,6 +27,12 @@ export default async function AdminPostEditPage({ params }: PageProps) {
   ]);
 
   return (
-    <PostEditorForm bundle={bundle} categories={categories} tags={tags} assets={assets} />
+    <PostEditorForm
+      bundle={bundle}
+      categories={categories}
+      tags={tags}
+      assets={assets}
+      uploadMaxFileSizeBytes={readUploadMaxFileSizeBytes()}
+    />
   );
 }

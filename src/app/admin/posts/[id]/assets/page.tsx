@@ -5,6 +5,7 @@ import { AssetGrid } from "@/components/admin/assets/asset-grid";
 import { AssetUploadForm } from "@/components/admin/assets/asset-upload-form";
 import { CoverImagePicker } from "@/components/admin/assets/cover-image-picker";
 import { OgImagePicker } from "@/components/admin/assets/og-image-picker";
+import { readUploadMaxFileSizeBytes } from "@/lib/env";
 import * as assetsService from "@/modules/assets/assets.service";
 import * as postsService from "@/modules/posts/posts.service";
 
@@ -41,7 +42,7 @@ export default async function AdminPostAssetsPage({ params }: PageProps) {
         <OgImagePicker postId={id} assets={assets} ogAssetId={post.ogAssetId} />
       </div>
 
-      <AssetUploadForm postId={id} />
+      <AssetUploadForm postId={id} maxSizeBytes={readUploadMaxFileSizeBytes()} />
 
       <div className="mt-8">
         <AssetGrid

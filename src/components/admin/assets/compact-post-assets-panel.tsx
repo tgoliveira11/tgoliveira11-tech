@@ -48,14 +48,17 @@ export function CompactPostAssetsPanel({
   coverAssetId,
   ogAssetId,
   onInsertMarkdown,
+  uploadMaxFileSizeBytes,
 }: {
   postId: string;
   assets: Asset[];
   coverAssetId: string | null;
   ogAssetId: string | null;
   onInsertMarkdown?: (markdown: string) => void;
+  uploadMaxFileSizeBytes?: number;
 }) {
-  const [showUpload, setShowUpload] = useState(assets.length === 0);
+  const hasAssets = assets.length > 0;
+  const [showUpload, setShowUpload] = useState(!hasAssets);
   const coverAsset = assets.find((asset) => asset.id === coverAssetId);
   const ogAsset = assets.find((asset) => asset.id === ogAssetId);
 
@@ -90,7 +93,7 @@ export function CompactPostAssetsPanel({
           </div>
         </div>
 
-        {assets.length > 0 ? (
+        {hasAssets ? (
           <>
             <CoverImagePicker postId={postId} assets={assets} coverAssetId={coverAssetId} />
             <OgImagePicker postId={postId} assets={assets} ogAssetId={ogAssetId} />
@@ -107,21 +110,28 @@ export function CompactPostAssetsPanel({
             </div>
           </>
         ) : (
-          <p className="rounded-md border border-dashed border-[var(--border)] px-3 py-4 text-xs text-[var(--muted)]">
-            No images yet. Upload an image to use it as a cover, OG image, or insert it into the
-            Markdown body.
-          </p>
+          <div className="rounded-md border border-dashed border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-4 text-center">
+            <p className="text-sm font-medium text-[var(--foreground)]">No images yet</p>
+            <p className="mt-1 text-xs text-[var(--muted)]">
+              Upload your first image to use it as a cover, Open Graph image, or insert it into the
+              Markdown body.
+            </p>
+          </div>
         )}
 
-        <button
-          type="button"
-          onClick={() => setShowUpload((current) => !current)}
-          className="w-full rounded-md border border-[var(--border)] px-3 py-2 text-sm hover:bg-[var(--surface-subtle)]"
-        >
-          {showUpload ? "Hide upload form" : assets.length === 0 ? "Upload image" : "Upload another image"}
-        </button>
+        {hasAssets ? (
+          <button
+            type="button"
+            onClick={() => setShowUpload((current) => !current)}
+            className="w-full rounded-md border border-[var(--border)] px-3 py-2 text-sm hover:bg-[var(--surface-subtle)]"
+          >
+            {showUpload ? "Hide upload form" : "Upload another image"}
+          </button>
+        ) : null}
 
-        {showUpload ? <AssetUploadForm postId={postId} compact /> : null}
+        {showUpload ? (
+          <AssetUploadForm postId={postId} compact maxSizeBytes={uploadMaxFileSizeBytes} />
+        ) : null}
 
         <Link
           href={`/admin/posts/${postId}/assets`}

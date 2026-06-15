@@ -8,7 +8,7 @@ import type { Tag } from "@/modules/tags/tags.types";
 import { type ActionResult, updatePostAction } from "@/modules/posts/admin-posts.actions";
 import { CompactPostAssetsPanel } from "@/components/admin/assets/compact-post-assets-panel";
 import { EditorStickyHeader } from "./editor-sticky-header";
-import { POST_EDITOR_FORM_ID } from "./editor-constants";
+import { EDITOR_EXCERPT_CLASS, POST_EDITOR_FORM_ID } from "./editor-constants";
 import { MarkdownEditor } from "./markdown-editor";
 import { PostEditorDangerZone } from "./post-editor-danger-zone";
 import { PostPromotionCard } from "./post-promotion-card";
@@ -24,11 +24,13 @@ export function PostEditorForm({
   categories,
   tags,
   assets,
+  uploadMaxFileSizeBytes,
 }: {
   bundle: AdminPostBundle;
   categories: Category[];
   tags: Tag[];
   assets: Asset[];
+  uploadMaxFileSizeBytes?: number;
 }) {
   const { post, tagIds } = bundle;
   const boundAction = updatePostAction.bind(null, post.id);
@@ -66,8 +68,8 @@ export function PostEditorForm({
         </p>
       ) : null}
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <form id={POST_EDITOR_FORM_ID} action={formAction} className="space-y-5">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
+        <form id={POST_EDITOR_FORM_ID} action={formAction} className="flex flex-col space-y-5">
           <input type="hidden" name="createRevision" value="true" />
 
           <label className="block text-sm">
@@ -95,18 +97,19 @@ export function PostEditorForm({
             <textarea
               name="excerpt"
               defaultValue={post.excerpt ?? ""}
-              rows={3}
-              className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+              className={EDITOR_EXCERPT_CLASS}
               placeholder="Short summary for listings and SEO"
             />
           </label>
 
-          <MarkdownEditor
+          <div className="flex min-h-0 flex-1 flex-col">
+            <MarkdownEditor
             key={editorKey}
             name="contentMarkdown"
             defaultValue={post.contentMarkdown}
             onRegisterInsert={registerInsert}
           />
+          </div>
         </form>
 
         <aside className="space-y-4">
@@ -118,6 +121,7 @@ export function PostEditorForm({
             coverAssetId={post.coverAssetId}
             ogAssetId={post.ogAssetId}
             onInsertMarkdown={insertMarkdown ?? undefined}
+            uploadMaxFileSizeBytes={uploadMaxFileSizeBytes}
           />
 
           <PostTaxonomyCard

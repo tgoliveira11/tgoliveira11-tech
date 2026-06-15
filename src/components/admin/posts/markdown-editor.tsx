@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  EDITOR_CONTENT_MIN_HEIGHT_CLASS,
+  EDITOR_CONTENT_PREVIEW_PANEL_CLASS,
+  EDITOR_CONTENT_TEXTAREA_CLASS,
+} from "./editor-constants";
 import { MarkdownPreview } from "./markdown-preview";
 
 type EditorMode = "write" | "preview" | "split";
@@ -29,8 +34,13 @@ export function MarkdownEditor({
     });
   }, [onRegisterInsert]);
 
+  const panelClass =
+    mode === "split"
+      ? `grid gap-4 lg:grid-cols-2 ${EDITOR_CONTENT_MIN_HEIGHT_CLASS}`
+      : EDITOR_CONTENT_MIN_HEIGHT_CLASS;
+
   return (
-    <div className="space-y-3">
+    <div className={`flex flex-col space-y-3 ${EDITOR_CONTENT_MIN_HEIGHT_CLASS}`}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <label htmlFor="post-content-markdown" className="text-sm font-medium">
           {label}
@@ -53,7 +63,7 @@ export function MarkdownEditor({
               role="tab"
               aria-selected={mode === key}
               onClick={() => setMode(key)}
-              className={`rounded px-3 py-1.5 ${
+              className={`rounded px-3 py-2 ${
                 mode === key
                   ? "bg-[var(--primary)] text-white"
                   : "text-[var(--foreground)] hover:bg-[var(--surface-subtle)]"
@@ -69,30 +79,27 @@ export function MarkdownEditor({
         Supports Markdown. Images can be inserted from the assets panel.
       </p>
 
-      <div
-        className={
-          mode === "split"
-            ? "grid gap-4 lg:grid-cols-2"
-            : mode === "preview"
-              ? "block"
-              : "block"
-        }
-      >
-        {(mode === "write" || mode === "split") && (
-          <textarea
-            id="post-content-markdown"
-            name={name}
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            rows={28}
-            className="min-h-[28rem] w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-            spellCheck={false}
-          />
-        )}
+      <div className={panelClass}>
+        <textarea
+          id="post-content-markdown"
+          name={name}
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          className={
+            mode === "preview"
+              ? "sr-only"
+              : EDITOR_CONTENT_TEXTAREA_CLASS
+          }
+          spellCheck={false}
+          aria-hidden={mode === "preview" ? true : undefined}
+          tabIndex={mode === "preview" ? -1 : undefined}
+        />
         {(mode === "preview" || mode === "split") && (
-          <div className={mode === "preview" ? "min-h-[28rem]" : ""}>
+          <div className={EDITOR_CONTENT_PREVIEW_PANEL_CLASS}>
             <p className="mb-2 text-xs font-medium text-[var(--muted)]">Live preview</p>
-            <MarkdownPreview markdown={value} />
+            <div className="min-h-0 flex-1 overflow-auto rounded-md border border-[var(--border)] bg-[var(--surface-subtle)] p-3">
+              <MarkdownPreview markdown={value} />
+            </div>
           </div>
         )}
       </div>
