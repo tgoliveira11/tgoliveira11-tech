@@ -20,6 +20,8 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Next:** Begin M7 — Hardening.
 
+**Recent polish:** Public editorial UI applied across all human-facing reader pages (see `docs/UI_UX_SKILL.md` public section).
+
 ---
 
 ## M0 — Foundation complete ✅

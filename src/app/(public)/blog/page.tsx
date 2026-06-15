@@ -1,6 +1,9 @@
 import { PublicLayout } from "@/components/public/public-layout";
+import { PublicPageHero } from "@/components/public/public-page-hero";
+import { PublicPageShell } from "@/components/public/public-page-shell";
 import { PostList } from "@/components/public/post-list";
-import { Pagination } from "@/components/public/pagination";
+import { PublicPagination } from "@/components/public/public-pagination";
+import { SearchForm } from "@/components/public/search-form";
 import { getBlogListingPage } from "@/modules/public/public-posts.service";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { buildSiteMetadata } from "@/modules/public/seo";
@@ -10,7 +13,7 @@ export async function generateMetadata() {
   return {
     ...buildSiteMetadata(config),
     title: "Blog",
-    description: `Published posts from ${config.title}`,
+    description: "Browse all published posts.",
   };
 }
 
@@ -25,14 +28,26 @@ export default async function BlogListingPage({
 
   return (
     <PublicLayout config={config}>
-      <section>
-        <h1 className="text-3xl font-semibold tracking-tight">Blog</h1>
-        <p className="mt-2 text-[var(--muted)]">Published posts only.</p>
-        <div className="mt-8">
-          <PostList posts={posts} />
-        </div>
-        <Pagination basePath="/blog" page={page} totalPages={totalPages} />
-      </section>
+      <PublicPageShell>
+        <PublicPageHero
+          eyebrow="Archive"
+          title="Blog"
+          description="Browse all published posts."
+        >
+          <SearchForm variant="hero" />
+        </PublicPageHero>
+
+        <section aria-labelledby="blog-posts-heading">
+          <h2 id="blog-posts-heading" className="sr-only">
+            All posts
+          </h2>
+          <PostList
+            posts={posts}
+            emptyMessage="Published posts will appear here once they are available."
+          />
+          <PublicPagination basePath="/blog" page={page} totalPages={totalPages} />
+        </section>
+      </PublicPageShell>
     </PublicLayout>
   );
 }

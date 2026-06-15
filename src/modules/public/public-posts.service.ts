@@ -1,18 +1,16 @@
 import * as repo from "./public-posts.repository";
 import { getBlogConfig } from "./blog-config";
+import { splitHomePosts } from "./public-display";
 
 export async function getHomePagePosts() {
   const config = await getBlogConfig();
   const bundles = await repo.listPublishedPostBundles({ limit: config.postsPerPage + 5 });
-
-  const pinned = bundles.filter((bundle) => bundle.post.pinned);
-  const pinnedIds = new Set(pinned.map((bundle) => bundle.post.id));
-  const recent = bundles.filter((bundle) => !pinnedIds.has(bundle.post.id));
+  const { featuredPost, recent } = splitHomePosts(bundles, config.postsPerPage);
 
   return {
     config,
-    pinned,
-    recent: recent.slice(0, config.postsPerPage),
+    featuredPost,
+    recent,
   };
 }
 
@@ -38,6 +36,7 @@ export async function getBlogListingPage(page: number) {
 export {
   getPublishedPostBundleBySlug,
   searchPublishedPostBundles,
+  listPublishedPostBundles,
   listPublishedPostBundlesByCategorySlug,
   listPublishedPostBundlesByTagSlug,
   listPublicTags,

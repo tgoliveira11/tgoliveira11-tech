@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
 import { PublicLayout } from "@/components/public/public-layout";
+import { PublicBackLink } from "@/components/public/public-breadcrumbs";
+import { PublicPageHero } from "@/components/public/public-page-hero";
+import { PublicPageShell } from "@/components/public/public-page-shell";
 import { PostList } from "@/components/public/post-list";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { listPublishedPostBundlesByCategorySlug } from "@/modules/public/public-posts.service";
@@ -15,6 +18,7 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     ...buildSiteMetadata(config),
     title: `Category: ${result.category.name}`,
+    description: result.category.description ?? `Posts in ${result.category.name}.`,
   };
 }
 
@@ -27,18 +31,25 @@ export default async function CategoryDetailPage({ params }: PageProps) {
 
   return (
     <PublicLayout config={config}>
-      <section>
-        <h1 className="text-3xl font-semibold tracking-tight">{result.category.name}</h1>
-        {result.category.description ? (
-          <p className="mt-2 text-[var(--muted)]">{result.category.description}</p>
-        ) : null}
-        <div className="mt-8">
+      <PublicPageShell>
+        <PublicBackLink href="/categories">All categories</PublicBackLink>
+        <PublicPageHero
+          eyebrow="Category"
+          title={result.category.name}
+          description={
+            result.category.description ?? `Published posts in ${result.category.name}.`
+          }
+        />
+        <section aria-labelledby="category-posts-heading">
+          <h2 id="category-posts-heading" className="sr-only">
+            Posts in {result.category.name}
+          </h2>
           <PostList
             posts={result.posts}
             emptyMessage="No published posts in this category yet."
           />
-        </div>
-      </section>
+        </section>
+      </PublicPageShell>
     </PublicLayout>
   );
 }

@@ -10,15 +10,17 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 ## Phase overview
 
-| Phase | Name | Outcome |
-|-------|------|---------|
-| 1 | Blog domain foundation | Schema, migrations, repos, services, utilities |
-| 2 | Public blog | Reader-facing pages, SEO, RSS, sitemap |
-| 3 | Admin publishing | Dashboard, editor, preview, lifecycle actions |
-| 4 | Images/assets | Upload, library, insert into Markdown |
-| 5 | Analytics | View tracking, aggregates, admin dashboard ✅ |
-| 6 | Migration | GitHub Pages import ✅ |
-| 7 | Hardening | Tests, audit, accessibility, performance |
+
+| Phase | Name                   | Outcome                                        |
+| ----- | ---------------------- | ---------------------------------------------- |
+| 1     | Blog domain foundation | Schema, migrations, repos, services, utilities |
+| 2     | Public blog            | Reader-facing pages, SEO, RSS, sitemap         |
+| 3     | Admin publishing       | Dashboard, editor, preview, lifecycle actions  |
+| 4     | Images/assets          | Upload, library, insert into Markdown          |
+| 5     | Analytics              | View tracking, aggregates, admin dashboard ✅   |
+| 6     | Migration              | GitHub Pages import ✅                          |
+| 7     | Hardening              | Tests, audit, accessibility, performance       |
+
 
 ---
 
@@ -133,6 +135,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 - [x] Create `src/app/(public)/layout.tsx` — public shell
 - [x] Move/replace home page → featured/pinned + recent posts
+- [x] Public editorial UI polish — home, blog, post detail, search, tags, categories, not-found
 - [x] `/blog` — paginated listing
 - [x] `/blog/[slug]` — post detail with sanitized HTML
 - [x] `/tags` and `/tags/[slug]` — posts by tag
@@ -145,6 +148,9 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] `public-layout.tsx`, `site-header.tsx`, `site-footer.tsx`
 - [x] `post-card.tsx`, `post-list.tsx`, `tag-list.tsx`, `category-list.tsx`
 - [x] `search-form.tsx`, `empty-state.tsx`, `pagination.tsx`
+- [x] `home-hero.tsx`, `featured-post-card.tsx`, `recent-posts-section.tsx`, `topics-section.tsx`
+- [x] `public-page-shell.tsx`, `public-page-hero.tsx`, `public-empty-state.tsx`, `public-pagination.tsx`
+- [x] `topic-pill.tsx`, `topic-card.tsx`, `article-header.tsx`, `article-meta.tsx`, `article-navigation.tsx`, `site-nav.tsx`
 - [x] `post-view-tracker.tsx` — client-side view tracking
 - [x] JSON-LD via `buildBlogPostingJsonLd` in post detail metadata
 
@@ -194,7 +200,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 - Admin UI under `src/app/admin/` protected by `requireAdminSession()` in layout.
 - Non-admin authenticated users receive Next.js `forbidden()` → `src/app/admin/forbidden.tsx`.
-- Mutations use **Server Actions** in `src/modules/posts/admin-posts.actions.ts` (not `/api/admin/*` route handlers).
+- Mutations use **Server Actions** in `src/modules/posts/admin-posts.actions.ts` (not `/api/admin/`* route handlers).
 - Tag assignment wired via `post-tags.repository.ts` + `tagIds` on create/update.
 - Dashboard stats via `getDashboardStats()` in `posts.service.ts`.
 - Public path revalidation via `revalidatePublicPaths()` after publish/unpublish/archive.
@@ -222,7 +228,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] Return 403 for authenticated non-admin users (`forbidden()` + `forbidden.tsx`)
 - [x] Admin navigation component
 - [x] `/admin` dashboard — post counts by status, recent activity
-- [x] Package account/security/sessions pages wrapped at `/admin/account`, `/admin/security`, `/admin/sessions` (legacy `/settings/*` redirects)
+- [x] Package account/security/sessions pages wrapped at `/admin/account`, `/admin/security`, `/admin/sessions` (legacy `/settings/`* redirects)
 
 ### 3.2 Post management
 
@@ -256,8 +262,7 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] `docs/UI_UX_SKILL.md` + `.cursor/rules/postforge-ui-ux.mdc` — admin UI principles
 - [ ] Autosave — deferred; manual Save draft with `createRevision: true`
 - [ ] Editor toolbar — deferred
-- [x] Inline tag and category creation in editor taxonomy comboboxes (create-or-reuse by slug/name)
-- [x] Searchable tag multi-select with chips and keyboard navigation
+- [ ] Inline tag creation — deferred (helper text points to tag management)
 
 **Save/publish safety (unchanged):** `updatePostAction` with `intent=publish` saves current form fields then publishes the same post ID. Cover/OG asset IDs are set via asset actions only and are not cleared on save.
 
@@ -268,7 +273,7 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] Status badges and action buttons (publish, unpublish, schedule, archive, duplicate)
 - [x] Schedule datetime picker
 - [x] Featured/pin toggles
-- [x] Category and tag selectors (searchable comboboxes with inline create)
+- [x] Category and tag selectors
 
 ### 3.6 Scheduler
 
@@ -500,15 +505,17 @@ Phase 1 ──► Phase 2 ──► Phase 3
 
 ## Suggested libraries (add when implementing)
 
-| Concern | Library | Phase |
-|---------|---------|-------|
-| Validation | `zod` | 1 |
-| Markdown | `remark`, `remark-gfm`, `remark-rehype`, `rehype-sanitize`, `rehype-highlight` | 1 |
-| Frontmatter | `gray-matter` | 6 |
-| Image metadata | `sharp` or `image-size` | 4 |
-| Dates | `date-fns` | 2 |
-| Testing | `vitest` | 1 |
-| E2E | `playwright` (optional) | 7 |
+
+| Concern        | Library                                                                        | Phase |
+| -------------- | ------------------------------------------------------------------------------ | ----- |
+| Validation     | `zod`                                                                          | 1     |
+| Markdown       | `remark`, `remark-gfm`, `remark-rehype`, `rehype-sanitize`, `rehype-highlight` | 1     |
+| Frontmatter    | `gray-matter`                                                                  | 6     |
+| Image metadata | `sharp` or `image-size`                                                        | 4     |
+| Dates          | `date-fns`                                                                     | 2     |
+| Testing        | `vitest`                                                                       | 1     |
+| E2E            | `playwright` (optional)                                                        | 7     |
+
 
 ---
 
@@ -518,3 +525,4 @@ Phase 1 ──► Phase 2 ──► Phase 3
 - [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — table definitions
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — code structure
 - [POSTFORGE_TDR.md](./POSTFORGE_TDR.md) — requirements and acceptance criteria
+

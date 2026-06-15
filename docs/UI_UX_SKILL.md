@@ -106,3 +106,112 @@ Guidelines for admin and authoring surfaces in PostForge. Use this when building
 - Auto-publish cron UI beyond schedule datetime
 - Rich-text WYSIWYG editor
 - Autosave revisions
+
+---
+
+## Public site UI
+
+Public pages should feel **editorial and reader-focused**, not like the admin panel.
+
+### Core principles
+
+1. **Discovery first** — Home prioritizes reading, search, and topic exploration.
+2. **Clear hierarchy** — Hero → featured/latest post → recent posts → topics.
+3. **Curated taxonomy** — Limit visible tags on cards; group categories and tags in intentional “Explore topics” sections.
+4. **No duplication** — Featured post appears once; recent list excludes it.
+5. **Published only** — Public surfaces never show drafts, scheduled, unpublished, or archived posts.
+6. **Wider reading layout** — Use `max-w-6xl` (~1152px) for public content; keep line length readable in prose blocks.
+7. **Card restraint** — Cover images use consistent aspect ratios; hover states and borders differentiate cards from admin forms.
+
+### Home page structure
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Header: logo · nav (Blog, Tags, Categories, Search) · theme │
+├─────────────────────────────────────────────────────────────┤
+│ Hero: title · description · CTAs · search                   │
+├─────────────────────────────────────────────────────────────┤
+│ Featured card: pinned > featured > latest (single post)     │
+├─────────────────────────────────────────────────────────────┤
+│ Recent posts grid (excludes featured) · View all posts      │
+├─────────────────────────────────────────────────────────────┤
+│ Explore topics: category cards + tag pills (limited)        │
+├─────────────────────────────────────────────────────────────┤
+│ Footer: description · nav · RSS                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Post cards
+
+- Default variant for `/blog` and search listings.
+- Compact variant for home recent grid.
+- Show at most 4 tags; use `+N more` when truncated.
+- Category as subtle label; promotion badges only on blog/search default cards.
+- Accessible link labels for cover images and read links.
+
+### Empty states
+
+- When no published posts: polished empty state only — no topics section.
+- Copy: “No posts published yet” with short explanation.
+
+### Components
+
+- `HomeHero`, `FeaturedPostCard`, `RecentPostsSection`, `TopicsSection`, `PublicSectionHeading`
+- `PublicPageShell`, `PublicPageHero`, `PublicEmptyState`, `PublicPagination`, `PublicBackLink`
+- `TopicPill`, `TopicCard`, `ArticleHeader`, `ArticleMeta`, `ArticleNavigation`, `SiteNav`
+- Helpers in `public-display.ts`: `pickFeaturedPost`, `splitHomePosts`, `limitTagsForDisplay`
+- Helpers in `search.ts`: `normalizeSearchQuery`, `hasSearchQuery`, `formatSearchResultLabel`
+
+### Public page shell pattern
+
+All human-facing public pages use:
+
+```
+PublicLayout
+  └─ PublicPageShell
+       ├─ PublicPageHero (title, description, optional search/actions)
+       ├─ PublicBackLink (detail pages)
+       └─ content section (PostList, TagList, CategoryList, article)
+```
+
+- Blog listing: hero + search + post list + pagination
+- Post detail: back link + article header + `prose-article` body + prev/next nav
+- Search: hero search; empty state with recent posts; results with count label
+- Tags/Categories index: hero + pill/card grid
+- Tag/Category detail: back link + hero + post list
+- Not found: `PublicEmptyState` with action links inside `PublicLayout`
+
+### Article page layout
+
+- Shell width: `max-w-6xl` (layout); article column: `max-w-3xl`
+- `ArticleHeader`: category badge, title, excerpt, cover (16:9), all tags as pills
+- `ArticleMeta`: published, updated (when newer than published), reading time
+- Body: `.prose.prose-article` for final published reading experience
+
+### Topic index/detail layout
+
+- Tags index: `TopicPill` grid — show all public tags, no fake counts
+- Categories index: `TopicCard` grid with optional description
+- Detail pages: hero with context line + `PostList` with default cards
+
+### Tag display rules
+
+| Surface | Tag behavior |
+|---------|----------------|
+| Home cards | Max 4 tags + “+N more” |
+| Blog/search cards | Max 4 tags + “+N more” |
+| Post detail | All tags, pill style below cover |
+| Tags index | All tags with published posts |
+
+### Empty state pattern
+
+- `PublicEmptyState`: dashed border card, title, description, optional actions
+- Taxonomy indexes: inline empty when no published taxonomy
+- Post lists: empty when no posts in context
+- Not found: friendly copy + Go home / Browse posts / Search
+
+### Header navigation
+
+- `SiteNav` (client): active state for Blog, Tags, Categories, Search
+- Home `/` does not highlight nav items
+- Sticky header with backdrop blur

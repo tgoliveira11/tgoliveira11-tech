@@ -1,4 +1,6 @@
 import { PublicLayout } from "@/components/public/public-layout";
+import { PublicPageHero } from "@/components/public/public-page-hero";
+import { PublicPageShell } from "@/components/public/public-page-shell";
 import { CategoryList } from "@/components/public/category-list";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { listPublicCategories } from "@/modules/public/public-posts.service";
@@ -6,7 +8,11 @@ import { buildSiteMetadata } from "@/modules/public/seo";
 
 export async function generateMetadata() {
   const config = await getBlogConfig();
-  return { ...buildSiteMetadata(config), title: "Categories" };
+  return {
+    ...buildSiteMetadata(config),
+    title: "Categories",
+    description: "Browse posts by category.",
+  };
 }
 
 export default async function CategoriesIndexPage() {
@@ -15,15 +21,19 @@ export default async function CategoriesIndexPage() {
 
   return (
     <PublicLayout config={config}>
-      <section>
-        <h1 className="text-3xl font-semibold tracking-tight">Categories</h1>
-        <p className="mt-2 text-sm text-[var(--muted)]">
-          Categories that have at least one published post.
-        </p>
-        <div className="mt-8">
+      <PublicPageShell>
+        <PublicPageHero
+          eyebrow="Topics"
+          title="Categories"
+          description="Browse posts by category."
+        />
+        <section aria-labelledby="categories-list-heading">
+          <h2 id="categories-list-heading" className="sr-only">
+            All categories
+          </h2>
           <CategoryList categories={categories} />
-        </div>
-      </section>
+        </section>
+      </PublicPageShell>
     </PublicLayout>
   );
 }
