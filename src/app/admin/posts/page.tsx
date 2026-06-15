@@ -1,5 +1,6 @@
 import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminPageTitle } from "@/components/admin/admin-page-title";
+import { CreateDraftButton } from "@/components/admin/posts/create-draft-button";
 import { PostFilters } from "@/components/admin/posts/post-filters";
 import { PostTable } from "@/components/admin/posts/post-table";
 import { createDraftAction } from "@/modules/posts/admin-posts.actions";
@@ -40,9 +41,9 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
         description="Manage drafts, scheduled posts, and published content."
         actions={
           <form action={createDraftAction}>
-            <button type="submit" className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white">
+            <CreateDraftButton className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white">
               New Post
-            </button>
+            </CreateDraftButton>
           </form>
         }
       />
@@ -55,9 +56,9 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
           description="Try different filters or create a new draft."
           action={
             <form action={createDraftAction}>
-              <button type="submit" className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm text-white">
+              <CreateDraftButton className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm text-white">
                 Create draft
-              </button>
+              </CreateDraftButton>
             </form>
           }
         />

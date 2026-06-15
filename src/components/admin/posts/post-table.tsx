@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { Post } from "@/modules/posts/posts.types";
 import {
   archivePostAction,
@@ -33,10 +33,16 @@ export function PostTable({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  function run(action: () => Promise<unknown>) {
+  function run(action: () => Promise<{ ok: boolean; error?: string } | void>) {
     startTransition(async () => {
-      await action();
+      const result = await action();
+      if (result && !result.ok) {
+        setActionError(result.error ?? "Something went wrong");
+        return;
+      }
+      setActionError(null);
       router.refresh();
     });
   }
@@ -46,7 +52,13 @@ export function PostTable({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]">
+    <div className="space-y-3">
+      {actionError ? (
+        <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {actionError}
+        </p>
+      ) : null}
+      <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--card)]">
       <table className="min-w-full text-left text-sm">
         <thead className="border-b border-[var(--border)] bg-[var(--surface-subtle)] text-xs uppercase text-[var(--muted)]">
           <tr>
@@ -104,7 +116,7 @@ export function PostTable({
                       className="text-left text-emerald-700 underline disabled:opacity-50"
                       onClick={() => run(() => publishPostAction(post.id))}
                     >
-                      Publish
+                      Publish saved
                     </button>
                   ) : (
                     <button
@@ -145,6 +157,7 @@ export function PostTable({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

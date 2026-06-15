@@ -9,9 +9,9 @@ import * as postsService from "@/modules/posts/posts.service";
 import {
   publishPostSchema,
   schedulePostSchema,
-  updatePostSchema,
 } from "@/modules/posts/posts.validation";
 import { publicPostPath } from "@/modules/posts/slug";
+import { parseUpdatePostFormData, readPostEditorIntent } from "@/modules/posts/admin-posts.form";
 
 export type ActionResult = {
   ok: boolean;
@@ -25,25 +25,6 @@ function mapActionError(error: unknown): string {
   return "Something went wrong";
 }
 
-function parseTagIds(formData: FormData): string[] {
-  return formData
-    .getAll("tagIds")
-    .map((value) => String(value))
-    .filter(Boolean);
-}
-
-function nullableField(formData: FormData, key: string): string | null | undefined {
-  if (!formData.has(key)) return undefined;
-  const value = formData.get(key);
-  if (value === null || value === "") return null;
-  return String(value);
-}
-
-function optionalBoolean(formData: FormData, key: string): boolean | undefined {
-  if (!formData.has(key)) return undefined;
-  return formData.get(key) === "on" || formData.get(key) === "true";
-}
-
 export async function createDraftAction(): Promise<void> {
   const session = await requireAdminSession();
   const post = await postsService.createDraft({}, session.user.id);
@@ -55,31 +36,29 @@ export async function updatePostAction(
   _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!postId) {
+    return { ok: false, error: "Post ID is required" };
+  }
+
   try {
     const session = await requireAdminSession();
     const existing = await postsService.getById(postId);
-
-    const input = updatePostSchema.parse({
-      title: formData.get("title") ?? undefined,
-      slug: formData.get("slug") ?? undefined,
-      excerpt: nullableField(formData, "excerpt"),
-      contentMarkdown: formData.get("contentMarkdown") ?? undefined,
-      categoryId: nullableField(formData, "categoryId"),
-      tagIds: parseTagIds(formData),
-      seoTitle: nullableField(formData, "seoTitle"),
-      seoDescription: nullableField(formData, "seoDescription"),
-      canonicalUrl: nullableField(formData, "canonicalUrl"),
-      ogTitle: nullableField(formData, "ogTitle"),
-      ogDescription: nullableField(formData, "ogDescription"),
-      featured: optionalBoolean(formData, "featured"),
-      pinned: optionalBoolean(formData, "pinned"),
-      pinnedPriority: formData.get("pinnedPriority")
-        ? Number(formData.get("pinnedPriority"))
-        : undefined,
-      createRevision: formData.get("createRevision") === "true",
-    });
+    const intent = readPostEditorIntent(formData);
+    const input = parseUpdatePostFormData(formData);
 
     const updated = await postsService.updateDraft(postId, input, session.user.id);
+
+    if (intent === "publish") {
+      const published = await postsService.publishPost(postId, session.user.id, publishPostSchema.parse({}));
+      revalidatePublicPaths(existing.slug);
+      if (published.slug !== existing.slug) {
+        revalidatePublicPaths(published.slug);
+      }
+      return {
+        ok: true,
+        message: `Published at ${publicPostPath(published.slug)}`,
+      };
+    }
 
     if (existing.status === "published" || updated.status === "published") {
       revalidatePublicPaths(existing.slug);
@@ -95,6 +74,10 @@ export async function updatePostAction(
 }
 
 export async function publishPostAction(postId: string): Promise<ActionResult> {
+  if (!postId) {
+    return { ok: false, error: "Post ID is required" };
+  }
+
   try {
     const session = await requireAdminSession();
     const existing = await postsService.getById(postId);

@@ -8,17 +8,20 @@ import type { Category } from "@/modules/categories/categories.types";
 import type { Tag } from "@/modules/tags/tags.types";
 import {
   type ActionResult,
+  unpublishPostAction,
   updatePostAction,
 } from "@/modules/posts/admin-posts.actions";
+import { publicPostPath } from "@/modules/posts/slug";
 import { PostAssetsPanel } from "@/components/admin/assets/post-assets-panel";
 import { AdminStatusBadge } from "../admin-status-badge";
 import { MarkdownEditor } from "./markdown-editor";
-import { PublishControls } from "./publish-controls";
 import { ScheduleControls } from "./schedule-controls";
 import { FeaturedControls } from "./featured-controls";
 import { PinnedControls } from "./pinned-controls";
 import { AdminDangerZone } from "../admin-danger-zone";
 import { ArchiveButton } from "./archive-button";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 const initialState: ActionResult = { ok: true };
 
@@ -34,12 +37,16 @@ export function PostEditorForm({
   assets: Asset[];
 }) {
   const { post, tagIds } = bundle;
+  const router = useRouter();
   const boundAction = updatePostAction.bind(null, post.id);
   const [state, formAction, pending] = useActionState(boundAction, initialState);
+  const [unpublishPending, startUnpublish] = useTransition();
   const [insertMarkdown, setInsertMarkdown] = useState<((markdown: string) => void) | null>(null);
   const registerInsert = useCallback((insert: (markdown: string) => void) => {
     setInsertMarkdown(() => insert);
   }, []);
+
+  const editorKey = `${post.id}:${post.updatedAt.toISOString()}`;
 
   return (
     <div className="space-y-6">
@@ -55,7 +62,7 @@ export function PostEditorForm({
           Manage assets
         </Link>
         {post.status === "published" ? (
-          <Link href={`/blog/${post.slug}`} className="text-sm text-[var(--primary)] underline" target="_blank" rel="noreferrer">
+          <Link href={publicPostPath(post.slug)} className="text-sm text-[var(--primary)] underline" target="_blank" rel="noreferrer">
             View public post ↗
           </Link>
         ) : null}
@@ -115,6 +122,7 @@ export function PostEditorForm({
         </label>
 
         <MarkdownEditor
+          key={editorKey}
           name="contentMarkdown"
           defaultValue={post.contentMarkdown}
           onRegisterInsert={registerInsert}
@@ -207,16 +215,56 @@ export function PostEditorForm({
           </label>
         </div>
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] disabled:opacity-50"
-        >
-          {pending ? "Saving…" : "Save draft"}
-        </button>
+        <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
+          <h2 className="text-sm font-semibold">Save and publish</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            {post.status === "published"
+              ? "Save changes to update the live post. Cover and OG images are managed above and are not cleared when saving."
+              : "Publish saves the current editor fields first, then publishes this same post."}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="submit"
+              name="intent"
+              value="save"
+              disabled={pending}
+              className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] disabled:opacity-50"
+            >
+              {pending ? "Saving…" : "Save draft"}
+            </button>
+            {post.status !== "published" ? (
+              <button
+                type="submit"
+                name="intent"
+                value="publish"
+                disabled={pending}
+                className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              >
+                {pending ? "Publishing…" : "Save and publish"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={unpublishPending}
+                onClick={() => {
+                  startUnpublish(async () => {
+                    const result = await unpublishPostAction(post.id);
+                    if (!result.ok) {
+                      window.alert(result.error ?? "Could not unpublish");
+                      return;
+                    }
+                    router.refresh();
+                  });
+                }}
+                className="rounded-md border border-orange-300 px-4 py-2 text-sm text-orange-800 disabled:opacity-50"
+              >
+                Unpublish
+              </button>
+            )}
+          </div>
+        </section>
       </form>
 
-      <PublishControls postId={post.id} status={post.status} slug={post.slug} />
       <ScheduleControls postId={post.id} scheduledAt={post.scheduledAt} />
       <FeaturedControls postId={post.id} featured={post.featured} />
       <PinnedControls postId={post.id} pinned={post.pinned} pinnedPriority={post.pinnedPriority} />

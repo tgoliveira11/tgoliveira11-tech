@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminPageTitle } from "@/components/admin/admin-page-title";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { CreateDraftButton } from "@/components/admin/posts/create-draft-button";
 import { createDraftAction } from "@/modules/posts/admin-posts.actions";
 import * as postsService from "@/modules/posts/posts.service";
 
@@ -26,12 +27,9 @@ export default async function AdminDashboardPage() {
         actions={
           <>
             <form action={createDraftAction}>
-              <button
-                type="submit"
-                className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)]"
-              >
+              <CreateDraftButton className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)]">
                 New Post
-              </button>
+              </CreateDraftButton>
             </form>
             <Link href="/" className="rounded-md border border-[var(--border)] px-4 py-2 text-sm">
               View Public Blog
@@ -57,9 +55,9 @@ export default async function AdminDashboardPage() {
             description="Create your first draft to start publishing."
             action={
               <form action={createDraftAction}>
-                <button type="submit" className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm text-white">
+                <CreateDraftButton className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm text-white">
                   Create draft
-                </button>
+                </CreateDraftButton>
               </form>
             }
           />
