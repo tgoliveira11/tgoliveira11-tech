@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { BlogConfig } from "@/modules/public/blog-config";
+import { POSTFORGE_REPO_URL } from "@/modules/public/postforge-meta";
 import { PUBLIC_CONTENT_MAX_WIDTH_CLASS } from "./public-layout-constants";
 
 export function SiteFooter({ config }: { config: BlogConfig }) {
@@ -43,9 +44,22 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
             </ul>
           </nav>
         </div>
-        <p className="border-t border-[var(--border)] pt-6">
-          &copy; {new Date().getFullYear()} {config.title}
-        </p>
+        <div className="flex flex-col gap-3 border-t border-[var(--border)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            &copy; {new Date().getFullYear()} {config.title}
+          </p>
+          <p className="text-xs sm:text-sm">
+            Powered by{" "}
+            <a
+              href={POSTFORGE_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--foreground)] hover:text-[var(--primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+            >
+              PostForge
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
