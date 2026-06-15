@@ -22,6 +22,8 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Recent polish:** Public editorial UI applied across all human-facing reader pages (see `docs/UI_UX_SKILL.md` public section).
 
+**Template distribution:** PostForge is documented as a GitHub Template Repository — see `README.md`, `docs/TEMPLATE_STRATEGY.md`, and `docs/CREATE_A_BLOG.md`.
+
 ---
 
 ## M0 — Foundation complete ✅

@@ -473,7 +473,7 @@ All actions call `requireAdminSession()` before handling requests.
 
 - [ ] Backup/export script for posts (JSON + assets)
 - [ ] Document deployment for VPS vs Vercel
-- [ ] Update `.env.example` with all blog vars including `ADMIN_EMAIL`
+- [x] Update `.env.example` with all blog vars including `ADMIN_EMAIL`
 
 **Phase 7 exit criteria:** All acceptance criteria in [POSTFORGE_TDR.md §20](./POSTFORGE_TDR.md#20-acceptance-criteria-production-ready-mvp) met.
 
@@ -525,4 +525,9 @@ Phase 1 ──► Phase 2 ──► Phase 3
 - [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — table definitions
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — code structure
 - [POSTFORGE_TDR.md](./POSTFORGE_TDR.md) — requirements and acceptance criteria
+- [TEMPLATE_STRATEGY.md](./TEMPLATE_STRATEGY.md) — GitHub template distribution
+- [CREATE_A_BLOG.md](./CREATE_A_BLOG.md) — create a blog from the template
+- [DEPLOYMENT.md](./DEPLOYMENT.md) — production deployment
+- [UPGRADING_FROM_POSTFORGE.md](./UPGRADING_FROM_POSTFORGE.md) — upstream updates
+- [FAQ.md](./FAQ.md) — common questions
 
