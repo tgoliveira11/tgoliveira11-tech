@@ -24,13 +24,15 @@ export default async function HomePage() {
     ? await Promise.all([listPublicCategories(), listPublicTags()])
     : [[], []];
 
+  const primaryPostsHref = recent.length > 0 ? "#recent-posts" : featuredPost ? "#featured-post" : "/blog";
+
   return (
     <PublicLayout config={config}>
       <div className="space-y-14">
-        <HomeHero config={config} />
+        <HomeHero primaryPostsHref={primaryPostsHref} />
 
         {featuredPost ? (
-          <section aria-labelledby="featured-post-heading">
+          <section id="featured-post" aria-labelledby="featured-post-heading" className="scroll-mt-24">
             <h2 id="featured-post-heading" className="sr-only">
               Featured post
             </h2>

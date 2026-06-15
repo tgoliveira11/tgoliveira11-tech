@@ -8,7 +8,7 @@ export function RecentPostsSection({ posts }: { posts: PublicPostBundle[] }) {
   }
 
   return (
-    <section aria-labelledby="recent-posts-heading">
+    <section id="recent-posts" aria-labelledby="recent-posts-heading" className="scroll-mt-24">
       <PublicSectionHeading
         id="recent-posts-heading"
         title="Recent posts"
