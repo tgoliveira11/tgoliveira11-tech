@@ -6,6 +6,7 @@ import type { AdminPostBundle } from "@/modules/posts/posts.types";
 import type { Category } from "@/modules/categories/categories.types";
 import type { Tag } from "@/modules/tags/tags.types";
 import { type ActionResult, updatePostAction } from "@/modules/posts/admin-posts.actions";
+import { getSaveButtonLabel } from "@/modules/posts/admin-posts.messages";
 import { CompactPostAssetsPanel } from "@/components/admin/assets/compact-post-assets-panel";
 import { EditorStickyHeader } from "./editor-sticky-header";
 import { EDITOR_EXCERPT_CLASS, POST_EDITOR_FORM_ID } from "./editor-constants";
@@ -41,8 +42,7 @@ export function PostEditorForm({
   }, []);
 
   const editorKey = `${post.id}:${post.updatedAt.toISOString()}`;
-  const isPublished = post.status === "published";
-  const saveLabel = isPublished ? "Save changes" : "Save draft";
+  const saveLabel = getSaveButtonLabel(post.status);
 
   return (
     <div className="mx-auto max-w-7xl">

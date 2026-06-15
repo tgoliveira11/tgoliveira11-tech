@@ -113,6 +113,7 @@ describe("admin post actions publishing flow", () => {
     const result = await updatePostAction(postId, { ok: true }, editorForm({ intent: "save" }));
 
     expect(result.ok).toBe(true);
+    expect(result.message).toBe("Draft saved");
     expect(updateDraftMock).toHaveBeenCalledTimes(1);
     expect(updateDraftMock).toHaveBeenCalledWith(
       postId,
@@ -125,6 +126,38 @@ describe("admin post actions publishing flow", () => {
       userId
     );
     expect(publishPostMock).not.toHaveBeenCalled();
+  });
+
+  it("updatePostAction returns a published save message without changing status", async () => {
+    getByIdMock.mockResolvedValue(makePost({ status: "published", publishedAt: new Date() }));
+    updateDraftMock.mockResolvedValue(makePost({ status: "published", publishedAt: new Date() }));
+
+    const result = await updatePostAction(postId, { ok: true }, editorForm({ intent: "save" }));
+
+    expect(result.ok).toBe(true);
+    expect(result.message).toBe("Published post updated");
+    expect(publishPostMock).not.toHaveBeenCalled();
+  });
+
+  it("updatePostAction returns a scheduled save message", async () => {
+    const scheduledAt = new Date("2030-01-01T12:00:00.000Z");
+    getByIdMock.mockResolvedValue(makePost({ status: "scheduled", scheduledAt }));
+    updateDraftMock.mockResolvedValue(makePost({ status: "scheduled", scheduledAt }));
+
+    const result = await updatePostAction(postId, { ok: true }, editorForm({ intent: "save" }));
+
+    expect(result.ok).toBe(true);
+    expect(result.message).toBe("Scheduled post updated");
+  });
+
+  it("updatePostAction returns an unpublished save message", async () => {
+    getByIdMock.mockResolvedValue(makePost({ status: "unpublished", unpublishedAt: new Date() }));
+    updateDraftMock.mockResolvedValue(makePost({ status: "unpublished", unpublishedAt: new Date() }));
+
+    const result = await updatePostAction(postId, { ok: true }, editorForm({ intent: "save" }));
+
+    expect(result.ok).toBe(true);
+    expect(result.message).toBe("Post updated");
   });
 
   it("save and publish updates the same post then publishes it", async () => {

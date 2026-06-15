@@ -256,7 +256,8 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] `docs/UI_UX_SKILL.md` + `.cursor/rules/postforge-ui-ux.mdc` — admin UI principles
 - [ ] Autosave — deferred; manual Save draft with `createRevision: true`
 - [ ] Editor toolbar — deferred
-- [ ] Inline tag creation — deferred (helper text points to tag management)
+- [x] Inline tag and category creation in editor taxonomy comboboxes (create-or-reuse by slug/name)
+- [x] Searchable tag multi-select with chips and keyboard navigation
 
 **Save/publish safety (unchanged):** `updatePostAction` with `intent=publish` saves current form fields then publishes the same post ID. Cover/OG asset IDs are set via asset actions only and are not cleared on save.
 
@@ -267,7 +268,7 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] Status badges and action buttons (publish, unpublish, schedule, archive, duplicate)
 - [x] Schedule datetime picker
 - [x] Featured/pin toggles
-- [x] Category and tag selectors
+- [x] Category and tag selectors (searchable comboboxes with inline create)
 
 ### 3.6 Scheduler
 

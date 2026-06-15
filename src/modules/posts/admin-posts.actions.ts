@@ -12,6 +12,7 @@ import {
 } from "@/modules/posts/posts.validation";
 import { publicPostPath } from "@/modules/posts/slug";
 import { parseUpdatePostFormData, readPostEditorIntent } from "@/modules/posts/admin-posts.form";
+import { getSaveSuccessMessage } from "@/modules/posts/admin-posts.messages";
 
 export type ActionResult = {
   ok: boolean;
@@ -67,7 +68,7 @@ export async function updatePostAction(
       }
     }
 
-    return { ok: true, message: "Draft saved" };
+    return { ok: true, message: getSaveSuccessMessage(updated.status) };
   } catch (error) {
     return { ok: false, error: mapActionError(error) };
   }

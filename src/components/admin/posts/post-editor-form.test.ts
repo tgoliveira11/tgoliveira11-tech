@@ -26,4 +26,16 @@ describe("post editor form contract", () => {
     expect(parsed.coverAssetId).toBeUndefined();
     expect(parsed.ogAssetId).toBeUndefined();
   });
+
+  it("parses multiple tag IDs from the editor form", () => {
+    const formData = new FormData();
+    formData.append("tagIds", "550e8400-e29b-41d4-a716-446655440000");
+    formData.append("tagIds", "660e8400-e29b-41d4-a716-446655440001");
+
+    const parsed = parseUpdatePostFormData(formData);
+    expect(parsed.tagIds).toEqual([
+      "550e8400-e29b-41d4-a716-446655440000",
+      "660e8400-e29b-41d4-a716-446655440001",
+    ]);
+  });
 });

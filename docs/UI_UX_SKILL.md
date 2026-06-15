@@ -92,9 +92,17 @@ Guidelines for admin and authoring surfaces in PostForge. Use this when building
 - Archive at bottom of sidebar with confirmation.
 - Visually distinct border/background.
 
+## Taxonomy (category & tags)
+
+- Single **Taxonomy** card in the sidebar.
+- **Category:** searchable combobox, single-select, inline create with Enter.
+- **Tags:** creatable multi-select with chips; type to search, Enter/Tab/comma/space to add.
+- Keyboard: arrow keys navigate suggestions; Backspace on empty input removes last chip.
+- Create-or-reuse: normalized names, slug from existing utility, duplicate slugs/names reuse existing records.
+- Helper text explains category (broad) vs tags (specific).
+
 ## Deferred
 
-- Inline tag creation
 - Auto-publish cron UI beyond schedule datetime
 - Rich-text WYSIWYG editor
 - Autosave revisions
