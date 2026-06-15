@@ -330,11 +330,25 @@ import { users } from "@/db/schema"; // package-owned
 
 ### What NOT to build
 
-- Login/register pages (exist)
-- Session management UI (exists at `/settings/sessions`)
-- Password reset flow (exists)
-- Passkey/2FA setup (exists at `/settings/security`)
+- Login/register pages (exist — package-owned routes under `/login`, `/register`, etc.)
+- Session management UI logic (package-owned; PostForge wraps at `/admin/sessions`)
+- Password reset flow (exists — package-owned)
+- Passkey/2FA setup logic (package-owned; PostForge wraps at `/admin/security`)
 - Custom `users` table or user registration API
+
+### Package settings pages in the admin shell
+
+PostForge does **not** modify `@tgoliveira/secure-auth`. Account, security, and session UIs are imported from `@tgoliveira/secure-auth/react` and rendered inside the existing admin layout:
+
+| Canonical route | Package component | Notes |
+|-----------------|-------------------|--------|
+| `/admin/account` | `AccountSettingsPage` | Wrapped by `SecureAuthAdminPage` + `AdminLayout` |
+| `/admin/security` | `SecuritySettingsPage` | Includes passkeys and 2FA |
+| `/admin/sessions` | `SessionsSettingsPage` | Active sessions |
+
+Legacy `/settings/account`, `/settings/security`, and `/settings/sessions` redirect to the `/admin/*` equivalents. `secure-auth` `ui.paths` in `src/lib/auth/secure-auth.ts` points at the canonical admin routes so in-page links stay consistent.
+
+PostForge owns: admin shell, sidebar nav, `requireAdminSession()` on `/admin/*`, and outer styling via `.secure-auth-admin-surface`. The package owns forms, validations, and API calls.
 
 ---
 
@@ -351,6 +365,9 @@ import { users } from "@/db/schema"; // package-owned
 | `/admin/analytics` | secure-auth session | `ADMIN_EMAIL` match |
 | `/admin/analytics/posts/[id]` | secure-auth session | `ADMIN_EMAIL` match |
 | `/admin/import` | secure-auth session | `ADMIN_EMAIL` match |
+| `/admin/account` | secure-auth session | `ADMIN_EMAIL` match |
+| `/admin/security` | secure-auth session | `ADMIN_EMAIL` match |
+| `/admin/sessions` | secure-auth session | `ADMIN_EMAIL` match |
 
 ---
 

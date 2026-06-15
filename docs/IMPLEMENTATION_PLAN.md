@@ -222,6 +222,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] Return 403 for authenticated non-admin users (`forbidden()` + `forbidden.tsx`)
 - [x] Admin navigation component
 - [x] `/admin` dashboard — post counts by status, recent activity
+- [x] Package account/security/sessions pages wrapped at `/admin/account`, `/admin/security`, `/admin/sessions` (legacy `/settings/*` redirects)
 
 ### 3.2 Post management
 

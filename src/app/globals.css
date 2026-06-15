@@ -129,3 +129,13 @@ body {
   border: 1px solid var(--border);
   padding: 0.5rem 0.75rem;
 }
+
+/* Package settings pages embedded in PostForge admin shell */
+.secure-auth-admin-surface > main {
+  display: contents;
+}
+
+/* Hide duplicate package PageHeader; PostForge AdminPageTitle is canonical. */
+.secure-auth-admin-surface > div:has(> h1) {
+  display: none;
+}

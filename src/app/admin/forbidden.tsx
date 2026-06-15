@@ -12,7 +12,7 @@ export default function AdminForbiddenPage() {
         <Link href="/" className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm text-white">
           Go to public blog
         </Link>
-        <Link href="/settings/account" className="rounded-md border border-[var(--border)] px-4 py-2 text-sm">
+        <Link href="/admin/account" className="rounded-md border border-[var(--border)] px-4 py-2 text-sm">
           Account settings
         </Link>
       </div>

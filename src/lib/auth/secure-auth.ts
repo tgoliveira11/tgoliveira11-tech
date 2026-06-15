@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { devEmailProvider } from "@/lib/email/dev-email-provider";
 import { buildSecureAuthConfigFromEnv } from "@/lib/env/secure-auth-from-env";
 import { readEnv } from "@/lib/env/parse";
+import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
 
 const envConfig = buildSecureAuthConfigFromEnv({
   appName: "PostForge",
@@ -30,9 +31,9 @@ export const secureAuth = createSecureAuth({
       checkEmail: "/check-email",
       loginTwoFactor: "/login/2fa",
       loginComplete: "/login/complete",
-      account: "/settings/account",
-      security: "/settings/security",
-      sessions: "/settings/sessions",
+      account: SECURE_AUTH_ADMIN_PATHS.account,
+      security: SECURE_AUTH_ADMIN_PATHS.security,
+      sessions: SECURE_AUTH_ADMIN_PATHS.sessions,
       accountDeleted: "/account-deleted",
     },
     messages: {
