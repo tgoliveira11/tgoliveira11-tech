@@ -4,6 +4,8 @@ How to bring improvements from the official PostForge template into **your** ind
 
 **Upstream:** [github.com/tgoliveira11/postforge](https://github.com/tgoliveira11/postforge)
 
+**Day-to-day sync workflow for this repo:** [upstream-sync.md](upstream-sync.md) (remotes, npm scripts, GitHub Actions PR, review checklist).
+
 ---
 
 ## Important tradeoff
@@ -148,6 +150,7 @@ npm audit
 
 ## Related docs
 
+- [upstream-sync.md](upstream-sync.md) — remotes, safe sync scripts, automated PR workflow
 - [TEMPLATE_STRATEGY.md](TEMPLATE_STRATEGY.md)
 - [FAQ.md](FAQ.md)
 - [DEPLOYMENT.md](DEPLOYMENT.md)

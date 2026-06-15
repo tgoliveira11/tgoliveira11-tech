@@ -16,7 +16,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "import:github-pages": "tsx scripts/import-github-pages.ts",
-    "inspect:posts": "tsx scripts/inspect-posts.ts"
+    "inspect:posts": "tsx scripts/inspect-posts.ts",
+    "sync:upstream:configure": "git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://github.com/tgoliveira11/postforge.git; git remote set-url --push upstream no_push",
+    "sync:upstream:fetch": "git fetch upstream",
+    "sync:upstream:status": "bash scripts/sync-upstream-status.sh",
+    "sync:upstream:merge": "bash scripts/sync-upstream-merge.sh"
   },
   "overrides": {
     "esbuild": "^0.28.1",

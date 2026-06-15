@@ -1,0 +1,129 @@
+name: Sync upstream PostForge
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly — Monday 12:00 UTC
+    - cron: "0 12 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-upstream-postforge
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote (fetch-only)
+        run: |
+          git remote add upstream https://github.com/tgoliveira11/postforge.git
+          git remote set-url --push upstream no_push
+          git fetch upstream main
+
+      - name: Record upstream commit
+        id: upstream
+        run: |
+          echo "sha=$(git rev-parse upstream/main)" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$(git rev-parse --short upstream/main)" >> "$GITHUB_OUTPUT"
+          echo "subject=$(git log -1 --format=%s upstream/main)" >> "$GITHUB_OUTPUT"
+          echo "url=https://github.com/tgoliveira11/postforge/commit/$(git rev-parse upstream/main)" >> "$GITHUB_OUTPUT"
+
+      - name: Check if sync is needed
+        id: check
+        run: |
+          git checkout main
+          if git merge-base --is-ancestor upstream/main main; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "main already contains upstream/main (${{ steps.upstream.outputs.sha_short }})."
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            BEHIND="$(git rev-list --count main..upstream/main)"
+            echo "behind=${BEHIND}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stop when already up to date
+        if: steps.check.outputs.needed == 'false'
+        run: echo "No upstream sync PR needed."
+
+      - name: Prepare sync branch
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          git checkout -B sync/postforge-upstream main
+
+      - name: Merge upstream/main
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          git merge upstream/main -m "sync: merge upstream/main (${{ steps.upstream.outputs.sha_short }})"
+
+      - name: Push sync branch
+        if: steps.check.outputs.needed == 'true'
+        run: git push origin sync/postforge-upstream --force-with-lease
+
+      - name: Create or update pull request
+        if: steps.check.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY="$(cat <<EOF
+          ## Upstream sync from PostForge
+
+          This PR merges improvements from the official PostForge template into **tgoliveira11-tech**.
+
+          | Field | Value |
+          |-------|-------|
+          | Upstream repo | [tgoliveira11/postforge](https://github.com/tgoliveira11/postforge) |
+          | Upstream commit | [\`${{ steps.upstream.outputs.sha_short }}\`](${{ steps.upstream.outputs.url }}) |
+          | Subject | ${{ steps.upstream.outputs.subject }} |
+          | Commits behind upstream | ${{ steps.check.outputs.behind }} |
+
+          ### Important
+
+          - This PR may **conflict with local customizations** (ports, auth cookies, Docker, branding).
+          - **Do not auto-merge** without review.
+          - **Nothing is pushed to PostForge** — upstream is read-only.
+
+          ### Protected local areas (review carefully)
+
+          - \`.env.example\` — port **3011**, \`AUTH_COOKIE_PREFIX=tgoliveira11-tech\`
+          - \`docker-compose.yml\` — \`tgoliveira11-tech-postgres\`, port **5434**
+          - \`package.json\` — name \`tgoliveira11-tech\`, dev port **3011**
+          - \`src/lib/auth/**\` — app-specific NextAuth cookie isolation
+
+          ### Validation before merge
+
+          \`\`\`bash
+          npm install
+          npm run typecheck
+          npm run lint
+          npm test
+          \`\`\`
+
+          See [docs/upstream-sync.md](docs/upstream-sync.md) for the full review checklist.
+          EOF
+          )"
+
+          EXISTING="$(gh pr list --head sync/postforge-upstream --base main --json number --jq '.[0].number' || true)"
+          if [ -n "$EXISTING" ]; then
+            gh pr edit "$EXISTING" --title "sync: PostForge upstream (${{ steps.upstream.outputs.sha_short }})" --body "$BODY"
+            echo "Updated PR #${EXISTING}"
+          else
+            gh pr create \
+              --base main \
+              --head sync/postforge-upstream \
+              --title "sync: PostForge upstream (${{ steps.upstream.outputs.sha_short }})" \
+              --body "$BODY"
+          fi
