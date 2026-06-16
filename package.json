@@ -20,7 +20,8 @@
     "sync:upstream:configure": "git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://github.com/tgoliveira11/postforge.git; git remote set-url --push upstream no_push",
     "sync:upstream:fetch": "git fetch upstream",
     "sync:upstream:status": "bash scripts/sync-upstream-status.sh",
-    "sync:upstream:merge": "bash scripts/sync-upstream-merge.sh"
+    "sync:upstream:merge": "bash scripts/sync-upstream-merge.sh",
+    "icons:generate": "node scripts/generate-site-icons.mjs"
   },
   "overrides": {
     "esbuild": "^0.28.1",
