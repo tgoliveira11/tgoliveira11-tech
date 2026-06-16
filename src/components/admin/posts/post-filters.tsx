@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { TagFilterCombobox } from "@/components/admin/posts/tag-filter-combobox";
-import { ADMIN_POSTS_RESET_PATH } from "@/modules/admin/admin-posts-filters";
+import {
+  ADMIN_POSTS_RESET_PATH,
+  formatAdminPostsCountLabel,
+} from "@/modules/admin/admin-posts-filters";
 import type { AdminPostsFilterParams } from "@/modules/admin/admin-posts-filter-url";
 import type { Category } from "@/modules/categories/categories.types";
 import type { PostStatus } from "@/modules/posts/posts.types";
@@ -19,12 +22,16 @@ export function PostFilters({
   categories,
   tags,
   current,
+  totalItems,
+  hasActiveFilters,
 }: {
   categories: Category[];
   tags: Tag[];
   current: AdminPostsFilterParams & {
     status?: string;
   };
+  totalItems: number;
+  hasActiveFilters: boolean;
 }) {
   const filterParams: AdminPostsFilterParams = {
     status: current.status,
@@ -90,19 +97,24 @@ export function PostFilters({
         />
       </label>
 
-      <div className="flex items-end gap-2 md:col-span-4">
-        <button
-          type="submit"
-          className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)]"
-        >
-          Apply filters
-        </button>
-        <Link
-          href={ADMIN_POSTS_RESET_PATH}
-          className="rounded-md border border-[var(--border)] px-4 py-2 text-sm"
-        >
-          Reset
-        </Link>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:col-span-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="submit"
+            className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)]"
+          >
+            Apply filters
+          </button>
+          <Link
+            href={ADMIN_POSTS_RESET_PATH}
+            className="rounded-md border border-[var(--border)] px-4 py-2 text-sm"
+          >
+            Reset
+          </Link>
+        </div>
+        <p className="text-sm text-[var(--muted)] sm:text-right" aria-live="polite">
+          {formatAdminPostsCountLabel(totalItems, hasActiveFilters)}
+        </p>
       </div>
     </form>
   );

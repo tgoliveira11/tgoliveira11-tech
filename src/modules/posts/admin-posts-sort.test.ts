@@ -37,6 +37,18 @@ describe("admin posts sort helpers", () => {
     ).toBe("/admin/posts?status=published&search=hello&sort=title&direction=desc");
   });
 
+  it("does not treat direction-only query params as explicit sort", () => {
+    expect(parseAdminPostsSortInput({ direction: "desc" })).toEqual({ usesDefaultSort: true });
+  });
+
+  it("treats publicOrder query param as explicit sort", () => {
+    expect(parseAdminPostsSortInput({ sort: "publicOrder", direction: "asc" })).toEqual({
+      sort: "publicOrder",
+      direction: "asc",
+      usesDefaultSort: false,
+    });
+  });
+
   it("shows default indicator on public order when using default sort", () => {
     expect(
       adminSortIndicator({

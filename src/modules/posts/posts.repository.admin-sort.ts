@@ -14,23 +14,30 @@ export const DEFAULT_ADMIN_POST_ORDER_SQL = [
   "CASE WHEN public_order IS NULL THEN published_at END DESC NULLS LAST",
   "CASE WHEN public_order IS NULL THEN updated_at END DESC",
   "CASE WHEN public_order IS NOT NULL THEN public_order ELSE NULL END ASC NULLS LAST",
+  "updated_at DESC",
 ] as const;
 
 /**
- * Default admin list order:
- * 1. publicOrder IS NULL first (group 0), then publicOrder IS NOT NULL (group 1)
+ * Default admin list order (no explicit column sort selected):
+ * 1. publicOrder IS NULL first
  * 2. among nulls: publishedAt DESC NULLS LAST, then updatedAt DESC
  * 3. among non-nulls: publicOrder ASC
+ * 4. updatedAt DESC as final tiebreaker
  */
-export const DEFAULT_ADMIN_POST_ORDER: SQL[] = [
-  sql`CASE WHEN ${posts.publicOrder} IS NULL THEN 0 ELSE 1 END ASC`,
-  sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.publishedAt} END DESC NULLS LAST`,
-  sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.updatedAt} END DESC`,
-  sql`CASE WHEN ${posts.publicOrder} IS NOT NULL THEN ${posts.publicOrder} ELSE NULL END ASC NULLS LAST`,
-];
+export function getAdminPostsDefaultOrderBy(): SQL[] {
+  return [
+    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN 0 ELSE 1 END ASC`,
+    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.publishedAt} END DESC NULLS LAST`,
+    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.updatedAt} END DESC`,
+    sql`CASE WHEN ${posts.publicOrder} IS NOT NULL THEN ${posts.publicOrder} ELSE NULL END ASC NULLS LAST`,
+    desc(posts.updatedAt),
+  ];
+}
+
+export const DEFAULT_ADMIN_POST_ORDER = getAdminPostsDefaultOrderBy();
 
 /**
- * Pure comparator mirroring DEFAULT_ADMIN_POST_ORDER for unit tests.
+ * Pure comparator mirroring getAdminPostsDefaultOrderBy() for unit tests.
  */
 export function compareDefaultAdminPostOrder(
   left: AdminDefaultSortPost,
@@ -58,14 +65,32 @@ export function compareDefaultAdminPostOrder(
       }
     }
 
-    return right.updatedAt.getTime() - left.updatedAt.getTime();
+    const updatedDiff = right.updatedAt.getTime() - left.updatedAt.getTime();
+    if (updatedDiff !== 0) {
+      return updatedDiff;
+    }
+
+    return 0;
   }
 
-  return (left.publicOrder ?? 0) - (right.publicOrder ?? 0);
+  const orderDiff = (left.publicOrder ?? 0) - (right.publicOrder ?? 0);
+  if (orderDiff !== 0) {
+    return orderDiff;
+  }
+
+  return right.updatedAt.getTime() - left.updatedAt.getTime();
 }
 
 export function sortPostsByDefaultAdminOrder<T extends AdminDefaultSortPost>(items: T[]): T[] {
   return [...items].sort(compareDefaultAdminPostOrder);
+}
+
+function buildExplicitPublicOrderBy(direction: "asc" | "desc"): SQL[] {
+  return [
+    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN 0 ELSE 1 END ASC`,
+    direction === "asc" ? asc(posts.publicOrder) : desc(posts.publicOrder),
+    desc(posts.updatedAt),
+  ];
 }
 
 /**
@@ -92,7 +117,7 @@ export function buildFlagsOrderBy(direction: "asc" | "desc"): SQL[] {
 
 export function buildAdminPostOrderBy(filters: AdminPostListFilters): SQL[] {
   if (!filters.sort) {
-    return DEFAULT_ADMIN_POST_ORDER;
+    return getAdminPostsDefaultOrderBy();
   }
 
   const direction = filters.direction ?? "asc";
@@ -117,9 +142,7 @@ export function buildAdminPostOrderBy(filters: AdminPostListFilters): SQL[] {
     case "updated":
       return direction === "asc" ? [asc(posts.updatedAt)] : [desc(posts.updatedAt)];
     case "publicOrder":
-      return direction === "asc"
-        ? [sql`${posts.publicOrder} IS NULL`, asc(posts.publicOrder), desc(posts.publishedAt)]
-        : [sql`${posts.publicOrder} IS NULL`, desc(posts.publicOrder), desc(posts.publishedAt)];
+      return buildExplicitPublicOrderBy(direction);
     case "flags":
       return buildFlagsOrderBy(direction);
     case "category":
@@ -127,7 +150,7 @@ export function buildAdminPostOrderBy(filters: AdminPostListFilters): SQL[] {
         ? [asc(categories.name), desc(posts.updatedAt)]
         : [desc(categories.name), desc(posts.updatedAt)];
     default:
-      return DEFAULT_ADMIN_POST_ORDER;
+      return getAdminPostsDefaultOrderBy();
   }
 }
 

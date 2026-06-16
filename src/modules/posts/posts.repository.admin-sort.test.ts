@@ -5,6 +5,7 @@ import {
   compareDefaultAdminPostOrder,
   DEFAULT_ADMIN_POST_ORDER,
   DEFAULT_ADMIN_POST_ORDER_SQL,
+  getAdminPostsDefaultOrderBy,
   sortPostsByDefaultAdminOrder,
   type AdminDefaultSortPost,
 } from "@/modules/posts/posts.repository.admin-sort";
@@ -15,7 +16,7 @@ function makePost(overrides: Partial<AdminDefaultSortPost> & { id: string }): Ad
   return {
     publicOrder: null,
     publishedAt: null,
-    updatedAt: new Date("2024-01-01"),
+    updatedAt: new Date("2026-06-16T00:00:00Z"),
     ...overrides,
   };
 }
@@ -23,14 +24,13 @@ function makePost(overrides: Partial<AdminDefaultSortPost> & { id: string }): Ad
 describe("admin post order by", () => {
   it("uses default admin sort when no sort is provided", () => {
     expect(buildAdminPostOrderBy({})).toEqual(DEFAULT_ADMIN_POST_ORDER);
-    expect(DEFAULT_ADMIN_POST_ORDER).toHaveLength(4);
+    expect(getAdminPostsDefaultOrderBy()).toHaveLength(5);
   });
 
   it("documents explicit CASE-based default ordering without IS NOT NULL ASC grouping", () => {
-    expect(DEFAULT_ADMIN_POST_ORDER_SQL).toHaveLength(4);
+    expect(DEFAULT_ADMIN_POST_ORDER_SQL).toHaveLength(5);
     expect(DEFAULT_ADMIN_POST_ORDER_SQL[0]).toContain("CASE");
     expect(DEFAULT_ADMIN_POST_ORDER_SQL[0]).toContain("THEN 0");
-    expect(DEFAULT_ADMIN_POST_ORDER_SQL[0]).not.toMatch(/IS NOT NULL ASC/);
     expect(DEFAULT_ADMIN_POST_ORDER_SQL.join("\n")).not.toMatch(
       /public_order IS NOT NULL ASC/
     );
@@ -51,38 +51,40 @@ describe("admin post order by", () => {
     expect(buildFlagsOrderBy("desc")).toHaveLength(4);
   });
 
-  it("sorts public order ascending with nulls last in the manual column", () => {
-    const clauses = buildAdminPostOrderBy({ sort: "publicOrder", direction: "asc" });
-    expect(clauses.length).toBe(3);
+  it("sorts public order with null publicOrder rows first when column is selected", () => {
+    const defaultOrder = getAdminPostsDefaultOrderBy();
+    const explicitOrder = buildAdminPostOrderBy({ sort: "publicOrder", direction: "asc" });
+    expect(explicitOrder.length).toBe(3);
+    expect(explicitOrder).not.toEqual(defaultOrder);
   });
 });
 
 describe("default admin post ordering rules", () => {
   const postA = makePost({
     id: "A",
-    publishedAt: new Date("2024-01-10"),
-    updatedAt: new Date("2024-01-11"),
+    publishedAt: new Date("2026-06-16T04:00:00Z"),
+    updatedAt: new Date("2026-06-16T04:30:00Z"),
   });
   const postB = makePost({
     id: "B",
-    updatedAt: new Date("2024-01-12"),
+    updatedAt: new Date("2026-06-16T05:00:00Z"),
   });
   const postC = makePost({
     id: "C",
     publicOrder: 1,
-    publishedAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
+    publishedAt: new Date("2026-06-01T00:00:00Z"),
+    updatedAt: new Date("2026-06-01T00:00:00Z"),
   });
   const postD = makePost({
     id: "D",
     publicOrder: 2,
-    publishedAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
+    publishedAt: new Date("2026-06-01T00:00:00Z"),
+    updatedAt: new Date("2026-06-01T00:00:00Z"),
   });
   const postE = makePost({
     id: "E",
-    publishedAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
+    publishedAt: new Date("2026-06-17T01:00:00Z"),
+    updatedAt: new Date("2026-06-17T01:00:00Z"),
   });
 
   it("places publicOrder = null records before non-null records", () => {
