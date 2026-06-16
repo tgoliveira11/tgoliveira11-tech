@@ -82,8 +82,9 @@ Copy `.env.example` to `.env.local` and set at minimum:
 | `APP_BASE_URL` | Public site URL (e.g. `http://localhost:3000`) |
 | `NEXTAUTH_SECRET` | Auth session secret (long random string) |
 | `ADMIN_EMAIL` | Email allowed to access `/admin` |
+| `EMAIL_PROVIDER` | `console` locally (default); `resend` in production |
 
-**Full reference:** [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md)
+**Full reference:** [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) · **Email:** [docs/EMAIL_PROVIDERS.md](docs/EMAIL_PROVIDERS.md)
 
 ---
 

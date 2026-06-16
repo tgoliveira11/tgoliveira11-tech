@@ -155,6 +155,19 @@ Only that email can publish. See [CREATE_A_BLOG.md](CREATE_A_BLOG.md).
 
 ---
 
+## How do transactional emails work?
+
+PostForge wires `@tgoliveira/secure-auth` to an app-provided email provider.
+
+- **Local dev:** `EMAIL_PROVIDER=console` logs verification and password-reset emails to the server console.
+- **Production:** `EMAIL_PROVIDER=resend` sends real email through your own Resend account and verified domain.
+
+Each blog owner configures their own Resend API key, sender domain, DNS records, and Vercel env vars. PostForge does not ship a shared email account.
+
+See [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md).
+
+---
+
 ## Can multiple users write posts?
 
 **MVP:** one publishing admin (`ADMIN_EMAIL`). Other users may register and sign in but get **403** on `/admin`.

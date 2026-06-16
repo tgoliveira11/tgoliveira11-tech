@@ -139,12 +139,20 @@ AUTH_COOKIE_SECURE=true
 UPLOAD_PROVIDER=vercel-blob
 BLOB_READ_WRITE_TOKEN=<set-by-vercel-when-blob-connected>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+
+# Email (Resend — each blog owner uses their own account/domain)
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=<from-resend-dashboard>
+EMAIL_FROM="Your Blog <noreply@mail.your-domain.com>"
+EMAIL_REPLY_TO=you@your-domain.com
 ```
 
 **Not used when `UPLOAD_PROVIDER=vercel-blob`:**
 
 - `UPLOAD_LOCAL_DIR`
 - `UPLOAD_PUBLIC_BASE_URL`
+
+Email setup: [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md)
 
 Full reference: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)
 
