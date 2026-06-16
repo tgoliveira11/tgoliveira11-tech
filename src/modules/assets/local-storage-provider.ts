@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { readUploadLocalDir, readUploadPublicBaseUrl } from "@/lib/env";
 import { assertSafeStorageKey } from "@/modules/assets/assets.validation";
+import { buildPostAssetStorageKey } from "@/modules/assets/storage-keys";
 import type { StorageProvider, StorageUploadInput, StorageUploadResult } from "./storage-provider";
 
 export class LocalStorageProvider implements StorageProvider {
@@ -54,6 +55,6 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   buildStorageKey(postId: string, safeFilename: string): string {
-    return `posts/${postId}/${safeFilename}`;
+    return buildPostAssetStorageKey(postId, safeFilename);
   }
 }

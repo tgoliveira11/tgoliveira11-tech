@@ -118,6 +118,42 @@ Follow secure-auth release notes for breaking changes.
 
 ---
 
+## Adopting Vercel Blob storage (upstream feature)
+
+If your blog was created before PostForge shipped `UPLOAD_PROVIDER=vercel-blob`, merge upstream and configure Vercel:
+
+```bash
+git remote add upstream https://github.com/tgoliveira11/postforge.git
+git fetch upstream
+git merge upstream/main
+npm install
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run db:generate   # expect no schema changes
+```
+
+Then in Vercel → **Settings → Environment Variables** (Production):
+
+```env
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=<from-connected-blob-store>
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+```
+
+1. Create/connect a **Vercel Blob** store (public access) in Vercel **Storage**.
+2. Confirm `BLOB_READ_WRITE_TOKEN` is set automatically.
+3. Redeploy.
+
+**No DB migration** — existing `assets` table fields (`storageProvider`, `storageKey`, `publicUrl`) are sufficient.
+
+**Existing assets:** rows uploaded with `local` keep `/api/assets/...` URLs. New uploads use Blob URLs. Old local files on Vercel may 404 unless re-uploaded.
+
+**Full guides:** [deployment-vercel-neon.md](deployment-vercel-neon.md), [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md)
+
+---
+
 ## Required validation after upgrades
 
 ```bash
@@ -135,7 +171,7 @@ npm audit
 - [ ] `/login` and `/admin` as `ADMIN_EMAIL`
 - [ ] Create/edit/publish a post
 - [ ] Public `/blog/<slug>`
-- [ ] Image upload and display
+- [ ] Image upload and display (local: `/api/assets/...`; Vercel: `blob.vercel-storage.com`)
 - [ ] `/rss.xml` and `/sitemap.xml`
 
 ---
@@ -154,3 +190,5 @@ npm audit
 - [TEMPLATE_STRATEGY.md](TEMPLATE_STRATEGY.md)
 - [FAQ.md](FAQ.md)
 - [DEPLOYMENT.md](DEPLOYMENT.md)
+- [deployment-vercel-neon.md](deployment-vercel-neon.md)
+- [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md)

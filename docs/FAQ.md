@@ -30,15 +30,106 @@ You still need a custom domain (optional, paid) and must handle storage correctl
 
 Yes. PostForge is a standard Next.js App Router app.
 
-Use managed PostgreSQL and plan for **object storage** — not local disk uploads. See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
+Use managed PostgreSQL and set **`UPLOAD_PROVIDER=vercel-blob`** with a Vercel Blob store. See [deployment-vercel-neon.md](deployment-vercel-neon.md) and [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
 
 ---
 
 ## Where are images stored?
 
-By default, on disk at `UPLOAD_LOCAL_DIR` (usually `./storage/uploads`), served via `/api/assets/...`.
+- **Local (`UPLOAD_PROVIDER=local`):** disk at `UPLOAD_LOCAL_DIR`, served via `/api/assets/...`
+- **Vercel Blob (`UPLOAD_PROVIDER=vercel-blob`):** public URLs on `blob.vercel-storage.com`
 
-In production on serverless, use object storage or a VPS with persistent disk.
+See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
+
+---
+
+## Why do I need Vercel Blob on Vercel?
+
+Vercel serverless functions use an **ephemeral filesystem**. Files written to disk during uploads can disappear after redeploys or cold starts, and instances do not share disk.
+
+`UPLOAD_PROVIDER=local` works for development and VPS hosts with persistent storage, but **not** for reliable Vercel production uploads.
+
+PostForge ships with `UPLOAD_PROVIDER=vercel-blob` so template blogs get durable storage without extra infrastructure.
+
+See [deployment-vercel-neon.md](deployment-vercel-neon.md).
+
+---
+
+## Can I use local uploads in production?
+
+**On Vercel:** No — use `UPLOAD_PROVIDER=vercel-blob`.
+
+**On a VPS or dedicated server** with a persistent mounted volume: Yes — `UPLOAD_PROVIDER=local` with `UPLOAD_LOCAL_DIR` pointing to that path.
+
+---
+
+## Why are Blob URLs stored directly?
+
+Vercel Blob objects are served from `https://...blob.vercel-storage.com/...` with public access. There is no need to proxy through `/api/assets`.
+
+PostForge stores the Blob URL in `assets.publicUrl` and renders it directly on public pages (`PostImage` uses `unoptimized` for remote URLs). `next.config.ts` allows `*.blob.vercel-storage.com` in `images.remotePatterns`.
+
+---
+
+## Do I need a DB migration for Vercel Blob?
+
+**No.** The existing `assets` table already has:
+
+- `storageProvider` — `"local"` or `"vercel-blob"`
+- `storageKey` — `posts/{postId}/{safeFilename}`
+- `publicUrl` — local or Blob URL
+
+Run `npm run db:generate` after merging upstream — it should report no schema changes.
+
+---
+
+## How do I configure an existing blog repo?
+
+Merge upstream PostForge, install dependencies, run quality gates, then set Vercel env vars:
+
+```bash
+git remote add upstream https://github.com/tgoliveira11/postforge.git
+git fetch upstream
+git merge upstream/main
+npm install
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run db:generate
+```
+
+In Vercel:
+
+```env
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=<from-connected-blob-store>
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+```
+
+Redeploy. See [UPGRADING_FROM_POSTFORGE.md](UPGRADING_FROM_POSTFORGE.md) and [deployment-vercel-neon.md](deployment-vercel-neon.md).
+
+---
+
+## What happens to old local assets?
+
+Assets uploaded before switching providers **keep their existing `publicUrl`** in the database (typically `/api/assets/...`).
+
+- They continue to work if the files still exist on disk (e.g. VPS)
+- On Vercel, old local files are usually gone — those images may 404 until re-uploaded
+- **New uploads** use the configured provider (Blob URLs on Vercel)
+
+There is no automated migration script from local disk to Blob yet.
+
+---
+
+## Can I later use S3, R2, or Supabase Storage?
+
+The `StorageProvider` interface (`upload`, `delete`, `getPublicUrl`) is designed for additional backends. Vercel Blob is implemented today; S3/R2/Supabase are documented as future options.
+
+Adding a provider means implementing the interface, registering it in `storage-provider-factory.ts`, and documenting env vars. No schema change is expected.
+
+See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
 
 ---
 

@@ -43,3 +43,6 @@ next-env.d.ts
 
 # import CLI reports
 .import-reports/
+
+# local upload storage (UPLOAD_PROVIDER=local)
+/storage/uploads/

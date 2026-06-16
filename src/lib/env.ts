@@ -34,3 +34,13 @@ export function readUploadMaxFileSizeBytes(): number {
   const parsed = Number(raw);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 5 * 1024 * 1024;
 }
+
+export type UploadProviderName = "local" | "vercel-blob";
+
+export function readUploadProvider(): string | undefined {
+  return readEnv("UPLOAD_PROVIDER");
+}
+
+export function readBlobReadWriteToken(): string | undefined {
+  return readEnv("BLOB_READ_WRITE_TOKEN");
+}
