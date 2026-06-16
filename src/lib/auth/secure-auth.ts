@@ -6,6 +6,12 @@ import { devEmailProvider } from "@/lib/email/dev-email-provider";
 import { buildSecureAuthConfigFromEnv } from "@/lib/env/secure-auth-from-env";
 import { readEnv } from "@/lib/env/parse";
 import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
+import { createSecureAuthServicesPatcher } from "@/lib/auth/patch-secure-auth-services";
+
+type SecureAuthRouteHandler = (
+  request: Request,
+  context?: unknown
+) => Response | Promise<Response>;
 
 const envConfig = buildSecureAuthConfigFromEnv({
   appName: APP_DEFAULTS.name,
@@ -14,7 +20,7 @@ const envConfig = buildSecureAuthConfigFromEnv({
   afterLoginPath: "/admin",
 });
 
-export const secureAuth = createSecureAuth({
+const baseSecureAuth = createSecureAuth({
   db,
   ...envConfig,
   email: {
@@ -46,3 +52,16 @@ export const secureAuth = createSecureAuth({
     },
   },
 });
+
+const { ensurePatchedServices, wrapRoutes } = createSecureAuthServicesPatcher(() =>
+  baseSecureAuth.getServices()
+);
+
+/** secure-auth instance with app-specific NextAuth cookie names on all API routes. */
+export const secureAuth = {
+  ...baseSecureAuth,
+  getServices: ensurePatchedServices,
+  routes: wrapRoutes(
+    baseSecureAuth.routes as Record<string, Record<string, SecureAuthRouteHandler>>
+  ),
+};

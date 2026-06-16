@@ -1,4 +1,4 @@
-import { nextAuthGET, nextAuthPOST } from "@/lib/auth/next-auth-route-handlers";
+import { secureAuth } from "@/lib/auth/secure-auth";
 
-export const GET = nextAuthGET;
-export const POST = nextAuthPOST;
+export const GET = secureAuth.routes.nextAuth.GET;
+export const POST = secureAuth.routes.nextAuth.POST;
