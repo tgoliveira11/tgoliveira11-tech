@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  HOME_HERO_CONTENT,
-  PUBLIC_AUTHOR_PROFILE,
-  PUBLIC_PROFILE_LINKS,
-} from "@/modules/public/author-profile";
-import { SearchForm } from "./search-form";
+import { HOME_HERO_CONTENT, PUBLIC_PROFILE_LINKS } from "@/modules/public/author-profile";
 
 const primaryButtonClass =
   "inline-flex items-center justify-center rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--primary-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]";
@@ -66,10 +61,6 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
               </a>
             ) : null}
           </div>
-
-          <div className="mt-8 max-w-xl text-left lg:max-w-2xl">
-            <SearchForm variant="hero" />
-          </div>
         </div>
 
         <ul
@@ -90,10 +81,6 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
             </li>
           ))}
         </ul>
-
-        <p className="mt-8 text-center text-sm text-[var(--muted)] lg:text-left">
-          Based in {PUBLIC_AUTHOR_PROFILE.location}.
-        </p>
       </div>
     </section>
   );

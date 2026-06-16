@@ -3,7 +3,6 @@ import { PublicPageHero } from "@/components/public/public-page-hero";
 import { PublicPageShell } from "@/components/public/public-page-shell";
 import { PostList } from "@/components/public/post-list";
 import { PublicPagination } from "@/components/public/public-pagination";
-import { SearchForm } from "@/components/public/search-form";
 import { getBlogListingPage } from "@/modules/public/public-posts.service";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { buildSiteMetadata } from "@/modules/public/seo";
@@ -29,13 +28,7 @@ export default async function BlogListingPage({
   return (
     <PublicLayout config={config}>
       <PublicPageShell>
-        <PublicPageHero
-          eyebrow="Archive"
-          title="Blog"
-          description="Browse all published posts."
-        >
-          <SearchForm variant="hero" />
-        </PublicPageHero>
+        <PublicPageHero eyebrow="Archive" title="Blog" description="All published articles." />
 
         <section aria-labelledby="blog-posts-heading">
           <h2 id="blog-posts-heading" className="sr-only">

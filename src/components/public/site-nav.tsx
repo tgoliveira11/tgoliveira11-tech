@@ -11,16 +11,20 @@ const NAV_LINKS = [
     label: "Categories",
     match: (pathname: string) => pathname === "/categories" || pathname.startsWith("/categories/"),
   },
-  { href: "/search", label: "Search", match: (pathname: string) => pathname === "/search" },
+  { href: "/search", label: "Search", match: (pathname: string) => pathname === "/search", hideable: true },
 ] as const;
 
-export function SiteNav() {
+export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }) {
   const pathname = usePathname();
 
   return (
     <nav aria-label="Main navigation">
       <ul className="flex flex-wrap gap-1 sm:gap-2">
         {NAV_LINKS.map((link) => {
+          if (hideSearchLink && "hideable" in link && link.hideable) {
+            return null;
+          }
+
           const isActive = link.match(pathname);
           return (
             <li key={link.href}>

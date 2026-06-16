@@ -1,18 +1,27 @@
 import Link from "next/link";
 import type { BlogConfig } from "@/modules/public/blog-config";
 import { POSTFORGE_REPO_URL } from "@/modules/public/postforge-meta";
+import {
+  getPublicSiteTitle,
+  PUBLIC_SITE_CONFIG,
+} from "@/modules/public/public-site-config";
 import { PUBLIC_CONTENT_MAX_WIDTH_CLASS } from "./public-layout-constants";
 
 export function SiteFooter({ config }: { config: BlogConfig }) {
+  const siteTitle = getPublicSiteTitle(config);
+  const { showDescription, compact } = PUBLIC_SITE_CONFIG.footer;
+
   return (
     <footer className="mt-auto border-t border-[var(--border)] bg-[var(--card)]">
       <div
-        className={`mx-auto ${PUBLIC_CONTENT_MAX_WIDTH_CLASS} flex flex-col gap-6 px-4 py-10 text-sm text-[var(--muted)] sm:px-6`}
+        className={`mx-auto ${PUBLIC_CONTENT_MAX_WIDTH_CLASS} flex flex-col gap-4 px-4 text-sm text-[var(--muted)] sm:px-6 ${compact ? "py-6" : "py-10"}`}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-medium text-[var(--foreground)]">{config.title}</p>
-            <p className="mt-1 max-w-xl">{config.description}</p>
+            <p className="font-medium text-[var(--foreground)]">{siteTitle}</p>
+            {showDescription ? (
+              <p className="mt-1 max-w-xl">{config.description}</p>
+            ) : null}
           </div>
           <nav aria-label="Footer navigation">
             <ul className="flex flex-wrap gap-x-4 gap-y-2">
@@ -44,9 +53,11 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
             </ul>
           </nav>
         </div>
-        <div className="flex flex-col gap-3 border-t border-[var(--border)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className={`flex flex-col gap-2 border-t border-[var(--border)] sm:flex-row sm:items-center sm:justify-between ${compact ? "pt-4" : "pt-6 gap-3"}`}
+        >
           <p>
-            &copy; {new Date().getFullYear()} {config.title}
+            &copy; {new Date().getFullYear()} {siteTitle}
           </p>
           <p className="text-xs sm:text-sm">
             Powered by{" "}

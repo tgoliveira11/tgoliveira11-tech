@@ -45,7 +45,7 @@ export default async function SearchPage({
           title="Search"
           description="Find published articles by keyword."
         >
-          <SearchForm defaultQuery={query} variant="hero" />
+          <SearchForm defaultQuery={query} />
         </PublicPageHero>
 
         {searching ? (

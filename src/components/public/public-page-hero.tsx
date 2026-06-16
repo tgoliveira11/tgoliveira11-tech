@@ -12,7 +12,7 @@ export function PublicPageHero({
   children?: ReactNode;
 }) {
   return (
-    <header className="public-page-hero border-b border-[var(--border)] pb-8">
+    <header className="public-page-hero border-b border-[var(--border)] pb-6">
       {eyebrow ? (
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--primary)]">
           {eyebrow}
