@@ -57,11 +57,18 @@ const { ensurePatchedServices, wrapRoutes } = createSecureAuthServicesPatcher(()
   baseSecureAuth.getServices()
 );
 
+const wrappedRoutes = wrapRoutes(
+  baseSecureAuth.routes as Record<string, Record<string, SecureAuthRouteHandler>>
+);
+
 /** secure-auth instance with app-specific NextAuth cookie names on all API routes. */
 export const secureAuth = {
-  ...baseSecureAuth,
+  config: baseSecureAuth.config,
+  uiConfig: baseSecureAuth.uiConfig,
+  get ui() {
+    return baseSecureAuth.ui;
+  },
+  getPublicUIConfig: () => baseSecureAuth.getPublicUIConfig(),
   getServices: ensurePatchedServices,
-  routes: wrapRoutes(
-    baseSecureAuth.routes as Record<string, Record<string, SecureAuthRouteHandler>>
-  ),
+  routes: wrappedRoutes,
 };
