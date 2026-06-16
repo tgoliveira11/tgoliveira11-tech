@@ -1,6 +1,8 @@
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { buildRobotsTxt } from "@/modules/public/sitemap";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const config = await getBlogConfig();
   const body = buildRobotsTxt(config);

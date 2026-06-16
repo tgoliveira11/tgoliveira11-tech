@@ -8,6 +8,8 @@ import {
 } from "@/modules/public/public-posts.service";
 import { buildSitemapEntries } from "@/modules/public/sitemap";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const config = await getBlogConfig();
   const [posts, tags, categories] = await Promise.all([

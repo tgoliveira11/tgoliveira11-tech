@@ -3,6 +3,8 @@ import { getBlogConfig } from "@/modules/public/blog-config";
 import { buildRssXml } from "@/modules/public/rss";
 import { listPublishedPostsForFeed } from "@/modules/public/public-posts.service";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const config = await getBlogConfig();
 
