@@ -225,6 +225,16 @@ See [GITHUB_PAGES_MIGRATION.md](GITHUB_PAGES_MIGRATION.md).
 
 ---
 
+## Can I import a single post from a URL?
+
+Yes. Open **Admin → Import → Import from URL**, paste the URL of a post you own or have permission to reuse, and click **Import as draft**.
+
+PostForge extracts the title, subtitle, slug, Markdown content, and main image, then creates a **draft** for review. Only the main image is uploaded as a PostForge asset by default; other inline images may stay remote.
+
+See [GITHUB_PAGES_MIGRATION.md](GITHUB_PAGES_MIGRATION.md#single-post-url-import).
+
+---
+
 ## Why does `db:generate` say “nothing to migrate”?
 
 That is normal when the schema has not changed. Use `db:migrate` to **apply** existing migrations.

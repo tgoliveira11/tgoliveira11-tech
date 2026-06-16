@@ -152,6 +152,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 6.2 | Image mapping | Local copy + Markdown rewrite; remote preserved |
 | 6.3 | Redirect creation | 301 from legacy paths to `/blog/[slug]` |
 | 6.4 | Import tooling | CLI dry-run/import + `/admin/import` guidance |
+| 6.5 | URL import | Single-post import from HTML URL (admin UI) |
 
 **Exit gate:** Legacy Markdown folder imports as drafts with JSON report; redirects planned/created. ✅
 

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { AdminPageTitle } from "@/components/admin/admin-page-title";
+import { ImportFromUrlForm } from "@/components/admin/import/import-from-url-form";
 
 const REPORT_DIR = path.join(process.cwd(), ".import-reports");
 
@@ -23,12 +24,33 @@ export default function AdminImportPage() {
   return (
     <div className="space-y-6">
       <AdminPageTitle
-        title="GitHub Pages import"
-        description="Migrate legacy Markdown posts into PostForge using the CLI importer."
+        title="Import"
+        description="Import legacy content into PostForge as drafts."
       />
 
+      <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Import from URL</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Paste the URL of a blog post you own or have permission to reuse. PostForge will create
+            a draft using the source title, subtitle, content, and main image.
+          </p>
+        </div>
+        <ImportFromUrlForm />
+        <ul className="list-disc space-y-1 pl-5 text-xs text-[var(--muted)]">
+          <li>Imported posts are always saved as drafts.</li>
+          <li>Only the main image is uploaded as a PostForge asset by default.</li>
+          <li>Other inline images may remain as remote URLs.</li>
+          <li>JavaScript-rendered pages may not import reliably.</li>
+        </ul>
+      </section>
+
       <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 space-y-3">
-        <h2 className="text-lg font-semibold">Recommended workflow</h2>
+        <h2 className="text-lg font-semibold">GitHub Pages folder import</h2>
+        <p className="text-sm text-[var(--muted)]">
+          Migrate legacy Markdown folders using the CLI importer. See{" "}
+          <code>docs/GITHUB_PAGES_MIGRATION.md</code> for supported frontmatter and safety defaults.
+        </p>
         <ol className="list-decimal space-y-2 pl-5 text-sm">
           <li>Export or copy your GitHub Pages/Jekyll Markdown folder locally.</li>
           <li>Run a dry-run import to validate metadata, slugs, images, and redirects.</li>
@@ -36,22 +58,10 @@ export default function AdminImportPage() {
           <li>Run import mode to create draft posts (default safety).</li>
           <li>Review imported drafts in Admin → Posts, then publish manually.</li>
         </ol>
-        <p className="text-sm text-[var(--muted)]">
-          See <code>docs/GITHUB_PAGES_MIGRATION.md</code> in the repository for supported frontmatter, safety defaults,
-          and troubleshooting.
-        </p>
-      </section>
-
-      <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 space-y-3">
-        <h2 className="text-lg font-semibold">CLI commands</h2>
         <pre className="overflow-x-auto rounded-md bg-slate-950 p-4 text-xs text-slate-100">
 {`npm run import:github-pages -- --source ./legacy-blog --mode dry-run
 npm run import:github-pages -- --source ./legacy-blog --mode import --assets ./legacy-blog/assets`}
         </pre>
-        <p className="text-xs text-[var(--muted)]">
-          Imported posts default to draft. Use <code>--publish-imported true</code> only when you explicitly want
-          automatic publishing.
-        </p>
       </section>
 
       <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 space-y-3">

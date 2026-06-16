@@ -29,6 +29,7 @@
   "dependencies": {
     "@tgoliveira/secure-auth": "^0.1.10-internal",
     "@vercel/blob": "^2.4.0",
+    "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.2",
     "gray-matter": "^4.0.3",
     "next": "16.2.9",
@@ -43,6 +44,8 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "server-only": "^0.0.1",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2",
     "unified": "^11.0.5",
     "zod": "^4.4.3"
   },
@@ -52,6 +55,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/turndown": "^5.0.6",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
