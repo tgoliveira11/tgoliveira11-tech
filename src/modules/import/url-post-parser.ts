@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
-import type { AnyNode } from "domhandler";
+import type { AnyNode, Element } from "domhandler";
+import { isTag } from "domhandler";
 import TurndownService from "turndown";
 import { gfm } from "turndown-plugin-gfm";
 import { normalizeUrlPath } from "@/lib/paths";
@@ -248,7 +249,7 @@ export function findImageAfterPostDate(
 ): string | null {
   const dateElements = collectDateMetadataElements($, articleRoot);
 
-  for (const scope of findPostHeaderScopes($, articleRoot)) {
+  for (const scope of findPostHeaderScopes($)) {
     for (const element of collectDateMetadataElements($, scope)) {
       if (!dateElements.includes(element)) {
         dateElements.push(element);
@@ -302,10 +303,7 @@ function collectDateMetadataElements(
   return dateElements;
 }
 
-function findPostHeaderScopes(
-  $: cheerio.CheerioAPI,
-  articleRoot: cheerio.Cheerio<AnyNode>
-): cheerio.Cheerio<AnyNode>[] {
+function findPostHeaderScopes($: cheerio.CheerioAPI): cheerio.Cheerio<AnyNode>[] {
   const scopes: cheerio.Cheerio<AnyNode>[] = [];
   const seen = new Set<AnyNode>();
 
@@ -339,12 +337,19 @@ function findPostHeaderScopes(
   return scopes;
 }
 
-function isElementBeforeInDocument(
+export function isElementBeforeInDocument(
   $: cheerio.CheerioAPI,
   before: AnyNode,
   after: AnyNode
 ): boolean {
-  const nodes = $("body *").toArray();
+  if (!isTag(before) || !isTag(after)) {
+    return false;
+  }
+
+  const nodes: Element[] = $("body *")
+    .toArray()
+    .filter(isTag);
+
   if (!nodes.includes(after)) {
     nodes.push(after);
   }

@@ -5,6 +5,7 @@ import {
   extractSlugFromUrl,
   findImageAfterPostDate,
   htmlToMarkdown,
+  isElementBeforeInDocument,
   parseUrlPostHtml,
   resolveUrl,
 } from "@/modules/import/url-post-parser";
@@ -243,5 +244,19 @@ describe("article main image selection", () => {
     );
     expect(parsed.mainImageUrl).not.toBe("https://cdn.example.com/profile.jpg");
     expect(parsed.warnings).toContain("Main image extracted from image below post date/metadata");
+  });
+
+  it("returns false for document-order checks with non-element nodes", () => {
+    const $ = cheerio.load("<body><span class=\"post-meta\">Posted on June 16, 2023</span><article><p>Body</p></article></body>");
+    const documentNode = $.root().get(0);
+    const dateNode = $("span.post-meta").get(0);
+    const articleNode = $("article").get(0);
+
+    expect(documentNode).toBeDefined();
+    expect(dateNode).toBeDefined();
+    expect(articleNode).toBeDefined();
+
+    expect(isElementBeforeInDocument($, documentNode!, articleNode!)).toBe(false);
+    expect(isElementBeforeInDocument($, dateNode!, articleNode!)).toBe(true);
   });
 });
