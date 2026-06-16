@@ -197,6 +197,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] `HOME_POPULAR_CATEGORIES_LIMIT` env (default `6`, max `24`) for home category popularity
 - [x] `/blog` total published posts counter
 - [x] Home popular tags/categories ranked by published post count
+- [x] Admin tag filter searchable combobox; RSS opens in new tab
 - [x] `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`) for `/blog`
 - [x] Admin posts sortable columns + default public order sort
 - [x] `PublicPagination` on `/blog`

@@ -46,7 +46,12 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                 </Link>
               </li>
               <li>
-                <a href="/rss.xml" className="hover:text-[var(--primary)]">
+                <a
+                  href="/rss.xml"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--primary)]"
+                >
                   RSS
                 </a>
               </li>
