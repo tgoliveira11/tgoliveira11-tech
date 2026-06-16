@@ -60,6 +60,16 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                   RSS
                 </a>
               </li>
+              <li>
+                <a
+                  href={PUBLIC_SITE_CONFIG.footer.ltgUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--primary)]"
+                >
+                  LTG
+                </a>
+              </li>
             </ul>
           </nav>
         </div>

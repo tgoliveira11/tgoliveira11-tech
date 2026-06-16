@@ -78,6 +78,8 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Exit gate:** Seed a published post; visible on home, blog, search, RSS, and sitemap. Draft invisible. ✅
 
+**Follow-up (downstream):** Public `Admin` convenience link for authenticated visitors; admin `View site` link; footer LTG external link. `/admin` authorization unchanged (`requireAdminSession()`).
+
 **Deferred to later phases:** Related posts, middleware redirects, route integration tests, GIN indexes.
 
 ---

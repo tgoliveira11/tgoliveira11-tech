@@ -73,3 +73,28 @@ describe("requireAdminSession integration", () => {
   });
 });
 
+describe("hasAuthenticatedSession", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getServicesMock.mockResolvedValue({
+      getAuthOptions: vi.fn(() => ({})),
+    });
+  });
+
+  it("returns false when session is missing", async () => {
+    getServerSessionMock.mockResolvedValue(null);
+
+    const { hasAuthenticatedSession } = await import("@/modules/admin/authorization");
+    await expect(hasAuthenticatedSession()).resolves.toBe(false);
+  });
+
+  it("returns true when session has a user id", async () => {
+    getServerSessionMock.mockResolvedValue({
+      user: { id: "u1", email: "anyone@example.com" },
+    });
+
+    const { hasAuthenticatedSession } = await import("@/modules/admin/authorization");
+    await expect(hasAuthenticatedSession()).resolves.toBe(true);
+  });
+});
+

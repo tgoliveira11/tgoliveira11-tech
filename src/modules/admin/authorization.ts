@@ -65,3 +65,10 @@ export async function requireAdminApiSession() {
   }
   return { user };
 }
+
+/** Public convenience only — does not imply admin authorization. */
+export async function hasAuthenticatedSession(): Promise<boolean> {
+  const session = await getServerSession(await getAuthOptions());
+  const user = session?.user as { id?: string } | undefined;
+  return Boolean(user?.id);
+}

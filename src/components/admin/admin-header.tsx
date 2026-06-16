@@ -3,6 +3,9 @@ import { AdminSignOutButton } from "./admin-sign-out-button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { adminNavItems } from "@/modules/admin/admin-navigation";
 
+const viewSiteLinkClassName =
+  "rounded-md border border-[var(--border)] px-3 py-1.5 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-subtle)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]";
+
 export function AdminHeader({ adminEmail }: { adminEmail: string }) {
   return (
     <header className="border-b border-[var(--border)] bg-[var(--card)]">
@@ -25,6 +28,9 @@ export function AdminHeader({ adminEmail }: { adminEmail: string }) {
               </Link>
             ))}
           </nav>
+          <Link href="/" className={viewSiteLinkClassName}>
+            View site
+          </Link>
           <ThemeToggle compact />
           <AdminSignOutButton />
         </div>

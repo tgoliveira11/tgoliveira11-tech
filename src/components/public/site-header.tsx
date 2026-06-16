@@ -5,11 +5,18 @@ import {
   PUBLIC_SITE_CONFIG,
 } from "@/modules/public/public-site-config";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { AdminConvenienceLink } from "./admin-convenience-link";
 import { PUBLIC_CONTENT_MAX_WIDTH_CLASS } from "./public-layout-constants";
 import { SearchForm } from "./search-form";
 import { SiteNav } from "./site-nav";
 
-export function SiteHeader({ config }: { config: BlogConfig }) {
+export function SiteHeader({
+  config,
+  showAdminLink = false,
+}: {
+  config: BlogConfig;
+  showAdminLink?: boolean;
+}) {
   const siteTitle = getPublicSiteTitle(config);
   const hideNavSearch = PUBLIC_SITE_CONFIG.header.hideNavSearchWhenHeaderSearchVisible;
 
@@ -29,6 +36,7 @@ export function SiteHeader({ config }: { config: BlogConfig }) {
 
             <div className="flex shrink-0 items-center gap-2 md:hidden">
               <SiteNav hideSearchLink={hideNavSearch} />
+              {showAdminLink ? <AdminConvenienceLink /> : null}
               <ThemeToggle compact />
             </div>
           </div>
@@ -39,6 +47,7 @@ export function SiteHeader({ config }: { config: BlogConfig }) {
 
           <div className="hidden shrink-0 items-center gap-3 md:flex">
             <SiteNav hideSearchLink={hideNavSearch} />
+            {showAdminLink ? <AdminConvenienceLink /> : null}
             <ThemeToggle compact />
           </div>
         </div>
