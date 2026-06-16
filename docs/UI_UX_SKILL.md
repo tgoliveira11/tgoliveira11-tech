@@ -181,10 +181,16 @@ PublicLayout
 ### Manual public order (admin)
 
 - Set on `/admin/posts` per published post (`publicOrder` column)
+- New drafts receive the next available `publicOrder` automatically
 - Lower numbers appear first on home recent list, `/blog`, tag, and category pages
 - Posts without manual order fall back to `publishedAt DESC`
 - **Not** the same as pinned/featured — those control home hero promotion only
+- Schedule action is not shown on `/admin/posts`; use the post editor to schedule
+- Admin list filters: status, category, tag (`?tagId=`), search, sort
 - RSS feed stays `publishedAt DESC`; search stays relevance / date
+
+### Public page layout (detail/index)
+
 - Post detail: back link + article header + `prose-article` body + prev/next nav
 - Search: hero search; empty state with recent posts; results with count label
 - Tags/Categories index: hero + pill/card grid

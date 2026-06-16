@@ -134,4 +134,49 @@ Legacy paths are served by the public catch-all route `/(public)/[...legacyPath]
 
 ## Admin page
 
-Visit `/admin/import` for CLI examples and recent report filenames.
+Visit `/admin/import` for:
+
+- **Import from URL** — paste a single post URL (GitHub Pages/Jekyll HTML) to create a draft
+- **GitHub Pages folder import** — CLI examples and recent report filenames
+
+## Single post URL import
+
+Use **Admin → Import → Import from URL** to paste one HTML post URL (for example a legacy GitHub Pages article).
+
+**Important:** Only import posts you own or have permission to reuse.
+
+### What is imported
+
+| Field | Source priority |
+|-------|-----------------|
+| Title | Article `h1` → `og:title` → `twitter:title` → document title |
+| Excerpt / subtitle | `h2` after `h1` → meta description → `og:description` → first paragraph |
+| Slug | Last URL path segment (date prefixes preserved, e.g. `2023-06-16-my-post`) |
+| Content | Article HTML converted to Markdown |
+| Main image | `og:image` → `twitter:image` → first article image → uploaded as PostForge asset |
+| Status | Always **draft** |
+
+### Image behavior
+
+- The **main image** is downloaded and uploaded through the current storage provider (local or Vercel Blob).
+- It is set as **cover** and **OG** image with alt/caption = post title.
+- If the same image appears in content, its Markdown URL is rewritten to the PostForge asset URL.
+- **Other inline images** remain remote URLs in MVP.
+
+### Redirect option
+
+Optional checkbox: **Create redirect from source path to new post**
+
+- Default: off
+- Only created when the source URL hostname matches `APP_BASE_URL` / `NEXTAUTH_URL`
+- Maps source pathname → `/blog/{slug}` with 301
+
+### Limitations
+
+- Not all themes expose subtitles consistently (`h2` after `h1` works best).
+- Not every page has a clear `<article>` container.
+- Only the **main image** is imported as a PostForge asset by default.
+- Remote inline images may remain remote.
+- JavaScript-rendered content may not import well (server fetches static HTML only).
+- Do not create redirects for arbitrary external domains unless this site serves those old paths.
+- SSRF protections block localhost, private IPs, and non-http(s) URLs.
