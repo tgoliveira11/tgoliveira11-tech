@@ -45,7 +45,7 @@ See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
 
 ## How do I control the order of posts on the home page and blog?
 
-Set **manual public order** on `/admin/posts` for published posts (`publicOrder` column). Lower numbers appear first. Posts without a manual order fall back to publish date.
+Set **manual public order** on `/admin/posts` for published posts (`publicOrder` column). Lower numbers appear first. New posts start at `publicOrder = 0`.
 
 This is separate from **pinned** and **featured**, which only control the home-page hero promotion.
 

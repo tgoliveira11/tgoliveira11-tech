@@ -83,6 +83,7 @@ Copy `.env.example` to `.env.local` and set at minimum:
 | `NEXTAUTH_SECRET` | Auth session secret (long random string) |
 | `ADMIN_EMAIL` | Email allowed to access `/admin` |
 | `EMAIL_PROVIDER` | `console` locally (default); `resend` in production |
+| `PUBLIC_SITE_THEME` | Optional: `light` or `dark` to force public theme (hides toggle) |
 
 **Full reference:** [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) · **Email:** [docs/EMAIL_PROVIDERS.md](docs/EMAIL_PROVIDERS.md)
 

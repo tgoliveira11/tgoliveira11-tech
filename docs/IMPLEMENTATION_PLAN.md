@@ -199,7 +199,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] Home popular tags/categories ranked by published post count
 - [x] Admin tag filter searchable combobox; RSS opens in new tab
 - [x] `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`) for `/blog`
-- [x] Admin posts sortable columns + default admin sort (null `publicOrder` first, then manual order)
+- [x] Admin posts sortable columns + default admin sort (`publicOrder ASC`, then date desc)
 - [x] Admin posts filtered total counter (`N total posts` / `N posts found`)
 - [x] Admin tag filter fix (`tagId` UUID; two-step query avoids DISTINCT/ORDER BY error)
 - [x] Admin posts Reset clears all filter/sort params
@@ -227,11 +227,11 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - Manual **Save draft** only — autosave deferred.
 - Revisions page/history UI deferred (revisions still created on manual save, publish, unpublish).
 - Scheduler cron deferred to M3.6 follow-up (schedule UI sets status; auto-publish not wired).
-- Admin list default sort: `CASE WHEN publicOrder IS NULL THEN 0 ELSE 1 END ASC`; null group by `publishedAt DESC NULLS LAST`, then `updatedAt DESC`; non-null group by `publicOrder ASC`.
+- Admin list default sort: `publicOrder ASC`, `COALESCE(publishedAt, updatedAt) DESC`, `updatedAt DESC`.
 - Admin list shows filtered total count; Reset link returns to `/admin/posts` with no query params.
 - Tag filter uses canonical `tagId` query param; invalid values are ignored server-side.
 - Schedule action removed from `/admin/posts` list; scheduling remains on the post editor.
-- New drafts start with `publicOrder = null`; assign manually on `/admin/posts`.
+- New drafts start with `publicOrder = 0`.
 - Markdown editor: textarea + live sanitized preview (no toolbar, no image upload — M4).
 
 ### Manual smoke flow

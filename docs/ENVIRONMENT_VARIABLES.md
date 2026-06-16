@@ -129,6 +129,22 @@ See `.env.example` for:
 | `HOME_RECENT_POSTS_LIMIT` | Recent posts shown on home (below featured) | `12` | Positive integer, max `48`; invalid values fall back to `12` |
 | `HOME_POPULAR_CATEGORIES_LIMIT` | Top categories on home “Explore by category” | `6` | Positive integer, max `24`; invalid values fall back to `6` |
 
+### Public appearance
+
+| Variable | Purpose | Default | Server-only | Notes |
+|----------|---------|---------|-------------|-------|
+| `PUBLIC_SITE_THEME` | Force public site theme | unset | No (safe to document) | `light` or `dark` hides the public theme toggle; empty = visitor choice |
+
+Examples:
+
+```env
+PUBLIC_SITE_THEME=dark
+PUBLIC_SITE_THEME=light
+PUBLIC_SITE_THEME=
+```
+
+Applies to public pages only. Admin theme toggle remains available when forced.
+
 ---
 
 ## Uploads / storage

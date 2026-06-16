@@ -76,7 +76,7 @@ export async function createDraft(input: CreatePostInput, userId: string): Promi
     contentMarkdown: parsed.contentMarkdown ?? "",
     categoryId: parsed.categoryId ?? null,
     status: "draft",
-    publicOrder: null,
+    publicOrder: 0,
     createdBy: userId,
     updatedBy: userId,
   });
@@ -404,7 +404,7 @@ export async function duplicatePost(id: string, userId: string): Promise<Post> {
     featured: false,
     pinned: false,
     pinnedPriority: 0,
-    publicOrder: null,
+    publicOrder: 0,
     createdBy: userId,
     updatedBy: userId,
   });
@@ -483,7 +483,7 @@ export async function clearPostPublicOrder(id: string, userId: string): Promise<
   }
 
   const updated = await repo.updatePostById(id, {
-    publicOrder: null,
+    publicOrder: 0,
     updatedBy: userId,
   });
   if (!updated) throw new NotFoundError("Post not found");
@@ -500,33 +500,25 @@ export async function movePostPublicOrder(
     throw new NotFoundError("Post not found");
   }
   assertPublishedForPublicOrder(existing);
-  if (existing.publicOrder == null) {
-    throw new ValidationError("Set a public order before moving this post");
-  }
 
-  const ordered = await repo.listPublishedPostsWithPublicOrder();
-  const index = ordered.findIndex((post) => post.id === id);
-  if (index === -1) {
-    throw new NotFoundError("Post not found in public order list");
-  }
-
-  const neighborIndex = direction === "up" ? index - 1 : index + 1;
-  if (neighborIndex < 0 || neighborIndex >= ordered.length) {
+  const currentOrder = existing.publicOrder ?? 0;
+  if (direction === "up" && currentOrder <= 0) {
     return existing;
   }
 
-  const neighbor = ordered[neighborIndex]!;
-  const currentOrder = existing.publicOrder;
-  const neighborOrder = neighbor.publicOrder;
+  const nextOrder =
+    direction === "up"
+      ? Math.max(currentOrder - 1, 0)
+      : Math.min(currentOrder + 1, 9999);
 
-  if (neighborOrder == null) {
+  if (nextOrder === currentOrder) {
     return existing;
   }
 
-  await repo.updatePostById(id, { publicOrder: neighborOrder, updatedBy: userId });
-  await repo.updatePostById(neighbor.id, { publicOrder: currentOrder, updatedBy: userId });
-
-  const updated = await repo.findPostById(id);
+  const updated = await repo.updatePostById(id, {
+    publicOrder: nextOrder,
+    updatedBy: userId,
+  });
   if (!updated) throw new NotFoundError("Post not found");
   return updated;
 }

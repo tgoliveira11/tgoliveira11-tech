@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import type { ForcedPublicTheme } from "@/lib/env";
 import {
   applyTheme,
   getStoredTheme,
@@ -14,26 +16,40 @@ type ThemeContextValue = {
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   ready: boolean;
+  canToggleTheme: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+function isPublicPath(pathname: string): boolean {
+  return !pathname.startsWith("/admin");
+}
+
+export function ThemeProvider({
+  children,
+  forcedPublicTheme = null,
+}: {
+  children: React.ReactNode;
+  forcedPublicTheme?: ForcedPublicTheme | null;
+}) {
+  const pathname = usePathname();
+  const isPublicRoute = isPublicPath(pathname);
+  const effectiveForcedTheme = isPublicRoute ? forcedPublicTheme : null;
   const [theme, setThemeState] = useState<Theme>("light");
   const [ready, setReady] = useState(false);
   const initialized = useRef(false);
 
   useEffect(() => {
-    const stored = getStoredTheme() ?? "light";
+    const initialTheme = effectiveForcedTheme ?? getStoredTheme() ?? "light";
     initialized.current = true;
-    applyTheme(stored);
+    applyTheme(initialTheme);
     queueMicrotask(() => {
-      setThemeState(stored);
+      setThemeState(initialTheme);
       setReady(true);
     });
 
     function onStorage(event: StorageEvent) {
-      if (event.key !== THEME_STORAGE_KEY || !event.newValue) {
+      if (effectiveForcedTheme || event.key !== THEME_STORAGE_KEY || !event.newValue) {
         return;
       }
       if (event.newValue === "light" || event.newValue === "dark") {
@@ -44,24 +60,41 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  }, [effectiveForcedTheme]);
 
   useEffect(() => {
     if (!initialized.current) {
       return;
     }
+
+    if (effectiveForcedTheme) {
+      applyTheme(effectiveForcedTheme);
+      return;
+    }
+
     applyTheme(theme);
     persistTheme(theme);
-  }, [theme]);
+  }, [theme, effectiveForcedTheme]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({
-      theme,
+      theme: effectiveForcedTheme ?? theme,
       ready,
-      setTheme: setThemeState,
-      toggleTheme: () => setThemeState((current) => (current === "light" ? "dark" : "light")),
+      canToggleTheme: !effectiveForcedTheme,
+      setTheme: (nextTheme) => {
+        if (effectiveForcedTheme) {
+          return;
+        }
+        setThemeState(nextTheme);
+      },
+      toggleTheme: () => {
+        if (effectiveForcedTheme) {
+          return;
+        }
+        setThemeState((current) => (current === "light" ? "dark" : "light"));
+      },
     }),
-    [theme, ready]
+    [theme, ready, effectiveForcedTheme]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

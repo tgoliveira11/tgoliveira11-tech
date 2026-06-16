@@ -39,6 +39,8 @@ export type UploadProviderName = "local" | "vercel-blob";
 
 export type EmailProviderName = "console" | "resend";
 
+export type ForcedPublicTheme = "light" | "dark";
+
 export function readEmailProvider(): string | undefined {
   return readEnv("EMAIL_PROVIDER");
 }
@@ -53,6 +55,19 @@ export function readEmailFrom(): string | undefined {
 
 export function readEmailReplyTo(): string | undefined {
   return readEnv("EMAIL_REPLY_TO");
+}
+
+export function readPublicSiteTheme(): ForcedPublicTheme | null {
+  const value = readEnv("PUBLIC_SITE_THEME")?.toLowerCase();
+  if (!value) {
+    return null;
+  }
+
+  if (value === "light" || value === "dark") {
+    return value;
+  }
+
+  return null;
 }
 
 export function readUploadProvider(): string | undefined {
