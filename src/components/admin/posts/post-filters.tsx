@@ -25,13 +25,17 @@ export function PostFilters({
     categoryId?: string;
     tagId?: string;
     sort?: string;
+    direction?: string;
   };
 }) {
   return (
     <form
       method="get"
-      className="mb-4 grid gap-3 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 md:grid-cols-5"
+      className="mb-4 grid gap-3 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 md:grid-cols-4"
     >
+      {current.sort ? <input type="hidden" name="sort" value={current.sort} /> : null}
+      {current.direction ? <input type="hidden" name="direction" value={current.direction} /> : null}
+
       <label className="text-sm">
         <span className="mb-1 block font-medium">Status</span>
         <select
@@ -87,7 +91,7 @@ export function PostFilters({
         ) : null}
       </label>
 
-      <label className="text-sm md:col-span-2">
+      <label className="text-sm md:col-span-4">
         <span className="mb-1 block font-medium">Search</span>
         <input
           type="search"
@@ -96,19 +100,6 @@ export function PostFilters({
           placeholder="Title, slug, or content"
           className="w-full rounded-md border border-[var(--border)] px-3 py-2"
         />
-      </label>
-
-      <label className="text-sm">
-        <span className="mb-1 block font-medium">Sort</span>
-        <select
-          name="sort"
-          defaultValue={current.sort ?? "updatedAt"}
-          className="w-full rounded-md border border-[var(--border)] px-3 py-2"
-        >
-          <option value="updatedAt">Recently updated</option>
-          <option value="publishedAt">Recently published</option>
-          <option value="publicOrder">Public order</option>
-        </select>
       </label>
 
       <div className="flex items-end gap-2 md:col-span-4">

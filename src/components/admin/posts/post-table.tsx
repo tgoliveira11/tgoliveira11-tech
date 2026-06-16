@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import type { Post } from "@/modules/posts/posts.types";
+import {
+  adminSortIndicator,
+  buildAdminPostsSortHref,
+} from "@/modules/posts/admin-posts-sort";
+import type { AdminPostSortDirection, AdminPostSortField, Post } from "@/modules/posts/posts.types";
 import {
   archivePostAction,
   duplicatePostAction,
@@ -24,12 +28,77 @@ function formatDate(value: Date | null | undefined) {
   }).format(value);
 }
 
+function SortHeader({
+  label,
+  column,
+  currentSort,
+  currentDirection,
+  usesDefaultSort,
+  filters,
+}: {
+  label: string;
+  column: AdminPostSortField;
+  currentSort?: AdminPostSortField;
+  currentDirection?: AdminPostSortDirection;
+  usesDefaultSort: boolean;
+  filters: Record<string, string | undefined>;
+}) {
+  const indicator = adminSortIndicator({
+    column,
+    currentSort,
+    currentDirection,
+    usesDefaultSort,
+  });
+
+  const href = buildAdminPostsSortHref({
+    column,
+    currentSort,
+    currentDirection,
+    filters,
+  });
+
+  const ariaSort =
+    indicator === "asc"
+      ? "ascending"
+      : indicator === "desc"
+        ? "descending"
+        : indicator === "default"
+          ? "ascending"
+          : "none";
+
+  return (
+    <th className="px-3 py-2" aria-sort={ariaSort}>
+      <Link
+        href={href}
+        className="inline-flex items-center gap-1 hover:text-[var(--foreground)]"
+      >
+        <span>{label}</span>
+        <span aria-hidden="true" className="text-[10px] leading-none">
+          {indicator === "asc" ? "▲" : null}
+          {indicator === "desc" ? "▼" : null}
+          {indicator === "default" ? "◆" : null}
+        </span>
+      </Link>
+    </th>
+  );
+}
+
 export function PostTable({
   posts,
   categoryNames,
+  orderedPublishedIds,
+  sortState,
+  filterParams,
 }: {
   posts: Post[];
   categoryNames: Record<string, string>;
+  orderedPublishedIds: string[];
+  sortState: {
+    sort?: AdminPostSortField;
+    direction?: AdminPostSortDirection;
+    usesDefaultSort: boolean;
+  };
+  filterParams: Record<string, string | undefined>;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -47,6 +116,22 @@ export function PostTable({
     });
   }
 
+  function getMoveBounds(post: Post) {
+    if (post.status !== "published" || post.publicOrder == null) {
+      return { canMoveUp: false, canMoveDown: false };
+    }
+
+    const index = orderedPublishedIds.indexOf(post.id);
+    if (index === -1) {
+      return { canMoveUp: false, canMoveDown: false };
+    }
+
+    return {
+      canMoveUp: index > 0,
+      canMoveDown: index < orderedPublishedIds.length - 1,
+    };
+  }
+
   if (posts.length === 0) {
     return <p className="text-sm text-[var(--muted)]">No posts match the current filters.</p>;
   }
@@ -62,19 +147,78 @@ export function PostTable({
       <table className="min-w-full text-left text-sm">
         <thead className="border-b border-[var(--border)] bg-[var(--surface-subtle)] text-xs uppercase text-[var(--muted)]">
           <tr>
-            <th className="px-3 py-2">Title</th>
-            <th className="px-3 py-2">Status</th>
-            <th className="px-3 py-2">Published</th>
-            <th className="px-3 py-2">Scheduled</th>
-            <th className="px-3 py-2">Updated</th>
-            <th className="px-3 py-2">Flags</th>
-            <th className="px-3 py-2">Public order</th>
-            <th className="px-3 py-2">Category</th>
+            <SortHeader
+              label="Title"
+              column="title"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Status"
+              column="status"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Published"
+              column="published"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Scheduled"
+              column="scheduled"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Updated"
+              column="updated"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Flags"
+              column="flags"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Public order"
+              column="publicOrder"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
+            <SortHeader
+              label="Category"
+              column="category"
+              currentSort={sortState.sort}
+              currentDirection={sortState.direction}
+              usesDefaultSort={sortState.usesDefaultSort}
+              filters={filterParams}
+            />
             <th className="px-3 py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {posts.map((post) => (
+          {posts.map((post) => {
+            const moveBounds = getMoveBounds(post);
+
+            return (
             <tr key={post.id} className="border-b border-[var(--border)] last:border-b-0">
               <td className="px-3 py-3 align-top">
                 <div className="font-medium">{post.title}</div>
@@ -100,7 +244,12 @@ export function PostTable({
                 </div>
               </td>
               <td className="px-3 py-3 align-top">
-                <PublicOrderControls post={post} />
+                <PublicOrderControls
+                  key={`${post.id}-${post.publicOrder ?? "unset"}`}
+                  post={post}
+                  canMoveUp={moveBounds.canMoveUp}
+                  canMoveDown={moveBounds.canMoveDown}
+                />
               </td>
               <td className="px-3 py-3 align-top">
                 {post.categoryId ? categoryNames[post.categoryId] ?? "—" : "—"}
@@ -157,7 +306,8 @@ export function PostTable({
                 </div>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
       </div>

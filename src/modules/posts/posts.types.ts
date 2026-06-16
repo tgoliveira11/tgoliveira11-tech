@@ -7,6 +7,18 @@ export type PostRevision = InferSelectModel<typeof postRevisions>;
 export type PostStatus = Post["status"];
 export type RevisionType = (typeof revisionTypeEnum.enumValues)[number];
 
+export type AdminPostSortField =
+  | "title"
+  | "status"
+  | "published"
+  | "scheduled"
+  | "updated"
+  | "flags"
+  | "publicOrder"
+  | "category";
+
+export type AdminPostSortDirection = "asc" | "desc";
+
 export type AdminPostListFilters = {
   status?: PostStatus;
   categoryId?: string;
@@ -14,7 +26,8 @@ export type AdminPostListFilters = {
   featured?: boolean;
   pinned?: boolean;
   search?: string;
-  sort?: "updatedAt" | "publishedAt" | "publicOrder";
+  sort?: AdminPostSortField;
+  direction?: AdminPostSortDirection;
   limit?: number;
   offset?: number;
 };

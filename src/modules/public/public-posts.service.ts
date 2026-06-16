@@ -1,15 +1,16 @@
 import * as repo from "./public-posts.repository";
 import { getBlogConfig } from "./blog-config";
-import { readPublicPostsPageSize } from "@/lib/env";
+import { readHomeRecentPostsLimit, readPublicPostsPageSize } from "@/lib/env";
 import { normalizePage } from "@/lib/pagination";
 import { splitHomePosts } from "./public-display";
 
 export async function getHomePagePosts() {
   const config = await getBlogConfig();
+  const recentLimit = readHomeRecentPostsLimit();
   const bundles = await repo.listPublishedPostBundles({
-    limit: config.postsPerPage + 5,
+    limit: recentLimit + 5,
   });
-  const { featuredPost, recent } = splitHomePosts(bundles, config.postsPerPage);
+  const { featuredPost, recent } = splitHomePosts(bundles, recentLimit);
 
   return {
     config,

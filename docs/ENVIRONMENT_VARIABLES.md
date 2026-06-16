@@ -107,6 +107,7 @@ See `.env.example` for:
 | `ADMIN_EMAIL` | Email allowed to use `/admin` | — | **Required**; case-insensitive match |
 | `CRON_SECRET` | Protects scheduled publish cron endpoints | — | **Required** in production if cron is used |
 | `PUBLIC_POSTS_PAGE_SIZE` | Posts per page on `/blog` | `5` | Positive integer, max `50`; invalid values fall back to `5` |
+| `HOME_RECENT_POSTS_LIMIT` | Recent posts shown on home (below featured) | `12` | Positive integer, max `48`; invalid values fall back to `12` |
 
 ---
 
@@ -193,6 +194,7 @@ NEXTAUTH_URL
 NEXTAUTH_SECRET
 ADMIN_EMAIL
 PUBLIC_POSTS_PAGE_SIZE=5
+HOME_RECENT_POSTS_LIMIT=12
 UPLOAD_PROVIDER=local
 UPLOAD_LOCAL_DIR=./storage/uploads
 UPLOAD_PUBLIC_BASE_URL=/api/assets

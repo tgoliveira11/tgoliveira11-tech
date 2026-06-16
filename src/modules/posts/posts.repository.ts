@@ -3,6 +3,10 @@ import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
 import { postRevisions, posts, postTags } from "./posts.schema";
+import {
+  adminListRequiresCategoryJoin,
+  buildAdminPostOrderBy,
+} from "./posts.repository.admin-sort";
 import type { AdminPostListFilters, PostStatus, PublishedPostListOptions } from "./posts.types";
 import type { NewPost, Post, PostRevision, RevisionType } from "./posts.types";
 
@@ -87,12 +91,8 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-  const orderBy =
-    filters.sort === "publishedAt"
-      ? [desc(posts.publishedAt), desc(posts.updatedAt)]
-      : filters.sort === "publicOrder"
-        ? [sql`${posts.publicOrder} IS NULL`, asc(posts.publicOrder), desc(posts.publishedAt)]
-        : [desc(posts.updatedAt)];
+  const orderBy = buildAdminPostOrderBy(filters);
+  const needsCategoryJoin = adminListRequiresCategoryJoin(filters);
 
   const limit = filters.limit ?? 50;
   const offset = filters.offset ?? 0;
@@ -102,11 +102,29 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
       ? and(whereClause, eq(postTags.tagId, filters.tagId))
       : eq(postTags.tagId, filters.tagId);
 
-    const rows = await db
+    const query = db
       .selectDistinct({ post: posts })
       .from(posts)
-      .innerJoin(postTags, eq(postTags.postId, posts.id))
+      .innerJoin(postTags, eq(postTags.postId, posts.id));
+
+    const rows = await (needsCategoryJoin
+      ? query.leftJoin(categories, eq(posts.categoryId, categories.id))
+      : query
+    )
       .where(tagWhere)
+      .orderBy(...orderBy)
+      .limit(limit)
+      .offset(offset);
+
+    return rows.map((row) => row.post);
+  }
+
+  if (needsCategoryJoin) {
+    const rows = await db
+      .select({ post: posts })
+      .from(posts)
+      .leftJoin(categories, eq(posts.categoryId, categories.id))
+      .where(whereClause)
       .orderBy(...orderBy)
       .limit(limit)
       .offset(offset);

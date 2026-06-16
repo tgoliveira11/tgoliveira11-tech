@@ -31,7 +31,7 @@ export function PostCard({
         <Link
           href={postHref}
           className={`relative block overflow-hidden bg-[var(--surface-subtle)] ${
-            isCompact ? "aspect-[16/10]" : "mb-4 aspect-[16/9] rounded-lg"
+            isCompact ? "aspect-[16/9]" : "mb-4 aspect-[16/9] rounded-lg"
           }`}
           aria-label={`View cover image for ${post.title}`}
         >
@@ -45,8 +45,8 @@ export function PostCard({
         </Link>
       ) : null}
 
-      <div className={`flex flex-1 flex-col ${isCompact ? "p-5" : ""}`}>
-        <div className="flex flex-wrap items-center gap-2">
+      <div className={`flex flex-1 flex-col ${isCompact ? "p-4" : ""}`}>
+        <div className="flex flex-wrap items-center gap-1.5">
           {showPromotionBadges && post.pinned ? (
             <span className="text-xs font-medium uppercase tracking-wide text-[var(--primary)]">
               Pinned
@@ -68,8 +68,8 @@ export function PostCard({
         </div>
 
         <h2
-          className={`mt-2 font-semibold tracking-tight ${
-            isCompact ? "text-xl" : "text-2xl"
+          className={`font-semibold tracking-tight ${
+            isCompact ? "mt-1.5 text-base leading-snug" : "mt-2 text-2xl"
           }`}
         >
           <Link href={postHref} className="hover:text-[var(--primary)]">
@@ -80,13 +80,13 @@ export function PostCard({
         <PostMeta
           publishedAt={post.publishedAt}
           readingTimeMinutes={post.readingTimeMinutes}
-          className="mt-2"
+          className={isCompact ? "mt-1.5 text-xs" : "mt-2"}
         />
 
         {post.excerpt ? (
           <p
-            className={`mt-3 text-[var(--muted)] ${
-              isCompact ? "line-clamp-3 text-sm leading-relaxed" : ""
+            className={`text-[var(--muted)] ${
+              isCompact ? "mt-2 line-clamp-2 text-xs leading-relaxed" : "mt-3"
             }`}
           >
             {post.excerpt}
@@ -94,7 +94,10 @@ export function PostCard({
         ) : null}
 
         {visibleTags.length > 0 ? (
-          <ul className="mt-4 flex flex-wrap gap-2" aria-label="Post tags">
+          <ul
+            className={`flex flex-wrap gap-1.5 ${isCompact ? "mt-2" : "mt-4"}`}
+            aria-label="Post tags"
+          >
             {visibleTags.map((tag) => (
               <li key={tag.id}>
                 <Link
@@ -113,10 +116,12 @@ export function PostCard({
           </ul>
         ) : null}
 
-        <div className="mt-auto pt-4">
+        <div className={isCompact ? "mt-auto pt-2" : "mt-auto pt-4"}>
           <Link
             href={postHref}
-            className="text-sm font-medium text-[var(--primary)] hover:underline"
+            className={`font-medium text-[var(--primary)] hover:underline ${
+              isCompact ? "text-xs" : "text-sm"
+            }`}
           >
             Read post
           </Link>

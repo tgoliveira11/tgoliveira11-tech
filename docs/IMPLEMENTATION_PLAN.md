@@ -193,7 +193,9 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] `posts.publicOrder` nullable integer + index `(status, publicOrder, publishedAt)`
 - [x] Manual order on home recent, `/blog`, tag, category listings (`publicOrder IS NULL ASC`, `publicOrder ASC`, `publishedAt DESC`)
 - [x] RSS feed remains `publishedAt DESC`; search remains FTS / date order
+- [x] `HOME_RECENT_POSTS_LIMIT` env (default `12`, max `48`) for home recent grid
 - [x] `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`) for `/blog`
+- [x] Admin posts sortable columns + default public order sort
 - [x] `PublicPagination` on `/blog`
 - [x] Admin controls on `/admin/posts` (set, clear, up/down)
 - [x] Pinned/featured unchanged for home hero promotion
@@ -219,7 +221,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - Scheduler cron deferred to M3.6 follow-up (schedule UI sets status; auto-publish not wired).
 - Admin list tag filter implemented on `/admin/posts` (`?tagId=`).
 - Schedule action removed from `/admin/posts` list; scheduling remains on the post editor.
-- New drafts receive automatic `publicOrder = max + 1`.
+- New drafts start with `publicOrder = null`; assign manually on `/admin/posts`.
 - Markdown editor: textarea + live sanitized preview (no toolbar, no image upload — M4).
 
 ### Manual smoke flow

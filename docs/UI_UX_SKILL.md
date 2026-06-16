@@ -144,7 +144,7 @@ Public pages should feel **editorial and reader-focused**, not like the admin pa
 ### Post cards
 
 - Default variant for `/blog` and search listings.
-- Compact variant for home recent grid.
+- Compact variant for home recent grid (4 columns desktop, 2 tablet, 1 mobile; denser typography and shorter excerpts)
 - Show at most 4 tags; use `+N more` when truncated.
 - Category as subtle label; promotion badges only on blog/search default cards.
 - Accessible link labels for cover images and read links.
@@ -176,17 +176,19 @@ PublicLayout
 
 - Blog listing: hero + search + post list + pagination (`/blog?page=N`)
 - Page size on `/blog` from `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`)
-- Home page: featured hero + recent grid (no pagination; recent count from `blog_settings.postsPerPage`)
+- Home recent grid from `HOME_RECENT_POSTS_LIMIT` env (default `12`, max `48`); compact 4-column layout on desktop
 
 ### Manual public order (admin)
 
 - Set on `/admin/posts` per published post (`publicOrder` column)
-- New drafts receive the next available `publicOrder` automatically
+- New drafts start with `publicOrder = null`; assign manually via Set, then reorder with arrows
 - Lower numbers appear first on home recent list, `/blog`, tag, and category pages
 - Posts without manual order fall back to `publishedAt DESC`
+- Admin table default sort: non-null `publicOrder` first, ascending; null orders by `publishedAt DESC`
+- Click column headers to sort; composes with status/category/tag/search filters
+- Arrow controls swap order with adjacent published posts; disabled when order is unset or at list boundary
 - **Not** the same as pinned/featured — those control home hero promotion only
 - Schedule action is not shown on `/admin/posts`; use the post editor to schedule
-- Admin list filters: status, category, tag (`?tagId=`), search, sort
 - RSS feed stays `publishedAt DESC`; search stays relevance / date
 
 ### Public page layout (detail/index)
