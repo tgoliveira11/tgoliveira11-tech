@@ -284,8 +284,8 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] `markdown-editor.tsx` — Write / Preview / Split tabs, larger textarea, `contentMarkdown` preserved
 - [x] Sidebar cards: status, compact assets, taxonomy, promotion, SEO (collapsed), schedule, danger zone
 - [x] `docs/UI_UX_SKILL.md` + `.cursor/rules/postforge-ui-ux.mdc` — admin UI principles
-- [ ] Autosave — deferred; manual Save draft with `createRevision: true`
-- [ ] Editor toolbar — deferred
+- [x] Autosave — debounced updates via `autosavePostAction` (no publish)
+- [x] Editor toolbar — Markdown formatting buttons with accessible labels
 - [ ] Inline tag creation — deferred (helper text points to tag management)
 
 **Save/publish safety (unchanged):** `updatePostAction` with `intent=publish` saves current form fields then publishes the same post ID. Cover/OG asset IDs are set via asset actions only and are not cleared on save.
@@ -310,7 +310,7 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] Unit: admin validation, lifecycle visibility, pin schema, authorization email helper
 - [ ] Integration: schedule → cron → published — deferred
 - [ ] E2E: full admin flow — deferred (manual smoke documented above)
-- [ ] Security: route integration tests — deferred
+- [x] Security: route integration tests (admin guard + public endpoint hardening)
 
 **Phase 3 exit criteria:** Full publish lifecycle works through admin UI. ✅
 
@@ -484,7 +484,8 @@ All actions call `requireAdminSession()` before handling requests.
 
 - [ ] Consistent API error responses
 - [ ] Admin toast notifications for failures
-- [ ] Public friendly error pages
+- [x] Public friendly error pages (no Server Components crash; fallback notices)
+- [x] Autosave/preview failures render friendly inline errors (no sensitive stack traces)
 
 ### 7.2 Audit logging
 
@@ -501,7 +502,7 @@ All actions call `requireAdminSession()` before handling requests.
 ### 7.4 Accessibility
 
 - [ ] Semantic HTML on public pages
-- [ ] Keyboard navigation in editor
+- [x] Keyboard navigation in editor (toolbar is focusable and labeled)
 - [ ] Alt text enforcement warnings
 
 ### 7.5 Performance
@@ -509,6 +510,7 @@ All actions call `requireAdminSession()` before handling requests.
 - [ ] Verify indexes on hot queries
 - [ ] Image optimization (next/image where applicable)
 - [ ] Cache headers for static assets
+- [x] Debounced markdown preview and debounced autosave to reduce server and DB load
 
 ### 7.6 Operations
 

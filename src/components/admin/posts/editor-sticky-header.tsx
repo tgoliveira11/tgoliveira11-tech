@@ -7,7 +7,24 @@ import type { Post } from "@/modules/posts/posts.types";
 import { unpublishPostAction } from "@/modules/posts/admin-posts.actions";
 import { publicPostPath } from "@/modules/posts/slug";
 import { AdminStatusBadge } from "../admin-status-badge";
+import { formatAutosaveTime, type AutosaveStatus } from "./use-autosave-post";
 import { formatEditorDate, POST_EDITOR_FORM_ID } from "./editor-constants";
+
+function autosaveIndicatorLabel(options: {
+  status: AutosaveStatus;
+  message: string | null;
+  error: string | null;
+  lastSavedAt: Date | null;
+}): string {
+  if (options.status === "saving") return "Saving…";
+  if (options.status === "unsaved") return "Unsaved changes";
+  if (options.status === "error") return "Autosave failed";
+  if (options.lastSavedAt) {
+    const prefix = options.message ?? "Changes saved";
+    return `${prefix} · Last saved at ${formatAutosaveTime(options.lastSavedAt)}`;
+  }
+  return "Saved";
+}
 
 export function EditorStickyHeader({
   post,
@@ -15,17 +32,35 @@ export function EditorStickyHeader({
   saveLabel,
   publishLabel,
   lastMessage,
+  autosaveStatus = "saved",
+  autosaveMessage = null,
+  autosaveError = null,
+  autosaveLastSavedAt = null,
+  onPauseAutosave,
+  onResumeAutosave,
 }: {
   post: Post;
   pending: boolean;
   saveLabel: string;
   publishLabel: string;
   lastMessage?: string;
+  autosaveStatus?: AutosaveStatus;
+  autosaveMessage?: string | null;
+  autosaveError?: string | null;
+  autosaveLastSavedAt?: Date | null;
+  onPauseAutosave?: () => void;
+  onResumeAutosave?: () => void;
 }) {
   const router = useRouter();
   const [unpublishPending, startUnpublish] = useTransition();
   const displayTitle = post.title.trim() || "Untitled draft";
   const isPublished = post.status === "published";
+  const autosaveLabel = autosaveIndicatorLabel({
+    status: autosaveStatus,
+    message: autosaveMessage,
+    error: autosaveError,
+    lastSavedAt: autosaveLastSavedAt,
+  });
 
   return (
     <header className="sticky top-0 z-20 -mx-4 border-b border-[var(--border)] bg-[var(--background)]/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-[var(--background)]/80">
@@ -62,6 +97,18 @@ export function EditorStickyHeader({
             Updated {formatEditorDate(post.updatedAt)}
             {lastMessage ? ` · ${lastMessage}` : null}
           </p>
+          <p
+            role="status"
+            className={`text-xs ${
+              autosaveStatus === "error"
+                ? "text-red-600 dark:text-red-400"
+                : autosaveStatus === "unsaved"
+                  ? "text-amber-700 dark:text-amber-300"
+                  : "text-[var(--muted)]"
+            }`}
+          >
+            {autosaveLabel}
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -97,13 +144,18 @@ export function EditorStickyHeader({
               type="button"
               disabled={unpublishPending}
               onClick={() => {
+                onPauseAutosave?.();
                 startUnpublish(async () => {
-                  const result = await unpublishPostAction(post.id);
-                  if (!result.ok) {
-                    window.alert(result.error ?? "Could not unpublish");
-                    return;
+                  try {
+                    const result = await unpublishPostAction(post.id);
+                    if (!result.ok) {
+                      window.alert(result.error ?? "Could not unpublish");
+                      return;
+                    }
+                    router.refresh();
+                  } finally {
+                    onResumeAutosave?.();
                   }
-                  router.refresh();
                 });
               }}
               className="rounded-md border border-orange-300 px-3 py-2 text-sm text-orange-800 disabled:opacity-50"

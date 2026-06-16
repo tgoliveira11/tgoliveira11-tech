@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { AppError } from "@/lib/errors";
+import { mapActionError } from "@/lib/action-errors";
 import { requireAdminSession } from "@/modules/admin/authorization";
 import { revalidatePublicPaths } from "@/modules/admin/revalidate-public";
 import { renderMarkdownToHtml } from "@/modules/markdown/markdown-renderer";
@@ -14,18 +14,50 @@ import {
 } from "@/modules/posts/posts.validation";
 import { publicPostPath } from "@/modules/posts/slug";
 import { parseUpdatePostFormData, readPostEditorIntent } from "@/modules/posts/admin-posts.form";
-import { getSaveSuccessMessage } from "@/modules/posts/admin-posts.messages";
+import { getAutosaveSuccessMessage, getSaveSuccessMessage } from "@/modules/posts/admin-posts.messages";
 
 export type ActionResult = {
   ok: boolean;
   message?: string;
   error?: string;
+  savedAt?: string;
 };
 
-function mapActionError(error: unknown): string {
-  if (error instanceof AppError) return error.message;
-  if (error instanceof Error) return error.message;
-  return "Something went wrong";
+export async function autosavePostAction(
+  postId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  if (!postId) {
+    return { ok: false, error: "Post ID is required" };
+  }
+
+  try {
+    const session = await requireAdminSession();
+    const existing = await postsService.getById(postId);
+    const input = {
+      ...parseUpdatePostFormData(formData),
+      createRevision: false,
+    };
+
+    const updated = await postsService.updateDraft(postId, input, session.user.id);
+
+    if (existing.status === "published" || updated.status === "published") {
+      revalidatePublicPaths(existing.slug);
+      if (updated.slug !== existing.slug) {
+        revalidatePublicPaths(updated.slug);
+      }
+    }
+
+    revalidateAdminPostEditor(postId);
+
+    return {
+      ok: true,
+      message: getAutosaveSuccessMessage(updated.status),
+      savedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    return { ok: false, error: mapActionError(error) };
+  }
 }
 
 export async function createDraftAction(): Promise<void> {
