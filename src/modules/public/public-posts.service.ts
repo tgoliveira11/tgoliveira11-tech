@@ -1,8 +1,12 @@
 import * as repo from "./public-posts.repository";
 import { getBlogConfig } from "./blog-config";
-import { readHomeRecentPostsLimit, readPublicPostsPageSize } from "@/lib/env";
+import {
+  readHomePopularCategoriesLimit,
+  readHomeRecentPostsLimit,
+  readPublicPostsPageSize,
+} from "@/lib/env";
 import { normalizePage } from "@/lib/pagination";
-import { splitHomePosts } from "./public-display";
+import { HOME_TOPICS_TAG_LIMIT, splitHomePosts } from "./public-display";
 
 export async function getHomePagePosts() {
   const config = await getBlogConfig();
@@ -40,6 +44,18 @@ export async function getBlogListingPage(page: number) {
   };
 }
 
+export async function getHomePageTopics() {
+  const [popularTags, popularCategories] = await Promise.all([
+    repo.listPopularTags(HOME_TOPICS_TAG_LIMIT),
+    repo.listPopularCategories(readHomePopularCategoriesLimit()),
+  ]);
+
+  return {
+    popularTags,
+    popularCategories,
+  };
+}
+
 export {
   getPublishedPostBundleBySlug,
   searchPublishedPostBundles,
@@ -49,6 +65,8 @@ export {
   listPublishedPostBundlesByTagSlug,
   listPublicTags,
   listPublicCategories,
+  listPopularTags,
+  listPopularCategories,
   listAllTags,
   listAllCategories,
   getPublishedNeighbors,
@@ -58,4 +76,4 @@ export {
   listPublishedPostsWithPublicOrder,
 } from "./public-posts.repository";
 
-export type { PublicPostBundle, PaginatedResult } from "./public-posts.repository";
+export type { PublicPostBundle, PaginatedResult, PopularTag, PopularCategory } from "./public-posts.repository";

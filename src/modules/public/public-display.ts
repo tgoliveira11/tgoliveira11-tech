@@ -2,7 +2,6 @@ import type { PublicPostBundle } from "./public-posts.repository";
 
 export const DEFAULT_VISIBLE_TAGS = 4;
 export const HOME_TOPICS_TAG_LIMIT = 16;
-export const HOME_TOPICS_CATEGORY_LIMIT = 6;
 
 export function limitTagsForDisplay<T extends { id: string; name: string }>(
   tags: T[],
@@ -52,4 +51,18 @@ export function splitHomePosts(bundles: PublicPostBundle[], pageSize: number) {
   const recent = bundles.filter((bundle) => bundle.post.id !== featuredId).slice(0, pageSize);
 
   return { featuredPost, recent };
+}
+
+export function formatPublishedPostCount(count: number): string {
+  if (count === 1) {
+    return "1 published post";
+  }
+  return `${count} published posts`;
+}
+
+export function formatTopicPostCount(count: number): string {
+  if (count === 1) {
+    return "1 post";
+  }
+  return `${count} posts`;
 }

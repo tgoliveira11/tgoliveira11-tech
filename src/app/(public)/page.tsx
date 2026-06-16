@@ -7,8 +7,7 @@ import { TopicsSection } from "@/components/public/topics-section";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import {
   getHomePagePosts,
-  listPublicCategories,
-  listPublicTags,
+  getHomePageTopics,
 } from "@/modules/public/public-posts.service";
 import { buildSiteMetadata } from "@/modules/public/seo";
 
@@ -20,9 +19,7 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const { config, featuredPost, recent } = await getHomePagePosts();
   const hasPublishedPosts = Boolean(featuredPost);
-  const [categories, tags] = hasPublishedPosts
-    ? await Promise.all([listPublicCategories(), listPublicTags()])
-    : [[], []];
+  const topics = hasPublishedPosts ? await getHomePageTopics() : null;
 
   return (
     <PublicLayout config={config}>
@@ -45,7 +42,9 @@ export default async function HomePage() {
 
         {hasPublishedPosts ? <RecentPostsSection posts={recent} /> : null}
 
-        {hasPublishedPosts ? <TopicsSection categories={categories} tags={tags} /> : null}
+        {hasPublishedPosts && topics ? (
+          <TopicsSection categories={topics.popularCategories} tags={topics.popularTags} />
+        ) : null}
       </div>
     </PublicLayout>
   );

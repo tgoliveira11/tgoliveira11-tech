@@ -194,6 +194,9 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] Manual order on home recent, `/blog`, tag, category listings (`publicOrder IS NULL ASC`, `publicOrder ASC`, `publishedAt DESC`)
 - [x] RSS feed remains `publishedAt DESC`; search remains FTS / date order
 - [x] `HOME_RECENT_POSTS_LIMIT` env (default `12`, max `48`) for home recent grid
+- [x] `HOME_POPULAR_CATEGORIES_LIMIT` env (default `6`, max `24`) for home category popularity
+- [x] `/blog` total published posts counter
+- [x] Home popular tags/categories ranked by published post count
 - [x] `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`) for `/blog`
 - [x] Admin posts sortable columns + default public order sort
 - [x] `PublicPagination` on `/blog`

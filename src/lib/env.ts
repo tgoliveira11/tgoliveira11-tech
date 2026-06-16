@@ -70,3 +70,16 @@ export function readHomeRecentPostsLimit(): number {
   }
   return Math.min(parsed, MAX_HOME_RECENT_POSTS_LIMIT);
 }
+
+const DEFAULT_HOME_POPULAR_CATEGORIES_LIMIT = 6;
+const MAX_HOME_POPULAR_CATEGORIES_LIMIT = 24;
+
+export function readHomePopularCategoriesLimit(): number {
+  const raw = readEnv("HOME_POPULAR_CATEGORIES_LIMIT");
+  if (!raw) return DEFAULT_HOME_POPULAR_CATEGORIES_LIMIT;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return DEFAULT_HOME_POPULAR_CATEGORIES_LIMIT;
+  }
+  return Math.min(parsed, MAX_HOME_POPULAR_CATEGORIES_LIMIT);
+}
