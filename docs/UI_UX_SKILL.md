@@ -186,7 +186,10 @@ PublicLayout
 - New drafts start with `publicOrder = null`; assign manually via Set, then reorder with arrows
 - Lower numbers appear first on home recent list, `/blog`, tag, and category pages
 - Posts without manual order fall back to `publishedAt DESC`
-- Admin table default sort: non-null `publicOrder` first, ascending; null orders by `publishedAt DESC`
+- Admin table default sort: posts with `publicOrder = null` first (`publishedAt DESC`, then `updatedAt DESC`); then posts with manual order ascending
+- Filtered results counter: `N total posts` with no filters, `N posts found` when filters/search are active
+- Reset navigates to `/admin/posts` and clears all filter/sort query params
+- Actions column uses icon buttons with `title` and `aria-label` (edit, preview, publish, unpublish, duplicate, archive)
 - Click column headers to sort; composes with status/category/tag/search filters
 - Arrow controls swap order with adjacent published posts; disabled when order is unset or at list boundary
 - **Not** the same as pinned/featured — those control home hero promotion only
@@ -248,3 +251,5 @@ PublicLayout
   - dropdown arrow shows all tags with **All tags** first
   - selecting a tag navigates immediately and preserves other query params
   - **All tags** or **Clear tag filter** removes `tagId` from the URL
+  - Invalid or empty `tagId` values are ignored server-side
+  - Canonical query param: `tagId` (UUID)

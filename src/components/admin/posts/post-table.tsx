@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PostRowActions } from "@/components/admin/posts/post-row-actions";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
@@ -255,55 +256,18 @@ export function PostTable({
                 {post.categoryId ? categoryNames[post.categoryId] ?? "—" : "—"}
               </td>
               <td className="px-3 py-3 align-top">
-                <div className="flex min-w-48 flex-col gap-1">
-                  <Link href={`/admin/posts/${post.id}/edit`} className="text-[var(--primary)] underline">
-                    Edit
-                  </Link>
-                  <Link href={`/admin/posts/${post.id}/preview`} className="text-[var(--primary)] underline">
-                    Preview
-                  </Link>
-                  {post.status !== "published" ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      className="text-left text-emerald-700 underline disabled:opacity-50"
-                      onClick={() => run(() => publishPostAction(post.id))}
-                    >
-                      Publish saved
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      className="text-left text-orange-700 underline disabled:opacity-50"
-                      onClick={() => run(() => unpublishPostAction(post.id))}
-                    >
-                      Unpublish
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    disabled={pending}
-                    className="text-left underline disabled:opacity-50"
-                    onClick={() => run(() => duplicatePostAction(post.id))}
-                  >
-                    Duplicate
-                  </button>
-                  {post.status !== "archived" ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      className="text-left text-red-700 underline disabled:opacity-50"
-                      onClick={() => {
-                        if (window.confirm("Archive this post? It will be removed from public surfaces.")) {
-                          run(() => archivePostAction(post.id));
-                        }
-                      }}
-                    >
-                      Archive
-                    </button>
-                  ) : null}
-                </div>
+                <PostRowActions
+                  post={post}
+                  pending={pending}
+                  onPublish={() => run(() => publishPostAction(post.id))}
+                  onUnpublish={() => run(() => unpublishPostAction(post.id))}
+                  onDuplicate={() => run(() => duplicatePostAction(post.id))}
+                  onArchive={() => {
+                    if (window.confirm("Archive this post? It will be removed from public surfaces.")) {
+                      run(() => archivePostAction(post.id));
+                    }
+                  }}
+                />
               </td>
             </tr>
             );

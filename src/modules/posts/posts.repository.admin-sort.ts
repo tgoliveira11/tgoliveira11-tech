@@ -3,12 +3,17 @@ import { categories } from "@/modules/categories/categories.schema";
 import { posts } from "./posts.schema";
 import type { AdminPostListFilters } from "./posts.types";
 
-/** Default admin list order: manual public order first, then publish date. */
+/**
+ * Default admin list order:
+ * 1. publicOrder IS NULL first (unordered posts needing attention)
+ * 2. among nulls: publishedAt DESC, then updatedAt DESC
+ * 3. then publicOrder IS NOT NULL, sorted by publicOrder ASC
+ */
 export const DEFAULT_ADMIN_POST_ORDER: SQL[] = [
-  sql`${posts.publicOrder} IS NULL`,
-  asc(posts.publicOrder),
-  sql`${posts.publishedAt} DESC NULLS LAST`,
-  desc(posts.updatedAt),
+  sql`${posts.publicOrder} IS NOT NULL`,
+  sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.publishedAt} END DESC NULLS LAST`,
+  sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.updatedAt} END DESC`,
+  sql`${posts.publicOrder} ASC NULLS LAST`,
 ];
 
 /**

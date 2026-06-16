@@ -32,6 +32,11 @@ export type AdminPostListFilters = {
   offset?: number;
 };
 
+export type AdminPostListResult = {
+  posts: Post[];
+  totalItems: number;
+};
+
 export type AdminPostBundle = {
   post: Post;
   category: import("@/modules/categories/categories.types").Category | null;

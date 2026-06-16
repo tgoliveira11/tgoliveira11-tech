@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ilike, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNotNull, lte, or, sql, type SQL } from "drizzle-orm";
 import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
@@ -7,7 +7,7 @@ import {
   adminListRequiresCategoryJoin,
   buildAdminPostOrderBy,
 } from "./posts.repository.admin-sort";
-import type { AdminPostListFilters, PostStatus, PublishedPostListOptions } from "./posts.types";
+import type { AdminPostListFilters, AdminPostListResult, PostStatus, PublishedPostListOptions } from "./posts.types";
 import type { NewPost, Post, PostRevision, RevisionType } from "./posts.types";
 
 export function publishedPostFilter(now = new Date()) {
@@ -71,7 +71,7 @@ export async function slugExists(slug: string, excludePostId?: string): Promise<
   return !!row;
 }
 
-export async function listAdminPosts(filters: AdminPostListFilters = {}): Promise<Post[]> {
+function buildAdminPostWhereClause(filters: AdminPostListFilters): SQL | undefined {
   const conditions = [];
 
   if (filters.status) conditions.push(eq(posts.status, filters.status));
@@ -90,10 +90,82 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
     );
   }
 
-  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  return conditions.length > 0 ? and(...conditions) : undefined;
+}
+
+async function listAdminPostsMatchingTagIds(input: {
+  postIds: string[];
+  filters: AdminPostListFilters;
+  whereClause: SQL | undefined;
+  orderBy: SQL[];
+  limit: number;
+  offset: number;
+  needsCategoryJoin: boolean;
+}): Promise<Post[]> {
+  if (input.postIds.length === 0) {
+    return [];
+  }
+
+  const idFilter = inArray(posts.id, input.postIds);
+
+  if (input.needsCategoryJoin) {
+    const rows = await db
+      .select({ post: posts })
+      .from(posts)
+      .leftJoin(categories, eq(posts.categoryId, categories.id))
+      .where(input.whereClause ? and(input.whereClause, idFilter) : idFilter)
+      .orderBy(...input.orderBy)
+      .limit(input.limit)
+      .offset(input.offset);
+
+    return rows.map((row) => row.post);
+  }
+
+  return db
+    .select()
+    .from(posts)
+    .where(input.whereClause ? and(input.whereClause, idFilter) : idFilter)
+    .orderBy(...input.orderBy)
+    .limit(input.limit)
+    .offset(input.offset);
+}
+
+export async function countAdminPosts(filters: AdminPostListFilters = {}): Promise<number> {
+  const whereClause = buildAdminPostWhereClause(filters);
+
+  if (filters.tagId) {
+    const tagWhere = whereClause
+      ? and(whereClause, eq(postTags.tagId, filters.tagId))
+      : eq(postTags.tagId, filters.tagId);
+
+    const [row] = await db
+      .select({ count: sql<number>`count(distinct ${posts.id})::int` })
+      .from(posts)
+      .innerJoin(postTags, eq(postTags.postId, posts.id))
+      .where(tagWhere);
+
+    return Number(row?.count ?? 0);
+  }
+
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(posts)
+    .where(whereClause);
+
+  return Number(row?.count ?? 0);
+}
+
+export async function listAdminPosts(filters: AdminPostListFilters = {}): Promise<Post[]> {
+  const result = await listAdminPostsWithTotal(filters);
+  return result.posts;
+}
+
+export async function listAdminPostsWithTotal(
+  filters: AdminPostListFilters = {}
+): Promise<AdminPostListResult> {
+  const whereClause = buildAdminPostWhereClause(filters);
   const orderBy = buildAdminPostOrderBy(filters);
   const needsCategoryJoin = adminListRequiresCategoryJoin(filters);
-
   const limit = filters.limit ?? 50;
   const offset = filters.offset ?? 0;
 
@@ -102,43 +174,51 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
       ? and(whereClause, eq(postTags.tagId, filters.tagId))
       : eq(postTags.tagId, filters.tagId);
 
-    const query = db
-      .selectDistinct({ post: posts })
-      .from(posts)
-      .innerJoin(postTags, eq(postTags.postId, posts.id));
+    const [idRows, totalItems] = await Promise.all([
+      db
+        .selectDistinct({ id: posts.id })
+        .from(posts)
+        .innerJoin(postTags, eq(postTags.postId, posts.id))
+        .where(tagWhere),
+      countAdminPosts(filters),
+    ]);
 
-    const rows = await (needsCategoryJoin
-      ? query.leftJoin(categories, eq(posts.categoryId, categories.id))
-      : query
-    )
-      .where(tagWhere)
-      .orderBy(...orderBy)
-      .limit(limit)
-      .offset(offset);
+    const postIds = idRows.map((row) => row.id);
+    const postsResult = await listAdminPostsMatchingTagIds({
+      postIds,
+      filters,
+      whereClause,
+      orderBy,
+      limit,
+      offset,
+      needsCategoryJoin,
+    });
 
-    return rows.map((row) => row.post);
+    return { posts: postsResult, totalItems };
   }
 
-  if (needsCategoryJoin) {
-    const rows = await db
-      .select({ post: posts })
-      .from(posts)
-      .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(whereClause)
-      .orderBy(...orderBy)
-      .limit(limit)
-      .offset(offset);
+  const [postsResult, totalItems] = await Promise.all([
+    needsCategoryJoin
+      ? db
+          .select({ post: posts })
+          .from(posts)
+          .leftJoin(categories, eq(posts.categoryId, categories.id))
+          .where(whereClause)
+          .orderBy(...orderBy)
+          .limit(limit)
+          .offset(offset)
+          .then((rows) => rows.map((row) => row.post))
+      : db
+          .select()
+          .from(posts)
+          .where(whereClause)
+          .orderBy(...orderBy)
+          .limit(limit)
+          .offset(offset),
+    countAdminPosts(filters),
+  ]);
 
-    return rows.map((row) => row.post);
-  }
-
-  return db
-    .select()
-    .from(posts)
-    .where(whereClause)
-    .orderBy(...orderBy)
-    .limit(limit)
-    .offset(offset);
+  return { posts: postsResult, totalItems };
 }
 
 export async function getMaxPublicOrder(): Promise<number | null> {
