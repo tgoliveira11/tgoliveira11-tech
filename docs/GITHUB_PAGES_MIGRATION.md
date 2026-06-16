@@ -104,7 +104,19 @@ Legacy paths are derived from:
 
 When a legacy path differs from the new canonical `/blog/[slug]`, a 301 redirect is created unless one already exists.
 
-Legacy paths are served by the public catch-all route `/(public)/[...legacyPath]`, which looks up `redirects.sourcePath` and issues a permanent redirect.
+### Automatic date-prefixed root redirects
+
+Root-level post URLs from the old GitHub Pages site (`/YYYY-MM-DD-slug`) are redirected permanently (HTTP `308`) to `/blog/YYYY-MM-DD-slug` by `src/proxy.ts`. Query strings are preserved. This works on any domain pointed at the Vercel project (for example `tgoliveira11.tech` or `tgoliveira11.com`).
+
+Matcher intent:
+
+```regex
+/^\/\d{4}-\d{2}-\d{2}-[a-z0-9-]+\/?$/i
+```
+
+### Database-backed redirects
+
+Other legacy paths are served by the public catch-all route `/(public)/[...legacyPath]`, which looks up `redirects.sourcePath` and issues a permanent redirect.
 
 ## Safety defaults
 

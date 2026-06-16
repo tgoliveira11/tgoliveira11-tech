@@ -453,12 +453,14 @@ Use Next.js `revalidatePath` or `revalidateTag` with tags like `posts`, `post:{s
 
 ## Redirect middleware
 
-Check `redirects` table early in request lifecycle:
+Date-prefixed legacy post URLs at the site root (`/YYYY-MM-DD-slug`) are redirected to `/blog/[slug]` in `src/proxy.ts` (HTTP `308`, query strings preserved). See `src/lib/legacy-post-redirect.ts` for the matcher.
 
-1. Option A: Next.js middleware (`middleware.ts`) — lookup `fromPath`
-2. Option B: Dynamic catch-all that checks redirects before 404
+Other legacy paths use the `redirects` table:
 
-Prefer middleware for performance on high-traffic paths.
+1. Option A: Next.js proxy (`proxy.ts`) — date-prefixed root slugs (implemented)
+2. Option B: Dynamic catch-all `/(public)/[...legacyPath]` — DB lookup before 404 (implemented)
+
+Prefer proxy for high-traffic deterministic legacy paths; use the catch-all for importer-created redirects.
 
 ---
 
