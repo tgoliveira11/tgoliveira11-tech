@@ -6,7 +6,11 @@ export function readPostEditorIntent(formData: FormData): PostEditorIntent {
   return formData.get("intent") === "publish" ? "publish" : "save";
 }
 
-function parseTagIds(formData: FormData): string[] {
+function parseTagIds(formData: FormData): string[] | undefined {
+  if (!formData.has("tagIds")) {
+    return undefined;
+  }
+
   return formData
     .getAll("tagIds")
     .map((value) => String(value))

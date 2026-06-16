@@ -166,23 +166,7 @@ export async function listPublishedPostBundlesByTagSlug(
   return { tag, posts: bundles };
 }
 
-export async function listPublicTags(): Promise<Tag[]> {
-  return db
-    .selectDistinct({
-      id: tags.id,
-      name: tags.name,
-      slug: tags.slug,
-      createdAt: tags.createdAt,
-      updatedAt: tags.updatedAt,
-    })
-    .from(tags)
-    .innerJoin(postTags, eq(tags.id, postTags.tagId))
-    .innerJoin(posts, eq(postTags.postId, posts.id))
-    .where(publishedPostFilter())
-    .orderBy(asc(tags.name));
-}
-
-export async function listPopularTags(limit: number): Promise<PopularTag[]> {
+export async function listPublicTags(): Promise<PopularTag[]> {
   return db
     .select({
       id: tags.id,
@@ -197,27 +181,15 @@ export async function listPopularTags(limit: number): Promise<PopularTag[]> {
     .innerJoin(posts, eq(postTags.postId, posts.id))
     .where(publishedPostFilter())
     .groupBy(tags.id, tags.name, tags.slug, tags.createdAt, tags.updatedAt)
-    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(tags.name))
-    .limit(limit);
+    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(tags.name));
 }
 
-export async function listPublicCategories(): Promise<Category[]> {
-  return db
-    .selectDistinct({
-      id: categories.id,
-      name: categories.name,
-      slug: categories.slug,
-      description: categories.description,
-      createdAt: categories.createdAt,
-      updatedAt: categories.updatedAt,
-    })
-    .from(categories)
-    .innerJoin(posts, eq(categories.id, posts.categoryId))
-    .where(publishedPostFilter())
-    .orderBy(asc(categories.name));
+export async function listPopularTags(limit: number): Promise<PopularTag[]> {
+  const rows = await listPublicTags();
+  return rows.slice(0, limit);
 }
 
-export async function listPopularCategories(limit: number): Promise<PopularCategory[]> {
+export async function listPublicCategories(): Promise<PopularCategory[]> {
   return db
     .select({
       id: categories.id,
@@ -239,8 +211,12 @@ export async function listPopularCategories(limit: number): Promise<PopularCateg
       categories.createdAt,
       categories.updatedAt
     )
-    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(categories.name))
-    .limit(limit);
+    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(categories.name));
+}
+
+export async function listPopularCategories(limit: number): Promise<PopularCategory[]> {
+  const rows = await listPublicCategories();
+  return rows.slice(0, limit);
 }
 
 export async function listAllTags(): Promise<Tag[]> {

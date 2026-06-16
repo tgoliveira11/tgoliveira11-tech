@@ -70,10 +70,22 @@ export async function trackPostViewEvent(input: TrackPostViewInput): Promise<voi
     postId: input.postId,
     eventType: "post_view",
     referrer: input.referrer ?? null,
+    referrerHost: input.referrerHost ?? null,
     userAgentFamily: input.userAgentFamily ?? null,
+    browserName: input.browserName ?? null,
+    osName: input.osName ?? null,
     deviceType: input.deviceType ?? null,
     country: input.country ?? null,
+    region: input.region ?? null,
+    city: input.city ?? null,
+    acceptLanguage: input.acceptLanguage ?? null,
+    utmSource: input.utmSource ?? null,
+    utmMedium: input.utmMedium ?? null,
+    utmCampaign: input.utmCampaign ?? null,
+    ipHash: input.ipHash ?? null,
+    ipAddress: input.ipAddress ?? null,
     sessionHash: input.sessionHash ?? null,
+    requestMetadata: input.requestMetadata ?? null,
   });
 
   await upsertDailyView(input.postId, { incrementUnique });

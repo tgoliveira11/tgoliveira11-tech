@@ -1,8 +1,8 @@
-import type { Category } from "@/modules/categories/categories.types";
+import type { PopularCategory } from "@/modules/public/public-posts.repository";
 import { PublicEmptyState } from "./public-empty-state";
 import { TopicCard, TopicCardGrid, TopicCardItem } from "./topic-card";
 
-export function CategoryList({ categories }: { categories: Category[] }) {
+export function CategoryList({ categories }: { categories: PopularCategory[] }) {
   if (categories.length === 0) {
     return (
       <PublicEmptyState
@@ -20,6 +20,7 @@ export function CategoryList({ categories }: { categories: Category[] }) {
             href={`/categories/${category.slug}`}
             name={category.name}
             description={category.description}
+            postCount={category.postCount}
           />
         </TopicCardItem>
       ))}

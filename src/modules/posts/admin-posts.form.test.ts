@@ -50,6 +50,30 @@ describe("admin post editor form parsing", () => {
 
     expect(parsed.coverAssetId).toBeUndefined();
     expect(parsed.ogAssetId).toBeUndefined();
+    expect(parsed.tagIds).toBeUndefined();
+  });
+
+  it("omits tagIds when the form does not submit taxonomy fields", () => {
+    const parsed = parseUpdatePostFormData(
+      form({
+        title: "Hello",
+        contentMarkdown: "Body",
+      })
+    );
+
+    expect(parsed.tagIds).toBeUndefined();
+  });
+
+  it("parses tagIds when taxonomy fields are present", () => {
+    const parsed = parseUpdatePostFormData(
+      form({
+        title: "Hello",
+        contentMarkdown: "Body",
+        tagIds: ["550e8400-e29b-41d4-a716-446655440000"],
+      })
+    );
+
+    expect(parsed.tagIds).toEqual(["550e8400-e29b-41d4-a716-446655440000"]);
   });
 
   it("rejects empty titles", () => {

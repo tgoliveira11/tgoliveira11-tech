@@ -1,8 +1,8 @@
-import type { Tag } from "@/modules/tags/tags.types";
+import type { PopularTag } from "@/modules/public/public-posts.repository";
 import { PublicEmptyState } from "./public-empty-state";
 import { TopicPill, TopicPillGrid, TopicPillItem } from "./topic-pill";
 
-export function TagList({ tags }: { tags: Tag[] }) {
+export function TagList({ tags }: { tags: PopularTag[] }) {
   if (tags.length === 0) {
     return (
       <PublicEmptyState
@@ -16,7 +16,7 @@ export function TagList({ tags }: { tags: Tag[] }) {
     <TopicPillGrid>
       {tags.map((tag) => (
         <TopicPillItem key={tag.id}>
-          <TopicPill href={`/tags/${tag.slug}`} name={tag.name} />
+          <TopicPill href={`/tags/${tag.slug}`} name={tag.name} count={tag.postCount} />
         </TopicPillItem>
       ))}
     </TopicPillGrid>

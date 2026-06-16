@@ -17,6 +17,10 @@ export async function createTag(input: CreateTagInput): Promise<Tag> {
     throw new ConflictError("Invalid tag slug");
   }
 
+  if (await repo.findTagByNameCaseInsensitive(parsed.name)) {
+    throw new ConflictError("Tag name already exists");
+  }
+
   if (await repo.findTagBySlug(slug)) {
     throw new ConflictError("Tag slug already exists");
   }
@@ -63,7 +67,20 @@ export async function listTags(): Promise<Tag[]> {
   return repo.listTags();
 }
 
+export async function listAdminTags() {
+  return repo.listAdminTags();
+}
+
+export async function getTagUsageCount(id: string): Promise<number> {
+  return repo.countTagUsage(id);
+}
+
 export async function deleteTag(id: string): Promise<void> {
+  const usageCount = await repo.countTagUsage(id);
+  if (usageCount > 0) {
+    throw new ConflictError("This tag is used by posts and cannot be deleted.");
+  }
+
   const deleted = await repo.deleteTagById(id);
   if (!deleted) {
     throw new NotFoundError("Tag not found");

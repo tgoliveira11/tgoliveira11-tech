@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { AppError } from "@/lib/errors";
 import { requireAdminSession } from "@/modules/admin/authorization";
@@ -33,6 +34,12 @@ export async function createDraftAction(): Promise<void> {
   redirect(`/admin/posts/${post.id}/edit`);
 }
 
+function revalidateAdminPostEditor(postId: string): void {
+  revalidatePath(`/admin/posts/${postId}/edit`);
+  revalidatePath(`/admin/posts/${postId}/preview`);
+  revalidatePath("/admin/posts");
+}
+
 export async function updatePostAction(
   postId: string,
   _prevState: ActionResult,
@@ -56,6 +63,7 @@ export async function updatePostAction(
       if (published.slug !== existing.slug) {
         revalidatePublicPaths(published.slug);
       }
+      revalidateAdminPostEditor(postId);
       return {
         ok: true,
         message: `Published at ${publicPostPath(published.slug)}`,
@@ -68,6 +76,8 @@ export async function updatePostAction(
         revalidatePublicPaths(updated.slug);
       }
     }
+
+    revalidateAdminPostEditor(postId);
 
     return { ok: true, message: getSaveSuccessMessage(updated.status) };
   } catch (error) {
