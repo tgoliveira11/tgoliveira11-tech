@@ -30,7 +30,7 @@ describe("patchSecureAuthEmailTemplates", () => {
     const verification = services.ctx.verificationEmailContent("verify-token");
     const reset = services.ctx.passwordResetEmailContent("reset-token");
 
-    expect(verification.subject).toContain("Verify your email — Thiago Oliveira Tech");
+    expect(verification.subject).toContain("Verify your email — tgoliveira11 tech");
     expect(verification.html).toContain(
       "https://tgoliveira11-tech.vercel.app/verify-email?token=verify-token"
     );
@@ -38,7 +38,7 @@ describe("patchSecureAuthEmailTemplates", () => {
       "https://tgoliveira11-tech.vercel.app/verify-email?token=verify-token"
     );
 
-    expect(reset.subject).toContain("Reset your password — Thiago Oliveira Tech");
+    expect(reset.subject).toContain("Reset your password — tgoliveira11 tech");
     expect(reset.html).toContain(
       "https://tgoliveira11-tech.vercel.app/reset-password?token=reset-token"
     );

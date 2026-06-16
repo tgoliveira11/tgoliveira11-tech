@@ -18,13 +18,13 @@ describe("email templates", () => {
 
   it("renders verification email with CTA URL in html and text", () => {
     const email = renderEmailVerificationTemplate({
-      appName: "Thiago Oliveira Tech",
+      appName: "tgoliveira11 tech",
       verifyUrl: VERIFY_URL,
       appBaseUrl: APP_BASE_URL,
       userEmail: "reader@example.com",
     });
 
-    expect(email.subject).toBe("Verify your email — Thiago Oliveira Tech");
+    expect(email.subject).toBe("Verify your email — tgoliveira11 tech");
     expect(email.html).toContain(VERIFY_URL);
     expect(email.text).toContain(VERIFY_URL);
     expect(email.html).toContain("Verify email address");
@@ -35,13 +35,13 @@ describe("email templates", () => {
 
   it("renders password reset email with CTA URL in html and text", () => {
     const email = renderPasswordResetTemplate({
-      appName: "Thiago Oliveira Tech",
+      appName: "tgoliveira11 tech",
       resetUrl: RESET_URL,
       appBaseUrl: APP_BASE_URL,
       userEmail: "reader@example.com",
     });
 
-    expect(email.subject).toBe("Reset your password — Thiago Oliveira Tech");
+    expect(email.subject).toBe("Reset your password — tgoliveira11 tech");
     expect(email.html).toContain(RESET_URL);
     expect(email.text).toContain(RESET_URL);
     expect(email.html).toContain("Reset password");
@@ -50,7 +50,7 @@ describe("email templates", () => {
 
   it("renders security event template without nullish values", () => {
     const email = renderSecurityEventTemplate({
-      appName: "Thiago Oliveira Tech",
+      appName: "tgoliveira11 tech",
       appBaseUrl: APP_BASE_URL,
       eventName: "Two-factor authentication enabled",
       userEmail: "reader@example.com",
@@ -67,11 +67,11 @@ describe("email templates", () => {
     const templates = createSecureAuthEmailTemplates();
 
     const verification = templates.verificationEmail?.({
-      appName: "Thiago Oliveira Tech",
+      appName: "tgoliveira11 tech",
       verifyUrl: VERIFY_URL,
     });
     const reset = templates.passwordReset?.({
-      appName: "Thiago Oliveira Tech",
+      appName: "tgoliveira11 tech",
       resetUrl: RESET_URL,
     });
 

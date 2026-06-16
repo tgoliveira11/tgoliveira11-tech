@@ -82,7 +82,7 @@ Production values for the blog deployed on Vercel with DNS on Cloudflare:
 ```env
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=<from Resend dashboard>
-EMAIL_FROM="Thiago Oliveira Tech <noreply@mail.tgoliveira11.tech>"
+EMAIL_FROM="tgoliveira11 tech <noreply@mail.tgoliveira11.tech>"
 EMAIL_REPLY_TO="thiago@tgoliveira11.tech"
 ```
 

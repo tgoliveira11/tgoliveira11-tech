@@ -94,7 +94,7 @@ Never prefix `RESEND_API_KEY` with `NEXT_PUBLIC_`.
 ```env
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=<from Resend>
-EMAIL_FROM="Thiago Oliveira Tech <noreply@mail.tgoliveira11.tech>"
+EMAIL_FROM="tgoliveira11 tech <noreply@mail.tgoliveira11.tech>"
 EMAIL_REPLY_TO="thiago@tgoliveira11.tech"
 ```
 
