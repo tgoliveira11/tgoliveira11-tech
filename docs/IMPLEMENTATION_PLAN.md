@@ -437,7 +437,7 @@ All actions call `requireAdminSession()` before handling requests.
 
 - [x] `src/modules/import/github-pages-*.ts` + `scripts/import-github-pages.ts`
 - [x] Scan directory of `.md` files (recursive)
-- [x] Parse YAML frontmatter (`gray-matter`)
+- [x] Parse YAML frontmatter (`js-yaml` via local frontmatter helper)
 - [x] Extract title, date, tags, categories, slug, permalink
 - [x] Detect image references; copy local images to assets
 - [x] Create posts, tags, categories via domain services
@@ -551,7 +551,7 @@ Phase 1 ──► Phase 2 ──► Phase 3
 | -------------- | ------------------------------------------------------------------------------ | ----- |
 | Validation     | `zod`                                                                          | 1     |
 | Markdown       | `remark`, `remark-gfm`, `remark-rehype`, `rehype-sanitize`, `rehype-highlight` | 1     |
-| Frontmatter    | `gray-matter`                                                                  | 6     |
+| Frontmatter    | `js-yaml` (local frontmatter helper)                                           | 6     |
 | Image metadata | `sharp` or `image-size`                                                        | 4     |
 | Dates          | `date-fns`                                                                     | 2     |
 | Testing        | `vitest`                                                                       | 1     |
