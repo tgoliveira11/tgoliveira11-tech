@@ -5,6 +5,7 @@ const {
   selectDistinctMock,
   fromMock,
   innerJoinMock,
+  leftJoinMock,
   whereMock,
   orderByMock,
   limitMock,
@@ -14,6 +15,7 @@ const {
   const limitMock = vi.fn();
   const orderByMock = vi.fn();
   const whereMock = vi.fn();
+  const leftJoinMock = vi.fn();
   const innerJoinMock = vi.fn();
   const fromMock = vi.fn();
   const selectDistinctMock = vi.fn();
@@ -24,6 +26,7 @@ const {
     selectDistinctMock,
     fromMock,
     innerJoinMock,
+    leftJoinMock,
     whereMock,
     orderByMock,
     limitMock,
@@ -38,12 +41,31 @@ vi.mock("@/db/get-db", () => ({
   },
 }));
 
-import { getMaxPublicOrder, getNextPublicOrder, listAdminPosts } from "@/modules/posts/posts.repository";
+import {
+  countAdminPosts,
+  getMaxPublicOrder,
+  getNextPublicOrder,
+  listAdminPosts,
+  listAdminPostsWithTotal,
+} from "@/modules/posts/posts.repository";
 
 function mockMaxPublicOrder(max: number | null) {
   const whereForMax = vi.fn().mockResolvedValue([{ max }]);
   const fromForMax = vi.fn().mockReturnValue({ where: whereForMax });
   selectMock.mockReturnValueOnce({ from: fromForMax });
+}
+
+function mockPlainListResult(rows: unknown[]) {
+  offsetMock.mockResolvedValueOnce(rows);
+}
+
+function mockTagFilterQueries(post: { id: string; title: string }) {
+  whereMock
+    .mockResolvedValueOnce([{ id: post.id }])
+    .mockResolvedValueOnce([{ count: 1 }])
+    .mockReturnValueOnce({ orderBy: orderByMock });
+
+  mockPlainListResult([post]);
 }
 
 describe("posts repository admin helpers", () => {
@@ -54,8 +76,13 @@ describe("posts repository admin helpers", () => {
     limitMock.mockReturnValue({ offset: offsetMock });
     orderByMock.mockReturnValue({ limit: limitMock });
     whereMock.mockReturnValue({ orderBy: orderByMock });
+    leftJoinMock.mockReturnValue({ where: whereMock });
     innerJoinMock.mockReturnValue({ where: whereMock });
-    fromMock.mockReturnValue({ where: whereMock, innerJoin: innerJoinMock });
+    fromMock.mockReturnValue({
+      where: whereMock,
+      innerJoin: innerJoinMock,
+      leftJoin: leftJoinMock,
+    });
     selectMock.mockReturnValue({ from: fromMock });
     selectDistinctMock.mockReturnValue({ from: fromMock });
   });
@@ -75,9 +102,9 @@ describe("posts repository admin helpers", () => {
     await expect(getNextPublicOrder()).resolves.toBe(6);
   });
 
-  it("listAdminPosts joins post_tags when tagId filter is provided", async () => {
+  it("listAdminPosts uses distinct post ids and a second query when tagId filter is provided", async () => {
     const post = { id: "post-1", title: "Tagged post" };
-    offsetMock.mockResolvedValue([{ post }]);
+    mockTagFilterQueries(post);
 
     const rows = await listAdminPosts({ tagId: "tag-1", status: "published" });
 
@@ -86,8 +113,26 @@ describe("posts repository admin helpers", () => {
     expect(rows).toEqual([post]);
   });
 
+  it("listAdminPostsWithTotal returns filtered total for tag queries", async () => {
+    const post = { id: "post-1", title: "Tagged post" };
+    mockTagFilterQueries(post);
+
+    const result = await listAdminPostsWithTotal({ tagId: "tag-1", status: "published" });
+
+    expect(result).toEqual({ posts: [post], totalItems: 1 });
+  });
+
+  it("countAdminPosts counts distinct posts for tag filters", async () => {
+    whereMock.mockResolvedValueOnce([{ count: 3 }]);
+
+    await expect(countAdminPosts({ tagId: "tag-1" })).resolves.toBe(3);
+    expect(innerJoinMock).toHaveBeenCalled();
+  });
+
   it("listAdminPosts uses a plain select when tagId is omitted", async () => {
-    offsetMock.mockResolvedValue([{ id: "post-1" }]);
+    whereMock.mockReturnValueOnce({ orderBy: orderByMock });
+    whereMock.mockResolvedValueOnce([{ count: 1 }]);
+    mockPlainListResult([{ id: "post-1" }]);
 
     await listAdminPosts({ status: "draft" });
 

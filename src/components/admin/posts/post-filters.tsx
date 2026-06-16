@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TagFilterCombobox } from "@/components/admin/posts/tag-filter-combobox";
+import { ADMIN_POSTS_RESET_PATH } from "@/modules/admin/admin-posts-filters";
 import type { AdminPostsFilterParams } from "@/modules/admin/admin-posts-filter-url";
 import type { Category } from "@/modules/categories/categories.types";
 import type { PostStatus } from "@/modules/posts/posts.types";
@@ -76,7 +77,7 @@ export function PostFilters({
 
       {current.tagId ? <input type="hidden" name="tagId" value={current.tagId} /> : null}
 
-      <TagFilterCombobox tags={tags} current={filterParams} />
+      <TagFilterCombobox key={current.tagId ?? "all"} tags={tags} current={filterParams} />
 
       <label className="text-sm md:col-span-4">
         <span className="mb-1 block font-medium">Search</span>
@@ -96,7 +97,10 @@ export function PostFilters({
         >
           Apply filters
         </button>
-        <Link href="/admin/posts" className="rounded-md border border-[var(--border)] px-4 py-2 text-sm">
+        <Link
+          href={ADMIN_POSTS_RESET_PATH}
+          className="rounded-md border border-[var(--border)] px-4 py-2 text-sm"
+        >
           Reset
         </Link>
       </div>

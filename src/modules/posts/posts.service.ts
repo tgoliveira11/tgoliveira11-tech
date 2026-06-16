@@ -9,6 +9,7 @@ import { isValidSlug, normalizeSlug, publicPostPath, slugFromTitle } from "./slu
 import type {
   AdminPostBundle,
   AdminPostListFilters,
+  AdminPostListResult,
   Post,
   PublishedPostListOptions,
 } from "./posts.types";
@@ -199,6 +200,16 @@ export async function getPublishedBySlug(slug: string): Promise<Post> {
 
 export async function listAdminPosts(filters?: AdminPostListFilters): Promise<Post[]> {
   return repo.listAdminPosts(filters);
+}
+
+export async function listAdminPostsWithTotal(
+  filters?: AdminPostListFilters
+): Promise<AdminPostListResult> {
+  return repo.listAdminPostsWithTotal(filters);
+}
+
+export async function countAdminPosts(filters?: AdminPostListFilters): Promise<number> {
+  return repo.countAdminPosts(filters);
 }
 
 export async function getAdminPostBundle(id: string): Promise<AdminPostBundle> {
