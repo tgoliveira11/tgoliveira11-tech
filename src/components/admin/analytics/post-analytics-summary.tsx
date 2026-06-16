@@ -2,6 +2,7 @@ import type { PostAnalyticsDetail } from "@/modules/analytics/analytics.types";
 import { AnalyticsSummaryCards } from "./analytics-summary-cards";
 import { DeviceBreakdown } from "./device-breakdown";
 import { EnrichedAnalyticsPanel } from "./enriched-analytics-panel";
+import { EnrichedAnalyticsUnavailableNotice } from "./enriched-analytics-unavailable-notice";
 import { ReferrerBreakdown } from "./referrer-breakdown";
 import { ViewsOverTime } from "./views-over-time";
 
@@ -9,6 +10,8 @@ export function PostAnalyticsSummaryPanel({ detail }: { detail: PostAnalyticsDet
   return (
     <div className="space-y-6">
       <AnalyticsSummaryCards summary={detail.summary} />
+
+      {detail.enrichedUnavailable ? <EnrichedAnalyticsUnavailableNotice /> : null}
 
       <ViewsOverTime title="Views by day (last 30 days)" points={detail.viewsByDay} />
 

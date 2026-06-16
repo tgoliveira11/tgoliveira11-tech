@@ -61,11 +61,13 @@ Local filesystem uploads are **not durable** on Vercel — use Blob for producti
 1. **Create blog repo** from the PostForge template — [CREATE_A_BLOG.md](CREATE_A_BLOG.md).
 2. **Import to Vercel** — connect GitHub repo, Next.js preset, `npm run build`.
 3. **Neon Postgres** — create project, copy `DATABASE_URL`, set in Vercel env.
-4. **Run migrations** once against production:
+4. **Run migrations** once against production (includes enriched analytics columns in `0003_groovy_absorbing_man`):
 
 ```bash
 DATABASE_URL="postgres://..." npm run db:migrate
 ```
+
+Re-run after pulling analytics enrichment changes if `/admin/analytics` shows a migration warning.
 
 5. **Vercel Blob** — Vercel project → **Storage** → create/connect **Blob** store (public access).
 6. **Confirm token** — `BLOB_READ_WRITE_TOKEN` appears in env when store is connected.
