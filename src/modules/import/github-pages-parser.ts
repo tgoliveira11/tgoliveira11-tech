@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import matter from "gray-matter";
+import { readFrontmatterFile } from "./frontmatter";
 import { isValidSlug, normalizeSlug, slugFromTitle } from "@/modules/posts/slug";
 import {
   KNOWN_FRONTMATTER_FIELDS,
@@ -120,7 +120,7 @@ export function parseLegacyMarkdownFile(
   filePath: string
 ): ParsedLegacyPost {
   const relativePath = path.relative(sourceRoot, filePath).replace(/\\/g, "/");
-  const raw = matter.read(filePath);
+  const raw = readFrontmatterFile(filePath);
   const data = raw.data as Record<string, unknown>;
   const warnings: string[] = [];
   const errors: string[] = [];

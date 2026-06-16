@@ -12,7 +12,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 |-------------|-------|
 | CLI importer (`npm run import:github-pages`) | ✅ |
 | Dry-run + import modes | ✅ |
-| Frontmatter parsing (gray-matter) | ✅ |
+| Frontmatter parsing (js-yaml) | ✅ |
 | Local image copy + Markdown rewrite | ✅ |
 | Redirect planning/creation | ✅ |
 | Import JSON reports | ✅ |
@@ -148,7 +148,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 6.1 | Import parser | `gray-matter`, slug/permalink/date/tags |
+| 6.1 | Import parser | `js-yaml`, slug/permalink/date/tags |
 | 6.2 | Image mapping | Local copy + Markdown rewrite; remote preserved |
 | 6.3 | Redirect creation | 301 from legacy paths to `/blog/[slug]` |
 | 6.4 | Import tooling | CLI dry-run/import + `/admin/import` guidance |
