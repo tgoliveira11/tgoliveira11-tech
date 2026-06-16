@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ThemeScript } from "@/components/theme/theme-script";
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen antialiased">
         <ThemeScript />
         <Providers uiConfig={secureAuth.uiConfig}>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
