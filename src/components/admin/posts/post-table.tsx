@@ -87,13 +87,11 @@ function SortHeader({
 export function PostTable({
   posts,
   categoryNames,
-  orderedPublishedIds,
   sortState,
   filterParams,
 }: {
   posts: Post[];
   categoryNames: Record<string, string>;
-  orderedPublishedIds: string[];
   sortState: {
     sort?: AdminPostSortField;
     direction?: AdminPostSortDirection;
@@ -118,18 +116,14 @@ export function PostTable({
   }
 
   function getMoveBounds(post: Post) {
-    if (post.status !== "published" || post.publicOrder == null) {
+    if (post.status !== "published") {
       return { canMoveUp: false, canMoveDown: false };
     }
 
-    const index = orderedPublishedIds.indexOf(post.id);
-    if (index === -1) {
-      return { canMoveUp: false, canMoveDown: false };
-    }
-
+    const order = post.publicOrder ?? 0;
     return {
-      canMoveUp: index > 0,
-      canMoveDown: index < orderedPublishedIds.length - 1,
+      canMoveUp: order > 0,
+      canMoveDown: order < 9999,
     };
   }
 
@@ -246,7 +240,7 @@ export function PostTable({
               </td>
               <td className="px-3 py-3 align-top">
                 <PublicOrderControls
-                  key={`${post.id}-${post.publicOrder ?? "unset"}`}
+                  key={`${post.id}-${post.publicOrder ?? 0}`}
                   post={post}
                   canMoveUp={moveBounds.canMoveUp}
                   canMoveDown={moveBounds.canMoveDown}

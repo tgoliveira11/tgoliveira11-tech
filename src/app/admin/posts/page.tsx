@@ -51,15 +51,13 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
 
   const hasActiveFilters = hasActiveAdminPostFilters(filterParams);
 
-  const [{ posts, totalItems }, categories, tags, orderedPublished] = await Promise.all([
+  const [{ posts, totalItems }, categories, tags] = await Promise.all([
     postsService.listAdminPostsWithTotal(listFilters),
     categoriesService.listCategories(),
     tagsService.listTags(),
-    postsService.listPublishedPostsWithPublicOrder(),
   ]);
 
   const categoryNames = Object.fromEntries(categories.map((category) => [category.id, category.name]));
-  const orderedPublishedIds = orderedPublished.map((post) => post.id);
 
   return (
     <div>
@@ -87,11 +85,11 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
         <p className="font-medium text-[var(--foreground)]">Manual public order</p>
         <p className="mt-1">
           Controls how posts appear on the home page and blog listing. Lower numbers appear first.
-          Posts without a manual order are sorted by publish date. Only published posts appear in
-          public ordering. Pinned and featured posts still control home-page promotion separately.
-          New posts start without a public order — use Set to assign one, then use arrows to reorder.
-          Click column headers to sort this table; the default order lists posts without public order
-          first (by publish date, then last updated), followed by manually ordered posts.
+          Posts with the same public order are sorted by publish date, then last updated. Only published
+          posts appear in public ordering. Pinned and featured posts still control home-page promotion
+          separately. New posts start with public order 0 and appear near the top by default. Use Set or
+          arrows to adjust order. Click column headers to sort this table; the default order is public
+          order ascending, then newest first within each order value.
         </p>
       </div>
 
@@ -111,7 +109,6 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
         <PostTable
           posts={posts}
           categoryNames={categoryNames}
-          orderedPublishedIds={orderedPublishedIds}
           sortState={sortState}
           filterParams={filterParams}
         />

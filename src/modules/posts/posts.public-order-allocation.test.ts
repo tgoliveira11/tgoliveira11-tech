@@ -1,22 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
-  getNextPublicOrderMock,
   insertPostMock,
   findPostByIdMock,
   slugExistsMock,
   syncPostTagsMock,
   getTagIdsForPostMock,
-  listPublishedPostsWithPublicOrderMock,
   updatePostByIdMock,
 } = vi.hoisted(() => ({
-  getNextPublicOrderMock: vi.fn(),
   insertPostMock: vi.fn(),
   findPostByIdMock: vi.fn(),
   slugExistsMock: vi.fn(),
   syncPostTagsMock: vi.fn(),
   getTagIdsForPostMock: vi.fn(),
-  listPublishedPostsWithPublicOrderMock: vi.fn(),
   updatePostByIdMock: vi.fn(),
 }));
 
@@ -24,11 +20,9 @@ vi.mock("@/modules/posts/posts.repository", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/modules/posts/posts.repository")>();
   return {
     ...actual,
-    getNextPublicOrder: getNextPublicOrderMock,
     insertPost: insertPostMock,
     findPostById: findPostByIdMock,
     slugExists: slugExistsMock,
-    listPublishedPostsWithPublicOrder: listPublishedPostsWithPublicOrderMock,
     updatePostById: updatePostByIdMock,
   };
 });
@@ -65,7 +59,7 @@ function makePost(overrides: Record<string, unknown> = {}) {
     featured: false,
     pinned: false,
     pinnedPriority: 0,
-    publicOrder: null,
+    publicOrder: 0,
     categoryId: null,
     publishedAt: null,
     scheduledAt: null,
@@ -93,60 +87,52 @@ describe("publicOrder creation", () => {
     insertPostMock.mockImplementation(async (values) => makePost(values));
   });
 
-  it("creates drafts with publicOrder null", async () => {
+  it("creates drafts with publicOrder 0", async () => {
     await createDraft({}, userId);
 
-    expect(getNextPublicOrderMock).not.toHaveBeenCalled();
     expect(insertPostMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        publicOrder: null,
+        publicOrder: 0,
         status: "draft",
       })
     );
   });
 
-  it("duplicates posts with publicOrder null", async () => {
+  it("duplicates posts with publicOrder 0", async () => {
     findPostByIdMock.mockResolvedValue(makePost({ id: "source", publicOrder: 3, status: "published" }));
 
     const copy = await duplicatePost("source", userId);
 
-    expect(getNextPublicOrderMock).not.toHaveBeenCalled();
     expect(insertPostMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        publicOrder: null,
+        publicOrder: 0,
       })
     );
-    expect(copy.publicOrder).toBeNull();
+    expect(copy.publicOrder).toBe(0);
   });
 });
 
 describe("movePostPublicOrder", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    findPostByIdMock.mockReset();
+    updatePostByIdMock.mockReset();
   });
 
-  it("swaps publicOrder values when moving down", async () => {
+  it("decrements publicOrder when moving up but not below 0", async () => {
     findPostByIdMock
-      .mockResolvedValueOnce(makePost({ id: "a", status: "published", publicOrder: 1 }))
-      .mockResolvedValueOnce(makePost({ id: "a", status: "published", publicOrder: 2 }));
-    listPublishedPostsWithPublicOrderMock.mockResolvedValue([
-      makePost({ id: "a", status: "published", publicOrder: 1 }),
-      makePost({ id: "b", status: "published", publicOrder: 2 }),
-    ]);
+      .mockResolvedValueOnce(makePost({ id: "a", status: "published", publicOrder: 2 }))
+      .mockResolvedValueOnce(makePost({ id: "a", status: "published", publicOrder: 1 }));
+    updatePostByIdMock.mockResolvedValue(makePost({ id: "a", status: "published", publicOrder: 1 }));
 
-    await movePostPublicOrder("a", userId, "down");
+    await movePostPublicOrder("a", userId, "up");
 
-    expect(updatePostByIdMock).toHaveBeenCalledWith("a", { publicOrder: 2, updatedBy: userId });
-    expect(updatePostByIdMock).toHaveBeenCalledWith("b", { publicOrder: 1, updatedBy: userId });
+    expect(updatePostByIdMock).toHaveBeenCalledWith("a", { publicOrder: 1, updatedBy: userId });
   });
 
-  it("does not move the first ordered post up", async () => {
-    const first = makePost({ id: "a", status: "published", publicOrder: 1 });
+  it("does not move below publicOrder 0", async () => {
+    const first = makePost({ id: "a", status: "published", publicOrder: 0 });
     findPostByIdMock.mockResolvedValue(first);
-    listPublishedPostsWithPublicOrderMock.mockResolvedValue([
-      first,
-      makePost({ id: "b", status: "published", publicOrder: 2 }),
-    ]);
 
     const result = await movePostPublicOrder("a", userId, "up");
 
@@ -154,11 +140,14 @@ describe("movePostPublicOrder", () => {
     expect(result).toEqual(first);
   });
 
-  it("rejects moves when publicOrder is null", async () => {
-    findPostByIdMock.mockResolvedValue(makePost({ status: "published", publicOrder: null }));
+  it("increments publicOrder when moving down", async () => {
+    findPostByIdMock
+      .mockResolvedValueOnce(makePost({ id: "a", status: "published", publicOrder: 1 }))
+      .mockResolvedValueOnce(makePost({ id: "a", status: "published", publicOrder: 2 }));
+    updatePostByIdMock.mockResolvedValue(makePost({ id: "a", status: "published", publicOrder: 2 }));
 
-    await expect(movePostPublicOrder("post-1", userId, "up")).rejects.toThrow(
-      "Set a public order before moving this post"
-    );
+    await movePostPublicOrder("a", userId, "down");
+
+    expect(updatePostByIdMock).toHaveBeenCalledWith("a", { publicOrder: 2, updatedBy: userId });
   });
 });

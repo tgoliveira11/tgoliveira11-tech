@@ -60,6 +60,7 @@ const REQUIRED_ENV_KEYS = [
   "CRON_SECRET",
   "ANALYTICS_ENABLED",
   "DEFAULT_TIMEZONE",
+  "PUBLIC_SITE_THEME",
 ] as const;
 
 function parseEnvExampleKeys(contents: string): Set<string> {

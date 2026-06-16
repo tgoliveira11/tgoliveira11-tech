@@ -9,6 +9,8 @@ import {
   updatePostPublicOrderAction,
 } from "@/modules/posts/admin-posts.actions";
 
+const MAX_PUBLIC_ORDER = 9999;
+
 export function PublicOrderControls({
   post,
   canMoveUp,
@@ -21,7 +23,8 @@ export function PublicOrderControls({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [value, setValue] = useState(post.publicOrder?.toString() ?? "");
+  const currentOrder = post.publicOrder ?? 0;
+  const [value, setValue] = useState(currentOrder.toString());
 
   if (post.status !== "published") {
     return (
@@ -53,8 +56,8 @@ export function PublicOrderControls({
       <div className="flex items-center gap-1">
         <input
           type="number"
-          min={1}
-          max={9999}
+          min={0}
+          max={MAX_PUBLIC_ORDER}
           value={value}
           onChange={(event) => setValue(event.target.value)}
           className="w-16 rounded border border-[var(--border)] px-2 py-1 text-xs"
@@ -63,7 +66,7 @@ export function PublicOrderControls({
         />
         <button
           type="button"
-          disabled={pending || !value}
+          disabled={pending || value === ""}
           className="rounded border border-[var(--border)] px-2 py-1 text-xs disabled:opacity-50"
           onClick={() => {
             const formData = new FormData();
@@ -77,36 +80,34 @@ export function PublicOrderControls({
       <div className="flex flex-wrap gap-1">
         <button
           type="button"
-          disabled={pending || post.publicOrder == null || !canMoveUp}
+          disabled={pending || !canMoveUp}
           className="rounded border border-[var(--border)] px-2 py-0.5 text-xs disabled:opacity-50"
           onClick={() => run(() => movePostPublicOrderAction(post.id, "up"))}
           aria-label={`Move ${post.title} up in public order`}
-          title={post.publicOrder == null ? "Set a public order first" : !canMoveUp ? "Already first in order" : undefined}
+          title={!canMoveUp ? "Already at minimum public order (0)" : undefined}
         >
           ↑
         </button>
         <button
           type="button"
-          disabled={pending || post.publicOrder == null || !canMoveDown}
+          disabled={pending || !canMoveDown}
           className="rounded border border-[var(--border)] px-2 py-0.5 text-xs disabled:opacity-50"
           onClick={() => run(() => movePostPublicOrderAction(post.id, "down"))}
           aria-label={`Move ${post.title} down in public order`}
-          title={post.publicOrder == null ? "Set a public order first" : !canMoveDown ? "Already last in order" : undefined}
+          title={!canMoveDown ? "Already at maximum public order" : undefined}
         >
           ↓
         </button>
         <button
           type="button"
-          disabled={pending || post.publicOrder == null}
+          disabled={pending || currentOrder === 0}
           className="rounded border border-[var(--border)] px-2 py-0.5 text-xs disabled:opacity-50"
           onClick={() => run(() => clearPostPublicOrderAction(post.id))}
         >
-          Clear
+          Reset
         </button>
       </div>
-      <span className="text-xs text-[var(--muted)]">
-        {post.publicOrder != null ? `#${post.publicOrder}` : "Not set — use Set to assign"}
-      </span>
+      <span className="text-xs text-[var(--muted)]">#{currentOrder}</span>
     </div>
   );
 }

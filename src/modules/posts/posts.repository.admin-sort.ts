@@ -4,37 +4,36 @@ import { posts } from "./posts.schema";
 import type { AdminPostListFilters } from "./posts.types";
 
 export type AdminDefaultSortPost = {
-  publicOrder: number | null;
+  publicOrder: number;
   publishedAt: Date | null;
   updatedAt: Date;
 };
 
 export const DEFAULT_ADMIN_POST_ORDER_SQL = [
-  "CASE WHEN public_order IS NULL THEN 0 ELSE 1 END ASC",
-  "CASE WHEN public_order IS NULL THEN published_at END DESC NULLS LAST",
-  "CASE WHEN public_order IS NULL THEN updated_at END DESC",
-  "CASE WHEN public_order IS NOT NULL THEN public_order ELSE NULL END ASC NULLS LAST",
+  "public_order ASC",
+  "COALESCE(published_at, updated_at) DESC",
   "updated_at DESC",
 ] as const;
 
 /**
  * Default admin list order (no explicit column sort selected):
- * 1. publicOrder IS NULL first
- * 2. among nulls: publishedAt DESC NULLS LAST, then updatedAt DESC
- * 3. among non-nulls: publicOrder ASC
- * 4. updatedAt DESC as final tiebreaker
+ * 1. publicOrder ASC
+ * 2. COALESCE(publishedAt, updatedAt) DESC within the same publicOrder
+ * 3. updatedAt DESC as final tiebreaker
  */
 export function getAdminPostsDefaultOrderBy(): SQL[] {
   return [
-    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN 0 ELSE 1 END ASC`,
-    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.publishedAt} END DESC NULLS LAST`,
-    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN ${posts.updatedAt} END DESC`,
-    sql`CASE WHEN ${posts.publicOrder} IS NOT NULL THEN ${posts.publicOrder} ELSE NULL END ASC NULLS LAST`,
+    asc(posts.publicOrder),
+    sql`COALESCE(${posts.publishedAt}, ${posts.updatedAt}) DESC`,
     desc(posts.updatedAt),
   ];
 }
 
 export const DEFAULT_ADMIN_POST_ORDER = getAdminPostsDefaultOrderBy();
+
+function getDefaultSortDate(post: AdminDefaultSortPost): number {
+  return (post.publishedAt ?? post.updatedAt).getTime();
+}
 
 /**
  * Pure comparator mirroring getAdminPostsDefaultOrderBy() for unit tests.
@@ -43,39 +42,14 @@ export function compareDefaultAdminPostOrder(
   left: AdminDefaultSortPost,
   right: AdminDefaultSortPost
 ): number {
-  const leftGroup = left.publicOrder === null ? 0 : 1;
-  const rightGroup = right.publicOrder === null ? 0 : 1;
-  if (leftGroup !== rightGroup) {
-    return leftGroup - rightGroup;
-  }
-
-  if (leftGroup === 0) {
-    const leftPublished = left.publishedAt?.getTime() ?? null;
-    const rightPublished = right.publishedAt?.getTime() ?? null;
-
-    if (leftPublished !== null || rightPublished !== null) {
-      if (leftPublished === null) {
-        return 1;
-      }
-      if (rightPublished === null) {
-        return -1;
-      }
-      if (leftPublished !== rightPublished) {
-        return rightPublished - leftPublished;
-      }
-    }
-
-    const updatedDiff = right.updatedAt.getTime() - left.updatedAt.getTime();
-    if (updatedDiff !== 0) {
-      return updatedDiff;
-    }
-
-    return 0;
-  }
-
-  const orderDiff = (left.publicOrder ?? 0) - (right.publicOrder ?? 0);
+  const orderDiff = left.publicOrder - right.publicOrder;
   if (orderDiff !== 0) {
     return orderDiff;
+  }
+
+  const dateDiff = getDefaultSortDate(right) - getDefaultSortDate(left);
+  if (dateDiff !== 0) {
+    return dateDiff;
   }
 
   return right.updatedAt.getTime() - left.updatedAt.getTime();
@@ -86,11 +60,9 @@ export function sortPostsByDefaultAdminOrder<T extends AdminDefaultSortPost>(ite
 }
 
 function buildExplicitPublicOrderBy(direction: "asc" | "desc"): SQL[] {
-  return [
-    sql`CASE WHEN ${posts.publicOrder} IS NULL THEN 0 ELSE 1 END ASC`,
-    direction === "asc" ? asc(posts.publicOrder) : desc(posts.publicOrder),
-    desc(posts.updatedAt),
-  ];
+  return direction === "asc"
+    ? getAdminPostsDefaultOrderBy()
+    : [desc(posts.publicOrder), sql`COALESCE(${posts.publishedAt}, ${posts.updatedAt}) DESC`, desc(posts.updatedAt)];
 }
 
 /**

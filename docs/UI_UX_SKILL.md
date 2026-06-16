@@ -127,7 +127,7 @@ Public pages should feel **editorial and reader-focused**, not like the admin pa
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Header: logo · nav (Blog, Tags, Categories, Search) · theme │
+│ Header: logo · nav (Blog, Tags, Categories, Search) · theme toggle │
 ├─────────────────────────────────────────────────────────────┤
 │ Hero: title · description · CTAs · search                   │
 ├─────────────────────────────────────────────────────────────┤
@@ -183,10 +183,10 @@ PublicLayout
 ### Manual public order (admin)
 
 - Set on `/admin/posts` per published post (`publicOrder` column)
-- New drafts start with `publicOrder = null`; assign manually via Set, then reorder with arrows
-- Lower numbers appear first on home recent list, `/blog`, tag, and category pages
-- Posts without manual order fall back to `publishedAt DESC`
-- Admin table default sort: posts with `publicOrder = null` first (group `CASE … THEN 0 ELSE 1`); within that group `publishedAt DESC NULLS LAST`, then `updatedAt DESC`; then manual `publicOrder ASC`
+- New drafts start with `publicOrder = 0`; use Set or arrows to adjust
+- Lower numbers appear first on public listings
+- Posts with the same `publicOrder` fall back to `COALESCE(publishedAt, updatedAt) DESC` on public pages
+- Admin table default sort: `publicOrder ASC`, then `COALESCE(publishedAt, updatedAt) DESC`, then `updatedAt DESC`
 - Filtered results counter: `N total posts` with no filters, `N posts found` when filters/search are active
 - Reset navigates to `/admin/posts` and clears all filter/sort query params
 - Actions column uses icon buttons with `title` and `aria-label` (edit, preview, publish, unpublish, duplicate, archive)
@@ -241,6 +241,12 @@ PublicLayout
 - Home `/` does not highlight nav items
 - Sticky header with backdrop blur
 - Footer RSS link opens `/rss.xml` in a new tab (`target="_blank"`, `rel="noopener noreferrer"`)
+
+### Public theme
+
+- Visitors can toggle light/dark via the header theme control by default
+- `PUBLIC_SITE_THEME=light` or `PUBLIC_SITE_THEME=dark` forces the public theme and hides the toggle
+- Forced theme applies to public pages only; admin keeps its own theme toggle
 
 ### Admin posts filters
 

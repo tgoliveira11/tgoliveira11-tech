@@ -64,21 +64,22 @@ describe("public order admin actions", () => {
     expect(revalidatePublicPathsMock).toHaveBeenCalledWith("test-post");
   });
 
-  it("rejects invalid public order", async () => {
+  it("allows public order 0", async () => {
     getByIdMock.mockResolvedValue(makePost());
+    setPostPublicOrderMock.mockResolvedValue(makePost({ publicOrder: 0 }));
 
     const formData = new FormData();
     formData.set("publicOrder", "0");
 
     const result = await updatePostPublicOrderAction(postId, { ok: false }, formData);
 
-    expect(result.ok).toBe(false);
-    expect(setPostPublicOrderMock).not.toHaveBeenCalled();
+    expect(result.ok).toBe(true);
+    expect(setPostPublicOrderMock).toHaveBeenCalledWith(postId, "admin-1", { publicOrder: 0 });
   });
 
-  it("clears public order", async () => {
+  it("resets public order to 0", async () => {
     getByIdMock.mockResolvedValue(makePost({ publicOrder: 1 }));
-    clearPostPublicOrderMock.mockResolvedValue(makePost({ publicOrder: null }));
+    clearPostPublicOrderMock.mockResolvedValue(makePost({ publicOrder: 0 }));
 
     const result = await clearPostPublicOrderAction(postId);
 
