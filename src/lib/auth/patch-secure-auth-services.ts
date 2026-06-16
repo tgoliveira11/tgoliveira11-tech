@@ -1,5 +1,6 @@
 import type { SecureAuthServices } from "@tgoliveira/secure-auth";
 import { augmentAuthOptionsWithAppCookies } from "@/lib/auth/next-auth-cookies";
+import { patchSecureAuthEmailTemplates } from "@/lib/auth/patch-secure-auth-email-templates";
 
 const PATCHED = Symbol("appAuthCookiesPatched");
 
@@ -7,6 +8,8 @@ type RouteHandler = (request: Request, context?: unknown) => Response | Promise<
 
 /** Apply app-specific NextAuth cookie names to the shared secure-auth services instance. */
 export function patchSecureAuthServices(services: SecureAuthServices): SecureAuthServices {
+  patchSecureAuthEmailTemplates(services);
+
   const getAuthOptions = services.getAuthOptions as typeof services.getAuthOptions & {
     [PATCHED]?: boolean;
   };

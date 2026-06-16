@@ -3,6 +3,7 @@ import { createSecureAuth } from "@tgoliveira/secure-auth/next";
 import { APP_DEFAULTS } from "@/lib/auth/app-defaults";
 import { db } from "@/db/client";
 import { createEmailProvider } from "@/lib/email/email-provider-factory";
+import { createSecureAuthEmailTemplates } from "@/lib/email/templates";
 import { buildSecureAuthConfigFromEnv } from "@/lib/env/secure-auth-from-env";
 import { readEmailFrom } from "@/lib/env";
 import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
@@ -28,6 +29,7 @@ const baseSecureAuth = createSecureAuth({
   email: {
     from: emailFrom,
     provider: createEmailProvider(),
+    templates: createSecureAuthEmailTemplates(),
   },
   ui: {
     ...envConfig.ui,

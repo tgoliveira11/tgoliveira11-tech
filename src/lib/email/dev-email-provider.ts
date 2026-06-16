@@ -1,13 +1,16 @@
 import type { EmailProvider } from "@tgoliveira/secure-auth/email";
+import { extractFirstUrl } from "@/lib/email/templates";
 
 /** Dev EmailProvider — logs delivery to the console, no SMTP. */
 export const devEmailProvider: EmailProvider = {
   async send(input) {
-    console.info("[postforge email]", {
+    const actionLink = extractFirstUrl(input.text) ?? extractFirstUrl(input.html);
+
+    console.info("[tgoliveira11-tech email]", {
       to: input.to,
       subject: input.subject,
-      text: input.text,
-      html: input.html,
+      actionLink,
+      textPreview: input.text?.split("\n").slice(0, 8).join("\n"),
     });
   },
 };
