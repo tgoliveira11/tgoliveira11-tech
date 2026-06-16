@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminActionIconLink } from "@/components/admin/admin-action-icon";
+import { AdminBackLink } from "@/components/admin/admin-back-link";
 import { AdminPageTitle } from "@/components/admin/admin-page-title";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { AnalyticsEmptyState } from "@/components/admin/analytics/analytics-empty-state";
@@ -27,23 +28,28 @@ export default async function AdminPostAnalyticsPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
+      <AdminBackLink href="/admin/analytics" label="Back to analytics" />
+
       <AdminPageTitle
         title="Post analytics"
         description={post.title}
         actions={
-          <div className="flex flex-wrap gap-2">
-            <Link href={`/admin/posts/${id}/edit`} className="rounded-md border border-[var(--border)] px-4 py-2 text-sm">
-              Edit post
-            </Link>
+          <div className="flex flex-wrap items-center gap-1">
+            <AdminActionIconLink
+              href={`/admin/posts/${id}/edit`}
+              icon="edit"
+              label={`Edit ${post.title}`}
+              title="Edit post"
+            />
             {post.status === "published" ? (
-              <Link
+              <AdminActionIconLink
                 href={publicPostPath(post.slug)}
-                className="rounded-md border border-[var(--border)] px-4 py-2 text-sm"
+                icon="external"
+                label={`Open public post ${post.title}`}
+                title="Public post"
                 target="_blank"
                 rel="noreferrer"
-              >
-                Public post ↗
-              </Link>
+              />
             ) : null}
           </div>
         }

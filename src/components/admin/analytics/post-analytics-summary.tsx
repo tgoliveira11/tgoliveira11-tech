@@ -1,6 +1,7 @@
 import type { PostAnalyticsDetail } from "@/modules/analytics/analytics.types";
 import { AnalyticsSummaryCards } from "./analytics-summary-cards";
 import { DeviceBreakdown } from "./device-breakdown";
+import { EnrichedAnalyticsPanel } from "./enriched-analytics-panel";
 import { ReferrerBreakdown } from "./referrer-breakdown";
 import { ViewsOverTime } from "./views-over-time";
 
@@ -16,21 +17,7 @@ export function PostAnalyticsSummaryPanel({ detail }: { detail: PostAnalyticsDet
         <DeviceBreakdown rows={detail.devices} />
       </div>
 
-      {detail.recentViews.length > 0 ? (
-        <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
-          <h2 className="text-sm font-semibold">Recent views</h2>
-          <ul className="mt-3 divide-y divide-[var(--border)]">
-            {detail.recentViews.map((view) => (
-              <li key={view.occurredAt.toISOString()} className="flex flex-wrap justify-between gap-2 py-2 text-sm">
-                <span>{new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(view.occurredAt)}</span>
-                <span className="text-[var(--muted)]">
-                  {view.referrer} · {view.deviceType}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <EnrichedAnalyticsPanel enriched={detail.enriched} />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { AdminActionIconButton } from "@/components/admin/admin-action-icon";
 import { deleteAssetAction } from "@/modules/assets/admin-assets.actions";
 
 export function AssetDeleteButton({ assetId }: { assetId: string }) {
@@ -9,8 +10,11 @@ export function AssetDeleteButton({ assetId }: { assetId: string }) {
   const [pending, startTransition] = useTransition();
 
   return (
-    <button
-      type="button"
+    <AdminActionIconButton
+      icon="delete"
+      label="Delete image"
+      title="Delete"
+      destructive
       disabled={pending}
       onClick={() => {
         if (
@@ -25,9 +29,6 @@ export function AssetDeleteButton({ assetId }: { assetId: string }) {
           router.refresh();
         });
       }}
-      className="rounded-md border border-red-300 px-2 py-1 text-xs text-red-700 disabled:opacity-50"
-    >
-      Delete
-    </button>
+    />
   );
 }

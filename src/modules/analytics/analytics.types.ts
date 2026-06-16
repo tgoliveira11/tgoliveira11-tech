@@ -69,10 +69,50 @@ export type RecentViewRow = {
   deviceType: string | null;
 };
 
+export type LabelCountRow = {
+  label: string;
+  count: number;
+};
+
+export type RecentVisitRow = {
+  occurredAt: Date;
+  postTitle?: string;
+  path?: string | null;
+  referrerHost?: string | null;
+  country?: string | null;
+  city?: string | null;
+  deviceType?: string | null;
+  browserName?: string | null;
+  osName?: string | null;
+  utmSource?: string | null;
+  utmCampaign?: string | null;
+  ipHash?: string | null;
+  ipAddress?: string | null;
+};
+
+export type EnrichedAnalyticsBreakdowns = {
+  referrerHosts: LabelCountRow[];
+  countries: LabelCountRow[];
+  devices: LabelCountRow[];
+  browsers: LabelCountRow[];
+  operatingSystems: LabelCountRow[];
+  utmSources: LabelCountRow[];
+  utmCampaigns: LabelCountRow[];
+  recentVisits: RecentVisitRow[];
+};
+
 export type PostAnalyticsDetail = {
   summary: PostAnalyticsSummary;
   viewsByDay: DailyViewsPoint[];
   referrers: ReferrerBreakdownRow[];
   devices: DeviceBreakdownRow[];
   recentViews: RecentViewRow[];
+  enriched: EnrichedAnalyticsBreakdowns;
+};
+
+export type BlogAnalyticsDetail = {
+  summary: BlogAnalyticsSummary;
+  viewsByDay: DailyViewsPoint[];
+  topPosts: TopPostAnalyticsRow[];
+  enriched: EnrichedAnalyticsBreakdowns;
 };
