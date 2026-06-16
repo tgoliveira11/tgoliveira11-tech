@@ -121,16 +121,38 @@ Only the configured `ADMIN_EMAIL` may publish posts.
 
 ---
 
+## Production uploads on Vercel
+
+PostForge is a **GitHub template** — every new blog includes production-ready upload support.
+
+| Environment | `UPLOAD_PROVIDER` | Storage |
+|-------------|-------------------|---------|
+| Local dev / VPS | `local` | `./storage/uploads` via `/api/assets/...` |
+| **Vercel production** | `vercel-blob` | Vercel Blob (`@vercel/blob`) |
+
+**Local uploads are for development and VPS hosts with persistent disk.** Vercel’s serverless filesystem is ephemeral — production deploys should use **Vercel Blob**:
+
+```env
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=<auto-set when Blob store is connected>
+```
+
+No database migration is required — existing `assets` table fields are reused.
+
+- **Vercel + Neon + Blob guide:** [docs/deployment-vercel-neon.md](docs/deployment-vercel-neon.md)
+- **Storage architecture:** [docs/STORAGE_STRATEGY.md](docs/STORAGE_STRATEGY.md)
+
+---
+
 ## Deployment
 
 Recommended low-cost stack:
 
 - **App:** Vercel Hobby (or any Node host)
 - **Database:** Neon Free or Supabase Free (PostgreSQL)
-- **Storage:** object storage for production (R2, S3, etc.) — **do not rely on local disk on serverless**
+- **Storage:** Vercel Blob on Vercel (`UPLOAD_PROVIDER=vercel-blob`) — **do not rely on local disk on serverless**
 
-**Deployment guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)  
-**Storage guide:** [docs/STORAGE_STRATEGY.md](docs/STORAGE_STRATEGY.md)
+**Deployment guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 ---
 
@@ -151,7 +173,8 @@ Blogs created from the template **do not auto-update** when PostForge upstream c
 | [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | All env vars explained |
 | [FIRST_POST.md](docs/FIRST_POST.md) | Create and publish your first article |
 | [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment checklist |
-| [STORAGE_STRATEGY.md](docs/STORAGE_STRATEGY.md) | Local vs object storage |
+| [deployment-vercel-neon.md](docs/deployment-vercel-neon.md) | Vercel + Neon + Vercel Blob |
+| [STORAGE_STRATEGY.md](docs/STORAGE_STRATEGY.md) | Local vs Vercel Blob storage |
 | [UPGRADING_FROM_POSTFORGE.md](docs/UPGRADING_FROM_POSTFORGE.md) | Receive upstream updates |
 | [FAQ.md](docs/FAQ.md) | Common questions |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |

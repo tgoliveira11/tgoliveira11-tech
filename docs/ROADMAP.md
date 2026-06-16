@@ -108,7 +108,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
-| 4.1 | StorageProvider | LocalStorageProvider + env config |
+| 4.1 | StorageProvider | Local + Vercel Blob providers, `UPLOAD_PROVIDER` factory |
 | 4.2 | Upload API | Multipart upload, validation, metadata |
 | 4.3 | Serving | `GET /api/assets/[...path]` |
 | 4.4 | Admin UI | Post asset library, insert/copy Markdown |
@@ -116,7 +116,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Exit gate:** Upload → insert in Markdown → publish → image visible on public post. ✅
 
-**Deferred:** Global media library, S3/R2 provider, width/height extraction, SVG support.
+**Deferred:** Global media library, S3/R2/Supabase providers, width/height extraction, SVG support, automated local→Blob migration.
 
 ---
 
@@ -232,7 +232,7 @@ Everything in M1–M7 above.
 | Unauthorized admin access | M3 | `ADMIN_EMAIL` check on all admin routes |
 | Draft leakage | M2, M3 | `publishedOnly` filter + tests |
 | XSS | M1, M2 | Mandatory sanitization |
-| Storage on serverless | M4 | Env-driven provider selection |
+| Storage on serverless | M4 | ✅ `UPLOAD_PROVIDER=vercel-blob` + Vercel Blob provider |
 | Migration data loss | M6 | Dry-run + import report |
 | Scheduler missed runs | M3 | Idempotent job; admin manual publish fallback |
 
@@ -247,6 +247,7 @@ Everything in M1–M7 above.
 | 2026-06 | Markdown only (no MDX) | Simpler, safer MVP |
 | 2026-06 | PostgreSQL FTS for search | No extra infrastructure for MVP |
 | 2026-06 | LocalStorageProvider first | Matches local Docker dev; VPS v1 |
+| 2026-06 | Vercel Blob in template | Durable uploads on serverless; no DB migration |
 | 2026-06 | Admin authorization via `ADMIN_EMAIL` | Auth from secure-auth; authorization is PostForge-owned; single admin for MVP |
 | 2026-06 | Future RBAC via `blog_user_roles` | Do not modify secure-auth `users` table |
 | 2026-06 | Post Project = workspace, not table | One `posts` row; related assets/revisions |
@@ -265,7 +266,7 @@ Track unresolved decisions. Default action if not decided before implementation:
 | 4 | Image max size? | 5 MB | M4 |
 | 5 | Analytics dedup? | Optional `visitorHash`; skip for MVP if tight | M5 |
 | 6 | Import: zip upload vs CLI? | CLI/script for MVP; UI later | M6 |
-| 7 | Deployment target? | Decide before M4 (affects storage) | M4 |
+| 7 | ~~Deployment target?~~ | **Resolved:** Vercel + Neon + Blob documented | — |
 
 ---
 

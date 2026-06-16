@@ -13,6 +13,8 @@ import {
   sanitizeFilename,
   updateAssetMetadataSchema,
 } from "./assets.validation";
+import { buildPostAssetStorageKey } from "./storage-keys";
+import { createStorageProvider } from "./storage-provider-factory";
 import type { StorageProvider } from "./storage-provider";
 
 export { buildImageMarkdown } from "./assets.utils";
@@ -21,13 +23,17 @@ let storageProvider: StorageProvider | null = null;
 
 export function getStorageProvider(): StorageProvider {
   if (!storageProvider) {
-    storageProvider = new LocalStorageProvider();
+    storageProvider = createStorageProvider();
   }
   return storageProvider;
 }
 
 export function setStorageProvider(provider: StorageProvider): void {
   storageProvider = provider;
+}
+
+export function resetStorageProvider(): void {
+  storageProvider = null;
 }
 
 export async function createAssetMetadata(
@@ -121,13 +127,12 @@ export async function uploadPostAsset(input: UploadPostAssetInput): Promise<Asse
   });
 
   const provider = getStorageProvider();
-  const localProvider = provider as LocalStorageProvider;
   const existingAssets = await repo.listAssetsByPostId(input.postId);
   const safeFilename = buildUniqueSafeFilename(
     input.originalFilename,
     existingAssets.map((asset) => asset.safeFilename)
   );
-  const storageKey = localProvider.buildStorageKey(input.postId, safeFilename);
+  const storageKey = buildPostAssetStorageKey(input.postId, safeFilename);
 
   const uploaded = await provider.upload({
     storageKey,
@@ -211,12 +216,16 @@ export async function setPostOgAsset(
 }
 
 export async function readAssetFile(asset: Asset): Promise<Buffer> {
-  const provider = getStorageProvider();
-  if (provider.name !== asset.storageProvider) {
-    throw new NotFoundError("Asset storage provider unavailable");
+  if (asset.storageProvider !== "local") {
+    throw new NotFoundError("Asset is not stored locally; use publicUrl for remote assets");
   }
 
-  return (provider as LocalStorageProvider).read(asset.storageKey);
+  const provider = getStorageProvider();
+  if (!(provider instanceof LocalStorageProvider)) {
+    throw new NotFoundError("Local storage provider unavailable");
+  }
+
+  return provider.read(asset.storageKey);
 }
 
 export function guessMimeTypeFromStorageKey(storageKey: string): string {

@@ -300,7 +300,10 @@ All actions call `requireAdminSession()` before handling requests.
 
 ### Implementation notes (M4)
 
-- Storage uses existing `StorageProvider` + `LocalStorageProvider` with env vars `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES` (alias `UPLOAD_MAX_FILE_SIZE`).
+- Storage uses `StorageProvider` with env-driven provider selection (`UPLOAD_PROVIDER`: `local` | `vercel-blob`).
+- **Local:** `LocalStorageProvider` + `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`.
+- **Vercel Blob:** `VercelBlobStorageProvider` (`@vercel/blob` put/del) + `BLOB_READ_WRITE_TOKEN`; shared keys via `buildPostAssetStorageKey()`.
+- Factory: `storage-provider-factory.ts`; no DB schema changes.
 - Upload: `POST /api/admin/posts/[id]/assets` (multipart) → `uploadPostAsset()` in `assets.service.ts`.
 - Serving: `GET /api/assets/[...path]` streams files from local storage with cache headers.
 - Admin UI: `/admin/posts/[id]/assets` + embedded panel on edit page.
@@ -324,8 +327,12 @@ All actions call `requireAdminSession()` before handling requests.
 
 - [x] `StorageProvider` interface
 - [x] `LocalStorageProvider` implementation (+ `read()` for serving)
-- [x] Env config: `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`
-- [ ] `STORAGE_PROVIDER` env switch — deferred (hardcoded local for MVP)
+- [x] `VercelBlobStorageProvider` (`@vercel/blob`, `access: "public"`)
+- [x] `storage-provider-factory.ts` — `UPLOAD_PROVIDER` env switch (`local` | `vercel-blob`)
+- [x] `storage-keys.ts` — shared `buildPostAssetStorageKey()` → `posts/{postId}/{safeFilename}`
+- [x] Env config: `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`, `BLOB_READ_WRITE_TOKEN`
+- [x] Remote URL rendering (`isRemoteAssetUrl`, `PostImage` unoptimized, `next.config.ts` remotePatterns)
+- [x] No DB migration — reuses `assets.storageProvider`, `storageKey`, `publicUrl`
 
 ### 4.2 Upload pipeline
 
@@ -353,10 +360,11 @@ All actions call `requireAdminSession()` before handling requests.
 ### 4.6 Tests (Phase 4)
 
 - [x] Unit: filename sanitization, upload validation, path traversal, LocalStorageProvider
+- [x] Unit: provider factory, Vercel Blob mocks, storage keys, remote URL detection
 - [x] Unit: SEO fallback when assets missing
-- [ ] Integration: upload → preview → publish — deferred (manual smoke documented)
+- [ ] Integration: upload → preview → publish — deferred (manual smoke documented in [deployment-vercel-neon.md](deployment-vercel-neon.md) and [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md))
 
-**Phase 4 exit criteria:** Images work end-to-end in local development. ✅
+**Phase 4 exit criteria:** Images work end-to-end in local development and Vercel Blob production path is documented and tested. ✅
 
 ---
 

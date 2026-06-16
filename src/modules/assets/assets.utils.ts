@@ -4,3 +4,7 @@ export function buildImageMarkdown(asset: Pick<Asset, "altText" | "originalFilen
   const alt = asset.altText?.trim() || asset.originalFilename;
   return `![${alt}](${asset.publicUrl})`;
 }
+
+export function isRemoteAssetUrl(publicUrl: string): boolean {
+  return publicUrl.startsWith("http://") || publicUrl.startsWith("https://");
+}
