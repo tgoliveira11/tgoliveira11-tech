@@ -186,7 +186,7 @@ PublicLayout
 - New drafts start with `publicOrder = null`; assign manually via Set, then reorder with arrows
 - Lower numbers appear first on home recent list, `/blog`, tag, and category pages
 - Posts without manual order fall back to `publishedAt DESC`
-- Admin table default sort: posts with `publicOrder = null` first (`publishedAt DESC`, then `updatedAt DESC`); then posts with manual order ascending
+- Admin table default sort: posts with `publicOrder = null` first (group `CASE … THEN 0 ELSE 1`); within that group `publishedAt DESC NULLS LAST`, then `updatedAt DESC`; then manual `publicOrder ASC`
 - Filtered results counter: `N total posts` with no filters, `N posts found` when filters/search are active
 - Reset navigates to `/admin/posts` and clears all filter/sort query params
 - Actions column uses icon buttons with `title` and `aria-label` (edit, preview, publish, unpublish, duplicate, archive)

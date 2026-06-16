@@ -227,7 +227,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - Manual **Save draft** only — autosave deferred.
 - Revisions page/history UI deferred (revisions still created on manual save, publish, unpublish).
 - Scheduler cron deferred to M3.6 follow-up (schedule UI sets status; auto-publish not wired).
-- Admin list default sort: `publicOrder IS NULL` posts first (`publishedAt DESC`, then `updatedAt DESC`), then `publicOrder ASC`.
+- Admin list default sort: `CASE WHEN publicOrder IS NULL THEN 0 ELSE 1 END ASC`; null group by `publishedAt DESC NULLS LAST`, then `updatedAt DESC`; non-null group by `publicOrder ASC`.
 - Admin list shows filtered total count; Reset link returns to `/admin/posts` with no query params.
 - Tag filter uses canonical `tagId` query param; invalid values are ignored server-side.
 - Schedule action removed from `/admin/posts` list; scheduling remains on the post editor.
