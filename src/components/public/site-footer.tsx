@@ -31,6 +31,11 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                 </Link>
               </li>
               <li>
+                <Link href="/about" className="hover:text-[var(--primary)]">
+                  About
+                </Link>
+              </li>
+              <li>
                 <Link href="/tags" className="hover:text-[var(--primary)]">
                   Tags
                 </Link>

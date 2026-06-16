@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getBlogConfig } from "@/modules/public/blog-config";
+import { ABOUT_SITEMAP_ENTRY } from "@/modules/public/about-content";
 import {
   listPublicCategories,
   listPublicTags,
@@ -15,10 +16,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     listPublicCategories(),
   ]);
 
-  return buildSitemapEntries({
-    config,
-    posts,
-    tags,
-    categories,
-  });
+  const baseUrl = config.baseUrl.replace(/\/$/, "");
+  const now = new Date();
+
+  return [
+    ...buildSitemapEntries({
+      config,
+      posts,
+      tags,
+      categories,
+    }),
+    {
+      url: `${baseUrl}${ABOUT_SITEMAP_ENTRY.path}`,
+      lastModified: now,
+      changeFrequency: ABOUT_SITEMAP_ENTRY.changeFrequency,
+      priority: ABOUT_SITEMAP_ENTRY.priority,
+    },
+  ];
 }

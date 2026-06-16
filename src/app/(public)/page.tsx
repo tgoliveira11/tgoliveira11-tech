@@ -1,4 +1,5 @@
 import { PublicEmptyState } from "@/components/public/public-empty-state";
+import { AboutPreview } from "@/components/public/about-preview";
 import { FeaturedPostCard } from "@/components/public/featured-post-card";
 import { HomeHero } from "@/components/public/home-hero";
 import { PublicLayout } from "@/components/public/public-layout";
@@ -43,6 +44,8 @@ export default async function HomePage() {
         )}
 
         {hasPublishedPosts ? <RecentPostsSection posts={recent} /> : null}
+
+        <AboutPreview />
 
         {hasPublishedPosts && topics ? (
           <TopicsSection categories={topics.popularCategories} tags={topics.popularTags} />
