@@ -22,7 +22,12 @@ export function PostList({
     );
   }
 
-  const listClassName = layout === "grid" ? "grid gap-6 sm:grid-cols-2" : "grid gap-6";
+  const listClassName =
+    layout === "grid"
+      ? variant === "compact"
+        ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        : "grid gap-6 sm:grid-cols-2"
+      : "grid gap-6";
 
   return (
     <ul className={listClassName}>

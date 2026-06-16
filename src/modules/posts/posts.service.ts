@@ -67,7 +67,6 @@ export async function createDraft(input: CreatePostInput, userId: string): Promi
   const title = parsed.title ?? "Untitled";
   const baseSlug = parsed.slug ?? slugFromTitle(title);
   const slug = await ensureUniqueSlug(baseSlug);
-  const publicOrder = await repo.getNextPublicOrder();
 
   const post = await repo.insertPost({
     title,
@@ -76,7 +75,7 @@ export async function createDraft(input: CreatePostInput, userId: string): Promi
     contentMarkdown: parsed.contentMarkdown ?? "",
     categoryId: parsed.categoryId ?? null,
     status: "draft",
-    publicOrder,
+    publicOrder: null,
     createdBy: userId,
     updatedBy: userId,
   });
@@ -376,7 +375,6 @@ export async function duplicatePost(id: string, userId: string): Promise<Post> {
   }
 
   const slug = await ensureUniqueSlug(`${existing.slug}-copy`);
-  const publicOrder = await repo.getNextPublicOrder();
 
   const post = await repo.insertPost({
     title: `${existing.title} (Copy)`,
@@ -395,7 +393,7 @@ export async function duplicatePost(id: string, userId: string): Promise<Post> {
     featured: false,
     pinned: false,
     pinnedPriority: 0,
-    publicOrder,
+    publicOrder: null,
     createdBy: userId,
     updatedBy: userId,
   });

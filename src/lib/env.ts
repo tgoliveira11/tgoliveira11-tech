@@ -57,3 +57,16 @@ export function readPublicPostsPageSize(): number {
   }
   return Math.min(parsed, MAX_PUBLIC_POSTS_PAGE_SIZE);
 }
+
+const DEFAULT_HOME_RECENT_POSTS_LIMIT = 12;
+const MAX_HOME_RECENT_POSTS_LIMIT = 48;
+
+export function readHomeRecentPostsLimit(): number {
+  const raw = readEnv("HOME_RECENT_POSTS_LIMIT");
+  if (!raw) return DEFAULT_HOME_RECENT_POSTS_LIMIT;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return DEFAULT_HOME_RECENT_POSTS_LIMIT;
+  }
+  return Math.min(parsed, MAX_HOME_RECENT_POSTS_LIMIT);
+}

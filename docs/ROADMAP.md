@@ -252,7 +252,7 @@ Everything in M1–M7 above.
 | 2026-06 | PostgreSQL FTS for search | No extra infrastructure for MVP |
 | 2026-06 | LocalStorageProvider first | Matches local Docker dev; VPS v1 |
 | 2026-06 | Vercel Blob in template | Durable uploads on serverless; no DB migration |
-| 2026-06 | Manual `publicOrder` + env pagination | Admin-controlled list order; `PUBLIC_POSTS_PAGE_SIZE` default 5 |
+| 2026-06 | Manual `publicOrder` + env pagination | Admin-controlled list order; `PUBLIC_POSTS_PAGE_SIZE` default 5; `HOME_RECENT_POSTS_LIMIT` default 12; sortable admin table |
 | 2026-06 | Admin authorization via `ADMIN_EMAIL` | Auth from secure-auth; authorization is PostForge-owned; single admin for MVP |
 | 2026-06 | Future RBAC via `blog_user_roles` | Do not modify secure-auth `users` table |
 | 2026-06 | Post Project = workspace, not table | One `posts` row; related assets/revisions |

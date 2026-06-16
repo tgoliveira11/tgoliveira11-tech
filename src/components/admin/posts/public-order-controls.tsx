@@ -9,7 +9,15 @@ import {
   updatePostPublicOrderAction,
 } from "@/modules/posts/admin-posts.actions";
 
-export function PublicOrderControls({ post }: { post: Post }) {
+export function PublicOrderControls({
+  post,
+  canMoveUp,
+  canMoveDown,
+}: {
+  post: Post;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -69,19 +77,21 @@ export function PublicOrderControls({ post }: { post: Post }) {
       <div className="flex flex-wrap gap-1">
         <button
           type="button"
-          disabled={pending || post.publicOrder == null}
+          disabled={pending || post.publicOrder == null || !canMoveUp}
           className="rounded border border-[var(--border)] px-2 py-0.5 text-xs disabled:opacity-50"
           onClick={() => run(() => movePostPublicOrderAction(post.id, "up"))}
           aria-label={`Move ${post.title} up in public order`}
+          title={post.publicOrder == null ? "Set a public order first" : !canMoveUp ? "Already first in order" : undefined}
         >
           ↑
         </button>
         <button
           type="button"
-          disabled={pending || post.publicOrder == null}
+          disabled={pending || post.publicOrder == null || !canMoveDown}
           className="rounded border border-[var(--border)] px-2 py-0.5 text-xs disabled:opacity-50"
           onClick={() => run(() => movePostPublicOrderAction(post.id, "down"))}
           aria-label={`Move ${post.title} down in public order`}
+          title={post.publicOrder == null ? "Set a public order first" : !canMoveDown ? "Already last in order" : undefined}
         >
           ↓
         </button>
@@ -95,7 +105,7 @@ export function PublicOrderControls({ post }: { post: Post }) {
         </button>
       </div>
       <span className="text-xs text-[var(--muted)]">
-        {post.publicOrder != null ? `#${post.publicOrder}` : "Auto"}
+        {post.publicOrder != null ? `#${post.publicOrder}` : "Not set — use Set to assign"}
       </span>
     </div>
   );
