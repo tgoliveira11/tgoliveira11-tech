@@ -19,6 +19,7 @@ import type {
   TopPostAnalyticsRow,
   TrackPostViewInput,
 } from "./analytics.types";
+import { EMPTY_ENRICHED_ANALYTICS } from "./analytics.types";
 
 function sinceDaysAgo(days: number): Date {
   const since = new Date();
@@ -65,6 +66,24 @@ async function getEnrichedBreakdowns(options: {
     utmCampaigns,
     recentVisits: recentRows.map((row) => sanitizeRecentVisitForDisplay(row)),
   };
+}
+
+async function loadEnrichedBreakdownsSafe(options: {
+  postId?: string;
+  sinceDays?: number;
+  recentLimit?: number;
+}): Promise<{ enriched: EnrichedAnalyticsBreakdowns; unavailable: boolean }> {
+  try {
+    return {
+      enriched: await getEnrichedBreakdowns(options),
+      unavailable: false,
+    };
+  } catch {
+    return {
+      enriched: EMPTY_ENRICHED_ANALYTICS,
+      unavailable: true,
+    };
+  }
 }
 
 async function buildSummaryForPost(postId: string): Promise<PostAnalyticsSummary> {
@@ -174,13 +193,17 @@ export async function getPostAnalyticsDetail(postId: string): Promise<PostAnalyt
     throw new NotFoundError("Post not found");
   }
 
-  const [summary, viewsByDay, referrers, devices, recentViews, enriched] = await Promise.all([
-    buildSummaryForPost(postId),
+  const summary = await buildSummaryForPost(postId);
+  const hasViews = summary.totalViews > 0;
+
+  const [viewsByDay, referrers, devices, recentViews, enrichedResult] = await Promise.all([
     getPostViewsByDay(postId),
     getPostReferrerBreakdown(postId),
     getPostDeviceBreakdown(postId),
     getRecentViews(postId),
-    getEnrichedBreakdowns({ postId, recentLimit: 15 }),
+    hasViews
+      ? loadEnrichedBreakdownsSafe({ postId, recentLimit: 15 })
+      : Promise.resolve({ enriched: EMPTY_ENRICHED_ANALYTICS, unavailable: false }),
   ]);
 
   return {
@@ -189,22 +212,28 @@ export async function getPostAnalyticsDetail(postId: string): Promise<PostAnalyt
     referrers,
     devices,
     recentViews,
-    enriched,
+    enriched: enrichedResult.enriched,
+    enrichedUnavailable: enrichedResult.unavailable ? true : undefined,
   };
 }
 
 export async function getBlogAnalyticsDetail(): Promise<BlogAnalyticsDetail> {
-  const [summary, topPosts, viewsByDay, enriched] = await Promise.all([
+  const [summary, topPosts, viewsByDay] = await Promise.all([
     getBlogAnalyticsSummary(),
     getTopPostsByViews(10),
     getViewsByDay(30),
-    getEnrichedBreakdowns({ recentLimit: 25 }),
   ]);
+
+  const enrichedResult =
+    summary.totalViews > 0
+      ? await loadEnrichedBreakdownsSafe({ recentLimit: 25 })
+      : { enriched: EMPTY_ENRICHED_ANALYTICS, unavailable: false };
 
   return {
     summary,
     topPosts,
     viewsByDay,
-    enriched,
+    enriched: enrichedResult.enriched,
+    enrichedUnavailable: enrichedResult.unavailable ? true : undefined,
   };
 }

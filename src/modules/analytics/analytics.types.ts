@@ -101,6 +101,17 @@ export type EnrichedAnalyticsBreakdowns = {
   recentVisits: RecentVisitRow[];
 };
 
+export const EMPTY_ENRICHED_ANALYTICS: EnrichedAnalyticsBreakdowns = {
+  referrerHosts: [],
+  countries: [],
+  devices: [],
+  browsers: [],
+  operatingSystems: [],
+  utmSources: [],
+  utmCampaigns: [],
+  recentVisits: [],
+};
+
 export type PostAnalyticsDetail = {
   summary: PostAnalyticsSummary;
   viewsByDay: DailyViewsPoint[];
@@ -108,6 +119,7 @@ export type PostAnalyticsDetail = {
   devices: DeviceBreakdownRow[];
   recentViews: RecentViewRow[];
   enriched: EnrichedAnalyticsBreakdowns;
+  enrichedUnavailable?: boolean;
 };
 
 export type BlogAnalyticsDetail = {
@@ -115,4 +127,5 @@ export type BlogAnalyticsDetail = {
   viewsByDay: DailyViewsPoint[];
   topPosts: TopPostAnalyticsRow[];
   enriched: EnrichedAnalyticsBreakdowns;
+  enrichedUnavailable?: boolean;
 };

@@ -281,6 +281,21 @@ function buildEventFilter(filter: AnalyticsEventFilter) {
   return and(...conditions);
 }
 
+function coalesceTrimmedLabel(
+  column:
+    | typeof analyticsEvents.referrerHost
+    | typeof analyticsEvents.country
+    | typeof analyticsEvents.deviceType
+    | typeof analyticsEvents.browserName
+    | typeof analyticsEvents.osName
+    | typeof analyticsEvents.utmSource
+    | typeof analyticsEvents.utmCampaign,
+  unknownLabel: string
+) {
+  const escapedLabel = unknownLabel.replace(/'/g, "''");
+  return sql<string>`coalesce(nullif(trim(${column}), ''), ${sql.raw(`'${escapedLabel}'`)})`;
+}
+
 async function getTopFieldCounts(
   column:
     | typeof analyticsEvents.referrerHost
@@ -294,14 +309,16 @@ async function getTopFieldCounts(
   limit = 8,
   unknownLabel = "Unknown"
 ): Promise<Array<{ label: string; count: number }>> {
+  const labelExpr = coalesceTrimmedLabel(column, unknownLabel);
+
   const rows = await db
     .select({
-      label: sql<string>`coalesce(nullif(trim(${column}), ''), ${unknownLabel})`,
+      label: labelExpr,
       count: sql<number>`count(*)::int`,
     })
     .from(analyticsEvents)
     .where(buildEventFilter(filter))
-    .groupBy(sql`coalesce(nullif(trim(${column}), ''), ${unknownLabel})`)
+    .groupBy(labelExpr)
     .orderBy(desc(sql`count(*)`))
     .limit(limit);
 

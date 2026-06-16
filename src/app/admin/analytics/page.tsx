@@ -2,6 +2,7 @@ import { AdminPageTitle } from "@/components/admin/admin-page-title";
 import { AnalyticsEmptyState } from "@/components/admin/analytics/analytics-empty-state";
 import { AnalyticsSummaryCards } from "@/components/admin/analytics/analytics-summary-cards";
 import { EnrichedAnalyticsPanel } from "@/components/admin/analytics/enriched-analytics-panel";
+import { EnrichedAnalyticsUnavailableNotice } from "@/components/admin/analytics/enriched-analytics-unavailable-notice";
 import { TopPostsTable } from "@/components/admin/analytics/top-posts-table";
 import { ViewsOverTime } from "@/components/admin/analytics/views-over-time";
 import { getBlogAnalyticsDetail } from "@/modules/analytics/analytics.service";
@@ -26,6 +27,8 @@ export default async function AdminAnalyticsPage() {
           </div>
         }
       />
+
+      {detail.enrichedUnavailable ? <EnrichedAnalyticsUnavailableNotice /> : null}
 
       {!hasData ? (
         <AnalyticsEmptyState

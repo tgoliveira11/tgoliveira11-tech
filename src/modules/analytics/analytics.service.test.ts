@@ -32,6 +32,7 @@ vi.mock("@/modules/analytics/analytics.repository", () => ({
 import * as postsRepo from "@/modules/posts/posts.repository";
 import * as repo from "@/modules/analytics/analytics.repository";
 import {
+  getBlogAnalyticsDetail,
   getBlogAnalyticsSummary,
   getPostAnalyticsDetail,
   getTopPostsByViews,
@@ -152,5 +153,34 @@ describe("analytics service", () => {
     expect(detail.recentViews).toHaveLength(1);
     expect(detail.enriched.referrerHosts[0]?.label).toBe("google.com");
     expect(detail.enriched.recentVisits[0]?.ipAddress).toBeNull();
+  });
+
+  it("getBlogAnalyticsDetail skips enriched queries when there are no views", async () => {
+    vi.mocked(repo.sumAllBlogViews).mockResolvedValue(0);
+    vi.mocked(repo.sumBlogViewsSince).mockResolvedValue(0);
+    vi.mocked(repo.countPostsWithViews).mockResolvedValue(0);
+    vi.mocked(repo.getTopPostsByViews).mockResolvedValue([]);
+    vi.mocked(repo.getBlogViewsByDay).mockResolvedValue([]);
+
+    const detail = await getBlogAnalyticsDetail();
+
+    expect(detail.summary.totalViews).toBe(0);
+    expect(detail.enriched.recentVisits).toEqual([]);
+    expect(repo.getTopReferrerHosts).not.toHaveBeenCalled();
+    expect(repo.getRecentAnalyticsEvents).not.toHaveBeenCalled();
+  });
+
+  it("getBlogAnalyticsDetail marks enriched unavailable when queries fail", async () => {
+    vi.mocked(repo.sumAllBlogViews).mockResolvedValue(10);
+    vi.mocked(repo.sumBlogViewsSince).mockResolvedValue(2);
+    vi.mocked(repo.countPostsWithViews).mockResolvedValue(1);
+    vi.mocked(repo.getTopPostsByViews).mockResolvedValue([]);
+    vi.mocked(repo.getBlogViewsByDay).mockResolvedValue([]);
+    vi.mocked(repo.getTopReferrerHosts).mockRejectedValue(new Error("column does not exist"));
+
+    const detail = await getBlogAnalyticsDetail();
+
+    expect(detail.enrichedUnavailable).toBe(true);
+    expect(detail.enriched.recentVisits).toEqual([]);
   });
 });
