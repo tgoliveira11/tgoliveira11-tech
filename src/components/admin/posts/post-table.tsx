@@ -11,7 +11,6 @@ import {
   unpublishPostAction,
 } from "@/modules/posts/admin-posts.actions";
 import { AdminStatusBadge } from "../admin-status-badge";
-import { ScheduleControls } from "./schedule-controls";
 import { PublicOrderControls } from "./public-order-controls";
 
 function formatDate(value: Date | null | undefined) {
@@ -133,7 +132,6 @@ export function PostTable({
                       Unpublish
                     </button>
                   )}
-                  <ScheduleControls postId={post.id} compact />
                   <button
                     type="button"
                     disabled={pending}

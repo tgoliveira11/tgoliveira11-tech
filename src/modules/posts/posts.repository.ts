@@ -2,7 +2,7 @@ import { and, asc, desc, eq, ilike, inArray, isNotNull, lte, or, sql } from "dri
 import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
-import { postRevisions, posts } from "./posts.schema";
+import { postRevisions, posts, postTags } from "./posts.schema";
 import type { AdminPostListFilters, PostStatus, PublishedPostListOptions } from "./posts.types";
 import type { NewPost, Post, PostRevision, RevisionType } from "./posts.types";
 
@@ -94,13 +94,51 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
         ? [sql`${posts.publicOrder} IS NULL`, asc(posts.publicOrder), desc(posts.publishedAt)]
         : [desc(posts.updatedAt)];
 
+  const limit = filters.limit ?? 50;
+  const offset = filters.offset ?? 0;
+
+  if (filters.tagId) {
+    const tagWhere = whereClause
+      ? and(whereClause, eq(postTags.tagId, filters.tagId))
+      : eq(postTags.tagId, filters.tagId);
+
+    const rows = await db
+      .selectDistinct({ post: posts })
+      .from(posts)
+      .innerJoin(postTags, eq(postTags.postId, posts.id))
+      .where(tagWhere)
+      .orderBy(...orderBy)
+      .limit(limit)
+      .offset(offset);
+
+    return rows.map((row) => row.post);
+  }
+
   return db
     .select()
     .from(posts)
     .where(whereClause)
     .orderBy(...orderBy)
-    .limit(filters.limit ?? 50)
-    .offset(filters.offset ?? 0);
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getMaxPublicOrder(): Promise<number | null> {
+  const [row] = await db
+    .select({ max: sql<number | null>`max(${posts.publicOrder})` })
+    .from(posts)
+    .where(isNotNull(posts.publicOrder));
+
+  if (row?.max == null) {
+    return null;
+  }
+
+  return Number(row.max);
+}
+
+export async function getNextPublicOrder(): Promise<number> {
+  const max = await getMaxPublicOrder();
+  return (max ?? 0) + 1;
 }
 
 export async function countPostsByStatus(): Promise<Record<PostStatus, number>> {

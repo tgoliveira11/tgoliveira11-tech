@@ -217,7 +217,9 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - Manual **Save draft** only — autosave deferred.
 - Revisions page/history UI deferred (revisions still created on manual save, publish, unpublish).
 - Scheduler cron deferred to M3.6 follow-up (schedule UI sets status; auto-publish not wired).
-- Admin list tag filter deferred; category + search + status filters implemented.
+- Admin list tag filter implemented on `/admin/posts` (`?tagId=`).
+- Schedule action removed from `/admin/posts` list; scheduling remains on the post editor.
+- New drafts receive automatic `publicOrder = max + 1`.
 - Markdown editor: textarea + live sanitized preview (no toolbar, no image upload — M4).
 
 ### Manual smoke flow

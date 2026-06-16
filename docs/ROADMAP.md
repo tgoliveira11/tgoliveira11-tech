@@ -89,7 +89,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | # | Milestone | Key deliverables |
 |---|-----------|------------------|
 | 3.1 | Admin shell | Layout, nav, session + `ADMIN_EMAIL` guard, 403 page |
-| 3.2 | Post list | Filters, search, status badges, lifecycle actions |
+| 3.2 | Post list | Filters (status, category, tag, search), lifecycle actions, public order |
 | 3.3 | Post editor | Create, edit, manual save, inline category/tag assignment |
 | 3.4 | Preview | Admin-only sanitized Markdown preview |
 | 3.5 | Lifecycle | Publish, unpublish, schedule, archive, duplicate |
@@ -101,7 +101,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Editor UX (follow-up):** Post editor redesigned as a writing-first workspace — sticky header, two-column layout, compact assets sidebar, promotion/SEO/schedule cards. See `docs/UI_UX_SKILL.md`.
 
-**Deferred:** Autosave, revisions UI, scheduler cron, admin tag filter, dedicated tag/category admin list screens, `/api/admin/*` REST routes.
+**Deferred:** Autosave, revisions UI, scheduler cron, dedicated tag/category admin list screens, `/api/admin/*` REST routes.
 
 ---
 

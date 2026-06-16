@@ -10,6 +10,7 @@ export type RevisionType = (typeof revisionTypeEnum.enumValues)[number];
 export type AdminPostListFilters = {
   status?: PostStatus;
   categoryId?: string;
+  tagId?: string;
   featured?: boolean;
   pinned?: boolean;
   search?: string;
