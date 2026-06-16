@@ -2,9 +2,9 @@ import "server-only";
 import { createSecureAuth } from "@tgoliveira/secure-auth/next";
 import { APP_DEFAULTS } from "@/lib/auth/app-defaults";
 import { db } from "@/db/client";
-import { devEmailProvider } from "@/lib/email/dev-email-provider";
+import { createEmailProvider } from "@/lib/email/email-provider-factory";
 import { buildSecureAuthConfigFromEnv } from "@/lib/env/secure-auth-from-env";
-import { readEnv } from "@/lib/env/parse";
+import { readEmailFrom } from "@/lib/env";
 import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
 import { createSecureAuthServicesPatcher } from "@/lib/auth/patch-secure-auth-services";
 
@@ -20,12 +20,14 @@ const envConfig = buildSecureAuthConfigFromEnv({
   afterLoginPath: "/admin",
 });
 
+const emailFrom = readEmailFrom() ?? `${envConfig.app.name} <noreply@localhost>`;
+
 const baseSecureAuth = createSecureAuth({
   db,
   ...envConfig,
   email: {
-    from: readEnv(process.env, "EMAIL_FROM") ?? `${envConfig.app.name} <noreply@localhost>`,
-    provider: devEmailProvider,
+    from: emailFrom,
+    provider: createEmailProvider(),
   },
   ui: {
     ...envConfig.ui,

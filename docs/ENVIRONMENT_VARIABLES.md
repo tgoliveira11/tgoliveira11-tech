@@ -73,11 +73,30 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 
 ### Email
 
-| Variable | Purpose | Notes |
-|----------|---------|-------|
-| `EMAIL_FROM` | From address for auth emails | Dev provider may log to console |
-| `EMAIL_VERIFICATION_SEND_ON_REGISTER` | Send verification on register | `true` default |
-| `EMAIL_VERIFICATION_REQUIRE_BEFORE_SIGN_IN` | Block login until verified | `false` default for easier local dev |
+| Variable | Purpose | Default | Server-only | Required |
+|----------|---------|---------|-------------|----------|
+| `EMAIL_PROVIDER` | Email delivery backend | `console` | Yes | No (defaults to console) |
+| `EMAIL_FROM` | From address for auth emails | `PostForge <noreply@localhost>` | Yes | Yes for `resend`; optional for `console` |
+| `RESEND_API_KEY` | Resend API key | — | **Yes** | Only when `EMAIL_PROVIDER=resend` |
+| `EMAIL_REPLY_TO` | Optional reply-to address | — | Yes | No |
+| `EMAIL_VERIFICATION_SEND_ON_REGISTER` | Send verification on register | `true` | Yes | No |
+| `EMAIL_VERIFICATION_REQUIRE_BEFORE_SIGN_IN` | Block login until verified | `false` | Yes | No |
+
+**Providers:**
+
+- `EMAIL_PROVIDER=console` — logs emails to the server console (local dev default). See [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md).
+- `EMAIL_PROVIDER=resend` — sends real email via Resend in production. Requires `RESEND_API_KEY` and `EMAIL_FROM`.
+
+Never prefix `RESEND_API_KEY` with `NEXT_PUBLIC_`.
+
+**Downstream example (`tgoliveira11-tech`):**
+
+```env
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=<from Resend>
+EMAIL_FROM="Thiago Oliveira Tech <noreply@mail.tgoliveira11.tech>"
+EMAIL_REPLY_TO="thiago@tgoliveira11.tech"
+```
 
 ### WebAuthn / passkeys
 
@@ -202,7 +221,14 @@ UPLOAD_LOCAL_DIR=./storage/uploads
 UPLOAD_PUBLIC_BASE_URL=/api/assets
 ```
 
-OAuth, email SMTP, `CRON_SECRET`, and `BLOB_READ_WRITE_TOKEN` can stay empty for basic local blogging.
+OAuth, `CRON_SECRET`, and `BLOB_READ_WRITE_TOKEN` can stay empty for basic local blogging.
+
+Email defaults to the console provider:
+
+```env
+EMAIL_PROVIDER=console
+EMAIL_FROM="PostForge <noreply@localhost>"
+```
 
 ### Production on Vercel (additional)
 
@@ -213,7 +239,7 @@ OAuth, email SMTP, `CRON_SECRET`, and `BLOB_READ_WRITE_TOKEN` can stay empty for
 - `UPLOAD_PROVIDER=vercel-blob` + `BLOB_READ_WRITE_TOKEN` (from connected Blob store)
 - **Do not** rely on `UPLOAD_LOCAL_DIR` on serverless — see [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md)
 - OAuth secrets if using social login
-- Real email provider when beyond dev
+- Transactional email via Resend — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md)
 
 ### Production on VPS (alternative)
 
@@ -225,5 +251,6 @@ OAuth, email SMTP, `CRON_SECRET`, and `BLOB_READ_WRITE_TOKEN` can stay empty for
 ## Related documentation
 
 - [.env.example](../.env.example) — copy-paste template
+- [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) — console vs Resend setup
 - [CREATE_A_BLOG.md](CREATE_A_BLOG.md) — setup walkthrough
 - [DEPLOYMENT.md](DEPLOYMENT.md) — production checklist

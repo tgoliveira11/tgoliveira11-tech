@@ -82,10 +82,15 @@ AUTH_COOKIE_SECURE=true
 UPLOAD_PROVIDER=vercel-blob
 BLOB_READ_WRITE_TOKEN=<set-by-vercel>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=<from-resend-dashboard>
+EMAIL_FROM="Your Blog <noreply@mail.your-domain.com>"
+EMAIL_REPLY_TO=you@your-domain.com
 ```
 
-8. **Deploy** — push to `main` or redeploy after env changes.
-9. **Post-deploy smoke test:**
+8. **Configure transactional email** — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) for Resend domain verification (Cloudflare DNS) and testing verification/reset emails.
+9. **Deploy** — push to `main` or redeploy after env changes.
+10. **Post-deploy smoke test:**
    - Register/login with `ADMIN_EMAIL`
    - Upload image → `publicUrl` is `https://...blob.vercel-storage.com/...`
    - Publish post → image renders on `/blog/<slug>`
@@ -154,8 +159,12 @@ Set on your host (Vercel → Settings → Environment Variables):
 | `CRON_SECRET` | Strong random secret (if using scheduled publish cron) |
 | `AUTH_COOKIE_SECURE` | `true` |
 | `UPLOAD_*` | See storage strategy |
+| `EMAIL_PROVIDER` | `resend` in production |
+| `RESEND_API_KEY` | From Resend dashboard (server-only) |
+| `EMAIL_FROM` | Verified sender on your Resend domain |
+| `EMAIL_REPLY_TO` | Optional reply-to address |
 
-Full list: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)
+Full list: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) · Email setup: [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md)
 
 ### 4. Build settings (Vercel)
 

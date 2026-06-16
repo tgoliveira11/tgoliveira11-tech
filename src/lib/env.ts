@@ -37,6 +37,24 @@ export function readUploadMaxFileSizeBytes(): number {
 
 export type UploadProviderName = "local" | "vercel-blob";
 
+export type EmailProviderName = "console" | "resend";
+
+export function readEmailProvider(): string | undefined {
+  return readEnv("EMAIL_PROVIDER");
+}
+
+export function readResendApiKey(): string | undefined {
+  return readEnv("RESEND_API_KEY");
+}
+
+export function readEmailFrom(): string | undefined {
+  return readEnv("EMAIL_FROM");
+}
+
+export function readEmailReplyTo(): string | undefined {
+  return readEnv("EMAIL_REPLY_TO");
+}
+
 export function readUploadProvider(): string | undefined {
   return readEnv("UPLOAD_PROVIDER");
 }
