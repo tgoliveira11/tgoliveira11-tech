@@ -188,6 +188,16 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 
 **Phase 2 exit criteria:** Public site works with manually inserted published posts (via service tests or seed script). ✅
 
+### 2.8 Public listing order and pagination ✅
+
+- [x] `posts.publicOrder` nullable integer + index `(status, publicOrder, publishedAt)`
+- [x] Manual order on home recent, `/blog`, tag, category listings (`publicOrder IS NULL ASC`, `publicOrder ASC`, `publishedAt DESC`)
+- [x] RSS feed remains `publishedAt DESC`; search remains FTS / date order
+- [x] `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`) for `/blog`
+- [x] `PublicPagination` on `/blog`
+- [x] Admin controls on `/admin/posts` (set, clear, up/down)
+- [x] Pinned/featured unchanged for home hero promotion
+
 ---
 
 ## Phase 3 — Admin publishing

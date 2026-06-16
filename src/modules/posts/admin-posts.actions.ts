@@ -8,6 +8,7 @@ import { renderMarkdownToHtml } from "@/modules/markdown/markdown-renderer";
 import * as postsService from "@/modules/posts/posts.service";
 import {
   publishPostSchema,
+  publicOrderSchema,
   schedulePostSchema,
 } from "@/modules/posts/posts.validation";
 import { publicPostPath } from "@/modules/posts/slug";
@@ -189,4 +190,57 @@ export async function previewMarkdownAction(markdown: string): Promise<{ html: s
   await requireAdminSession();
   const html = await renderMarkdownToHtml(markdown);
   return { html };
+}
+
+export async function updatePostPublicOrderAction(
+  postId: string,
+  _prevState: ActionResult,
+  formData: FormData
+): Promise<ActionResult> {
+  try {
+    const session = await requireAdminSession();
+    const parsed = publicOrderSchema.parse({ publicOrder: Number(formData.get("publicOrder")) });
+    const existing = await postsService.getById(postId);
+    await postsService.setPostPublicOrder(postId, session.user.id, parsed);
+    if (existing.status === "published") {
+      revalidatePublicPaths(existing.slug);
+    }
+    return { ok: true, message: `Public order set to ${parsed.publicOrder}` };
+  } catch (error) {
+    return { ok: false, error: mapActionError(error) };
+  }
+}
+
+export async function clearPostPublicOrderAction(postId: string): Promise<ActionResult> {
+  try {
+    const session = await requireAdminSession();
+    const existing = await postsService.getById(postId);
+    await postsService.clearPostPublicOrder(postId, session.user.id);
+    if (existing.status === "published") {
+      revalidatePublicPaths(existing.slug);
+    }
+    return { ok: true, message: "Public order cleared" };
+  } catch (error) {
+    return { ok: false, error: mapActionError(error) };
+  }
+}
+
+export async function movePostPublicOrderAction(
+  postId: string,
+  direction: "up" | "down"
+): Promise<ActionResult> {
+  try {
+    const session = await requireAdminSession();
+    const existing = await postsService.getById(postId);
+    await postsService.movePostPublicOrder(postId, session.user.id, direction);
+    if (existing.status === "published") {
+      revalidatePublicPaths(existing.slug);
+    }
+    return {
+      ok: true,
+      message: direction === "up" ? "Moved up in public order" : "Moved down in public order",
+    };
+  } catch (error) {
+    return { ok: false, error: mapActionError(error) };
+  }
 }

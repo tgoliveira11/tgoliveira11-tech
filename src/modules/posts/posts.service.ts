@@ -17,11 +17,13 @@ import {
   assertScheduleDate,
   createPostSchema,
   pinPostSchema,
+  publicOrderSchema,
   publishPostSchema,
   schedulePostSchema,
   updatePostSchema,
   type CreatePostInput,
   type PinPostInput,
+  type PublicOrderInput,
   type PublishPostInput,
   type SchedulePostInput,
   type UpdatePostInput,
@@ -433,6 +435,91 @@ export async function unpinPost(id: string, userId: string): Promise<Post> {
   });
   if (!updated) throw new NotFoundError("Post not found");
   return updated;
+}
+
+function assertPublishedForPublicOrder(post: Post) {
+  if (post.status !== "published") {
+    throw new ValidationError("Only published posts can have a manual public order");
+  }
+}
+
+export async function setPostPublicOrder(
+  id: string,
+  userId: string,
+  input: PublicOrderInput
+): Promise<Post> {
+  const parsed = publicOrderSchema.parse(input);
+  const existing = await repo.findPostById(id);
+  if (!existing) {
+    throw new NotFoundError("Post not found");
+  }
+  assertPublishedForPublicOrder(existing);
+
+  const updated = await repo.updatePostById(id, {
+    publicOrder: parsed.publicOrder,
+    updatedBy: userId,
+  });
+  if (!updated) throw new NotFoundError("Post not found");
+  return updated;
+}
+
+export async function clearPostPublicOrder(id: string, userId: string): Promise<Post> {
+  const existing = await repo.findPostById(id);
+  if (!existing) {
+    throw new NotFoundError("Post not found");
+  }
+
+  const updated = await repo.updatePostById(id, {
+    publicOrder: null,
+    updatedBy: userId,
+  });
+  if (!updated) throw new NotFoundError("Post not found");
+  return updated;
+}
+
+export async function movePostPublicOrder(
+  id: string,
+  userId: string,
+  direction: "up" | "down"
+): Promise<Post> {
+  const existing = await repo.findPostById(id);
+  if (!existing) {
+    throw new NotFoundError("Post not found");
+  }
+  assertPublishedForPublicOrder(existing);
+  if (existing.publicOrder == null) {
+    throw new ValidationError("Set a public order before moving this post");
+  }
+
+  const ordered = await repo.listPublishedPostsWithPublicOrder();
+  const index = ordered.findIndex((post) => post.id === id);
+  if (index === -1) {
+    throw new NotFoundError("Post not found in public order list");
+  }
+
+  const neighborIndex = direction === "up" ? index - 1 : index + 1;
+  if (neighborIndex < 0 || neighborIndex >= ordered.length) {
+    return existing;
+  }
+
+  const neighbor = ordered[neighborIndex]!;
+  const currentOrder = existing.publicOrder;
+  const neighborOrder = neighbor.publicOrder;
+
+  if (neighborOrder == null) {
+    return existing;
+  }
+
+  await repo.updatePostById(id, { publicOrder: neighborOrder, updatedBy: userId });
+  await repo.updatePostById(neighbor.id, { publicOrder: currentOrder, updatedBy: userId });
+
+  const updated = await repo.findPostById(id);
+  if (!updated) throw new NotFoundError("Post not found");
+  return updated;
+}
+
+export async function listPublishedPostsWithPublicOrder(): Promise<Post[]> {
+  return repo.listPublishedPostsWithPublicOrder();
 }
 
 export { isPublicPost } from "./posts.visibility";

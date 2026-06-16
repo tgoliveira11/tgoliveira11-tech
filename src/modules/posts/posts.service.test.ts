@@ -16,6 +16,7 @@ function makePost(overrides: Partial<Post>): Post {
     featured: false,
     pinned: false,
     pinnedPriority: 0,
+    publicOrder: null,
     categoryId: null,
     publishedAt: null,
     scheduledAt: null,
@@ -59,6 +60,20 @@ describe("public post visibility", () => {
         makePost({
           status: "published",
           publishedAt: new Date("2026-06-14T13:00:00.000Z"),
+        }),
+        now
+      )
+    ).toBe(false);
+  });
+
+  it("does not expose drafts even when publicOrder is set", () => {
+    const now = new Date("2026-06-14T12:00:00.000Z");
+    expect(
+      isPublicPost(
+        makePost({
+          status: "draft",
+          publicOrder: 1,
+          publishedAt: new Date("2026-06-14T11:00:00.000Z"),
         }),
         now
       )

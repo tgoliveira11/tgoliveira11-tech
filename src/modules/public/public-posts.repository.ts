@@ -1,4 +1,5 @@
-import { and, asc, desc, eq, gt, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, isNotNull, lt, ne, sql } from "drizzle-orm";
+import { buildPaginatedResult, type PaginatedResult } from "@/lib/pagination";
 import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
@@ -9,7 +10,9 @@ import { publishedPostFilter } from "@/modules/posts/posts.repository";
 import type { Post } from "@/modules/posts/posts.types";
 import { tags } from "@/modules/tags/tags.schema";
 import type { Tag } from "@/modules/tags/tags.types";
+import { publicPostListingOrder } from "./public-post-order";
 
+export type { PaginatedResult } from "@/lib/pagination";
 export type PublicPostBundle = {
   post: Post;
   category: Category | null;
@@ -17,32 +20,64 @@ export type PublicPostBundle = {
   coverAsset: Asset | null;
 };
 
-const DEFAULT_PAGE_SIZE = 12;
+export async function countPublishedPosts(options?: { excludePostId?: string }): Promise<number> {
+  const where = options?.excludePostId
+    ? and(publishedPostFilter(), ne(posts.id, options.excludePostId))
+    : publishedPostFilter();
 
-export function getDefaultPageSize(): number {
-  return DEFAULT_PAGE_SIZE;
-}
-
-export async function countPublishedPosts(): Promise<number> {
   const [row] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(posts)
-    .where(publishedPostFilter());
+    .where(where);
   return Number(row?.count ?? 0);
 }
 
 export async function listPublishedPostBundles(
-  options: { limit?: number; offset?: number } = {}
+  options: { limit?: number; offset?: number; excludePostId?: string } = {}
 ): Promise<PublicPostBundle[]> {
+  const where = options.excludePostId
+    ? and(publishedPostFilter(), ne(posts.id, options.excludePostId))
+    : publishedPostFilter();
+
   const rows = await db
     .select()
     .from(posts)
-    .where(publishedPostFilter())
-    .orderBy(desc(posts.pinned), desc(posts.pinnedPriority), desc(posts.publishedAt))
-    .limit(options.limit ?? DEFAULT_PAGE_SIZE)
+    .where(where)
+    .orderBy(...publicPostListingOrder)
+    .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
   return Promise.all(rows.map((post) => hydratePostBundle(post)));
+}
+
+export async function listPublishedPostBundlesPaginated(options: {
+  page: number;
+  pageSize: number;
+  excludePostId?: string;
+}): Promise<PaginatedResult<PublicPostBundle>> {
+  const offset = (options.page - 1) * options.pageSize;
+  const where = options.excludePostId
+    ? and(publishedPostFilter(), ne(posts.id, options.excludePostId))
+    : publishedPostFilter();
+
+  const [rows, totalItems] = await Promise.all([
+    db
+      .select()
+      .from(posts)
+      .where(where)
+      .orderBy(...publicPostListingOrder)
+      .limit(options.pageSize)
+      .offset(offset),
+    countPublishedPosts({ excludePostId: options.excludePostId }),
+  ]);
+
+  const items = await Promise.all(rows.map((post) => hydratePostBundle(post)));
+
+  return buildPaginatedResult(items, {
+    page: options.page,
+    pageSize: options.pageSize,
+    totalItems,
+  });
 }
 
 export async function getPublishedPostBundleBySlug(slug: string): Promise<PublicPostBundle | null> {
@@ -73,7 +108,7 @@ export async function searchPublishedPostBundles(
       )
     )
     .orderBy(desc(posts.publishedAt))
-    .limit(options.limit ?? DEFAULT_PAGE_SIZE)
+    .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
   return Promise.all(rows.map((post) => hydratePostBundle(post)));
@@ -95,8 +130,8 @@ export async function listPublishedPostBundlesByCategorySlug(
     .select()
     .from(posts)
     .where(and(eq(posts.categoryId, category.id), publishedPostFilter()))
-    .orderBy(desc(posts.publishedAt))
-    .limit(options.limit ?? DEFAULT_PAGE_SIZE)
+    .orderBy(...publicPostListingOrder)
+    .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
   const bundles = await Promise.all(rows.map((post) => hydratePostBundle(post)));
@@ -115,8 +150,8 @@ export async function listPublishedPostBundlesByTagSlug(
     .from(postTags)
     .innerJoin(posts, eq(postTags.postId, posts.id))
     .where(and(eq(postTags.tagId, tag.id), publishedPostFilter()))
-    .orderBy(desc(posts.publishedAt))
-    .limit(options.limit ?? DEFAULT_PAGE_SIZE)
+    .orderBy(...publicPostListingOrder)
+    .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
   const bundles = await Promise.all(rows.map((row) => hydratePostBundle(row.post)));
@@ -174,7 +209,7 @@ export async function getPublishedNeighbors(
       and(
         publishedPostFilter(),
         lt(posts.publishedAt, publishedAt),
-        sql`${posts.id} <> ${currentPostId}`
+        ne(posts.id, currentPostId)
       )
     )
     .orderBy(desc(posts.publishedAt))
@@ -187,7 +222,7 @@ export async function getPublishedNeighbors(
       and(
         publishedPostFilter(),
         gt(posts.publishedAt, publishedAt),
-        sql`${posts.id} <> ${currentPostId}`
+        ne(posts.id, currentPostId)
       )
     )
     .orderBy(asc(posts.publishedAt))
@@ -197,7 +232,14 @@ export async function getPublishedNeighbors(
 }
 
 export async function listPublishedPostsForFeed(limit = 50): Promise<PublicPostBundle[]> {
-  return listPublishedPostBundles({ limit, offset: 0 });
+  const rows = await db
+    .select()
+    .from(posts)
+    .where(publishedPostFilter())
+    .orderBy(desc(posts.publishedAt))
+    .limit(limit);
+
+  return Promise.all(rows.map((post) => hydratePostBundle(post)));
 }
 
 export async function listPublishedSlugs(): Promise<Array<{ slug: string; updatedAt: Date }>> {
@@ -206,6 +248,14 @@ export async function listPublishedSlugs(): Promise<Array<{ slug: string; update
     .from(posts)
     .where(publishedPostFilter())
     .orderBy(desc(posts.publishedAt));
+}
+
+export async function listPublishedPostsWithPublicOrder(): Promise<Post[]> {
+  return db
+    .select()
+    .from(posts)
+    .where(and(publishedPostFilter(), isNotNull(posts.publicOrder)))
+    .orderBy(asc(posts.publicOrder), desc(posts.publishedAt));
 }
 
 async function hydratePostBundle(post: Post): Promise<PublicPostBundle> {

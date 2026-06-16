@@ -12,6 +12,7 @@ import {
 } from "@/modules/posts/admin-posts.actions";
 import { AdminStatusBadge } from "../admin-status-badge";
 import { ScheduleControls } from "./schedule-controls";
+import { PublicOrderControls } from "./public-order-controls";
 
 function formatDate(value: Date | null | undefined) {
   if (!value) return "—";
@@ -68,6 +69,7 @@ export function PostTable({
             <th className="px-3 py-2">Scheduled</th>
             <th className="px-3 py-2">Updated</th>
             <th className="px-3 py-2">Flags</th>
+            <th className="px-3 py-2">Public order</th>
             <th className="px-3 py-2">Category</th>
             <th className="px-3 py-2">Actions</th>
           </tr>
@@ -97,6 +99,9 @@ export function PostTable({
                     </span>
                   ) : null}
                 </div>
+              </td>
+              <td className="px-3 py-3 align-top">
+                <PublicOrderControls post={post} />
               </td>
               <td className="px-3 py-3 align-top">
                 {post.categoryId ? categoryNames[post.categoryId] ?? "—" : "—"}

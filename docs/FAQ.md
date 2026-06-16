@@ -43,6 +43,18 @@ See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
 
 ---
 
+## How do I control the order of posts on the home page and blog?
+
+Set **manual public order** on `/admin/posts` for published posts (`publicOrder` column). Lower numbers appear first. Posts without a manual order fall back to publish date.
+
+This is separate from **pinned** and **featured**, which only control the home-page hero promotion.
+
+Pagination size is configured with `PUBLIC_POSTS_PAGE_SIZE` (default `5`) for `/blog`. The home page shows a fixed recent grid (size from blog settings).
+
+RSS and search use their own ordering (latest published / relevance).
+
+---
+
 ## Why do I need Vercel Blob on Vercel?
 
 Vercel serverless functions use an **ephemeral filesystem**. Files written to disk during uploads can disappear after redeploys or cold starts, and instances do not share disk.

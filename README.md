@@ -16,6 +16,7 @@ Licensed under the [MIT License](LICENSE).
 - **Editorial public site** — home, blog index, post detail, search, tags, categories, RSS, sitemap
 - **Admin workspace** — writing-first post editor, assets, taxonomy, SEO, scheduling, featured/pinned posts
 - **Images & assets** — cover/OG images, upload, insert into Markdown
+- **Public listing control** — manual `publicOrder` for home/blog/tag/category lists; env-driven pagination on `/blog` (`PUBLIC_POSTS_PAGE_SIZE`, default 5)
 - **Analytics** — lightweight post view tracking
 - **Import** — GitHub Pages / Jekyll migration CLI
 - **Auth** — registration, login, 2FA, passkeys, sessions via `@tgoliveira/secure-auth`

@@ -50,11 +50,16 @@ export const pinPostSchema = z.object({
   pinnedPriority: z.number().int().min(0).max(1000).default(0),
 });
 
+export const publicOrderSchema = z.object({
+  publicOrder: z.number().int().min(1).max(9999),
+});
+
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;
 export type PublishPostInput = z.infer<typeof publishPostSchema>;
 export type SchedulePostInput = z.infer<typeof schedulePostSchema>;
 export type PinPostInput = z.infer<typeof pinPostSchema>;
+export type PublicOrderInput = z.infer<typeof publicOrderSchema>;
 
 export function assertPublishablePost(input: {
   title: string;

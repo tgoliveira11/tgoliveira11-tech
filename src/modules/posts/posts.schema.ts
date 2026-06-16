@@ -48,6 +48,7 @@ export const posts = pgTable(
     featured: boolean("featured").notNull().default(false),
     pinned: boolean("pinned").notNull().default(false),
     pinnedPriority: integer("pinned_priority").notNull().default(0),
+    publicOrder: integer("public_order"),
     categoryId: uuid("category_id").references(() => categories.id, { onDelete: "set null" }),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
@@ -72,6 +73,11 @@ export const posts = pgTable(
     uniqueIndex("posts_slug_unique").on(table.slug),
     index("posts_status_idx").on(table.status),
     index("posts_status_published_at_idx").on(table.status, table.publishedAt),
+    index("posts_status_public_order_published_at_idx").on(
+      table.status,
+      table.publicOrder,
+      table.publishedAt
+    ),
     index("posts_category_id_idx").on(table.categoryId),
     index("posts_featured_idx").on(table.featured),
     index("posts_pinned_priority_idx").on(table.pinned, table.pinnedPriority),

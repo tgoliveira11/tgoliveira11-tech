@@ -73,6 +73,8 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 2.5 | Redirects | `/blog/[slug]` lookup only (full legacy redirects → M6) |
 | 2.6 | 404 | Friendly not-found page |
 | 2.7 | Analytics | `POST /api/analytics/post-view` with rate limiting |
+| 2.8 | Listing order | `publicOrder` field, admin controls, tag/category order |
+| 2.9 | Pagination | `PUBLIC_POSTS_PAGE_SIZE` on `/blog` |
 
 **Exit gate:** Seed a published post; visible on home, blog, search, RSS, and sitemap. Draft invisible. ✅
 
@@ -93,6 +95,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 3.5 | Lifecycle | Publish, unpublish, schedule, archive, duplicate |
 | 3.6 | Feature/pin | Toggle featured and pinned posts |
 | 3.7 | Mutations | Server Actions with `requireAdminSession()` |
+| 3.8 | Public order | Manual `publicOrder` on `/admin/posts` for published posts |
 
 **Exit gate:** Login as `ADMIN_EMAIL` → create → publish → visible publicly → unpublish → hidden. ✅
 
@@ -248,6 +251,7 @@ Everything in M1–M7 above.
 | 2026-06 | PostgreSQL FTS for search | No extra infrastructure for MVP |
 | 2026-06 | LocalStorageProvider first | Matches local Docker dev; VPS v1 |
 | 2026-06 | Vercel Blob in template | Durable uploads on serverless; no DB migration |
+| 2026-06 | Manual `publicOrder` + env pagination | Admin-controlled list order; `PUBLIC_POSTS_PAGE_SIZE` default 5 |
 | 2026-06 | Admin authorization via `ADMIN_EMAIL` | Auth from secure-auth; authorization is PostForge-owned; single admin for MVP |
 | 2026-06 | Future RBAC via `blog_user_roles` | Do not modify secure-auth `users` table |
 | 2026-06 | Post Project = workspace, not table | One `posts` row; related assets/revisions |
