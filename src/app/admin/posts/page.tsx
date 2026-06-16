@@ -1,6 +1,5 @@
 import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminPageTitle } from "@/components/admin/admin-page-title";
-import { AdminPostsResultsSummary } from "@/components/admin/posts/admin-posts-results-summary";
 import { CreateDraftButton } from "@/components/admin/posts/create-draft-button";
 import { PostFilters } from "@/components/admin/posts/post-filters";
 import { PostTable } from "@/components/admin/posts/post-table";
@@ -34,23 +33,20 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
     search: params.search,
     categoryId: params.categoryId,
     tagId: params.tagId,
-    sort: sortState.sort,
-    direction: sortState.direction,
     limit: 100,
+    ...(sortState.usesDefaultSort
+      ? {}
+      : { sort: sortState.sort, direction: sortState.direction }),
   });
-
-  if (sortState.usesDefaultSort) {
-    delete listFilters.sort;
-    delete listFilters.direction;
-  }
 
   const filterParams = {
     status: listFilters.status,
     search: listFilters.search,
     categoryId: listFilters.categoryId,
     tagId: listFilters.tagId,
-    sort: sortState.sort,
-    direction: sortState.direction,
+    ...(sortState.usesDefaultSort
+      ? {}
+      : { sort: sortState.sort, direction: sortState.direction }),
   };
 
   const hasActiveFilters = hasActiveAdminPostFilters(filterParams);
@@ -79,9 +75,13 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
         }
       />
 
-      <PostFilters categories={categories} tags={tags} current={filterParams} />
-
-      <AdminPostsResultsSummary totalItems={totalItems} hasFilters={hasActiveFilters} />
+      <PostFilters
+        categories={categories}
+        tags={tags}
+        current={filterParams}
+        totalItems={totalItems}
+        hasActiveFilters={hasActiveFilters}
+      />
 
       <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--muted)]">
         <p className="font-medium text-[var(--foreground)]">Manual public order</p>
