@@ -1,3 +1,4 @@
+import { BlogListingSummary } from "@/components/public/blog-listing-summary";
 import { PublicLayout } from "@/components/public/public-layout";
 import { PublicPageHero } from "@/components/public/public-page-hero";
 import { PublicPageShell } from "@/components/public/public-page-shell";
@@ -24,7 +25,7 @@ export default async function BlogListingPage({
 }) {
   const params = await searchParams;
   const page = normalizePage(params.page);
-  const { config, posts, totalPages } = await getBlogListingPage(page);
+  const { config, posts, totalPages, total } = await getBlogListingPage(page);
 
   return (
     <PublicLayout config={config}>
@@ -35,6 +36,7 @@ export default async function BlogListingPage({
           <h2 id="blog-posts-heading" className="sr-only">
             All posts
           </h2>
+          <BlogListingSummary totalPublishedPosts={total} />
           <PostList
             posts={posts}
             emptyMessage="Published posts will appear here once they are available."

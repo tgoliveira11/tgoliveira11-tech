@@ -108,6 +108,7 @@ See `.env.example` for:
 | `CRON_SECRET` | Protects scheduled publish cron endpoints | — | **Required** in production if cron is used |
 | `PUBLIC_POSTS_PAGE_SIZE` | Posts per page on `/blog` | `5` | Positive integer, max `50`; invalid values fall back to `5` |
 | `HOME_RECENT_POSTS_LIMIT` | Recent posts shown on home (below featured) | `12` | Positive integer, max `48`; invalid values fall back to `12` |
+| `HOME_POPULAR_CATEGORIES_LIMIT` | Top categories on home “Explore by category” | `6` | Positive integer, max `24`; invalid values fall back to `6` |
 
 ---
 
@@ -195,6 +196,7 @@ NEXTAUTH_SECRET
 ADMIN_EMAIL
 PUBLIC_POSTS_PAGE_SIZE=5
 HOME_RECENT_POSTS_LIMIT=12
+HOME_POPULAR_CATEGORIES_LIMIT=6
 UPLOAD_PROVIDER=local
 UPLOAD_LOCAL_DIR=./storage/uploads
 UPLOAD_PUBLIC_BASE_URL=/api/assets

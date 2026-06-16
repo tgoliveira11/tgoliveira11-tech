@@ -20,6 +20,14 @@ export type PublicPostBundle = {
   coverAsset: Asset | null;
 };
 
+export type PopularTag = Tag & {
+  postCount: number;
+};
+
+export type PopularCategory = Category & {
+  postCount: number;
+};
+
 export async function countPublishedPosts(options?: { excludePostId?: string }): Promise<number> {
   const where = options?.excludePostId
     ? and(publishedPostFilter(), ne(posts.id, options.excludePostId))
@@ -174,6 +182,25 @@ export async function listPublicTags(): Promise<Tag[]> {
     .orderBy(asc(tags.name));
 }
 
+export async function listPopularTags(limit: number): Promise<PopularTag[]> {
+  return db
+    .select({
+      id: tags.id,
+      name: tags.name,
+      slug: tags.slug,
+      createdAt: tags.createdAt,
+      updatedAt: tags.updatedAt,
+      postCount: sql<number>`count(distinct ${posts.id})::int`,
+    })
+    .from(tags)
+    .innerJoin(postTags, eq(tags.id, postTags.tagId))
+    .innerJoin(posts, eq(postTags.postId, posts.id))
+    .where(publishedPostFilter())
+    .groupBy(tags.id, tags.name, tags.slug, tags.createdAt, tags.updatedAt)
+    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(tags.name))
+    .limit(limit);
+}
+
 export async function listPublicCategories(): Promise<Category[]> {
   return db
     .selectDistinct({
@@ -188,6 +215,32 @@ export async function listPublicCategories(): Promise<Category[]> {
     .innerJoin(posts, eq(categories.id, posts.categoryId))
     .where(publishedPostFilter())
     .orderBy(asc(categories.name));
+}
+
+export async function listPopularCategories(limit: number): Promise<PopularCategory[]> {
+  return db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      description: categories.description,
+      createdAt: categories.createdAt,
+      updatedAt: categories.updatedAt,
+      postCount: sql<number>`count(distinct ${posts.id})::int`,
+    })
+    .from(categories)
+    .innerJoin(posts, eq(categories.id, posts.categoryId))
+    .where(publishedPostFilter())
+    .groupBy(
+      categories.id,
+      categories.name,
+      categories.slug,
+      categories.description,
+      categories.createdAt,
+      categories.updatedAt
+    )
+    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(categories.name))
+    .limit(limit);
 }
 
 export async function listAllTags(): Promise<Tag[]> {

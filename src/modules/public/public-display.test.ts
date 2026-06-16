@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   getFeaturedPostLabel,
+  formatPublishedPostCount,
+  formatTopicPostCount,
   limitTagsForDisplay,
   pickFeaturedPost,
   splitHomePosts,
@@ -101,5 +103,16 @@ describe("public display helpers", () => {
 
     expect(featuredPost).toBeNull();
     expect(recent).toEqual([]);
+  });
+
+  it("formats published post count labels", () => {
+    expect(formatPublishedPostCount(1)).toBe("1 published post");
+    expect(formatPublishedPostCount(2)).toBe("2 published posts");
+    expect(formatPublishedPostCount(23)).toBe("23 published posts");
+  });
+
+  it("formats topic post count labels", () => {
+    expect(formatTopicPostCount(1)).toBe("1 post");
+    expect(formatTopicPostCount(4)).toBe("4 posts");
   });
 });
