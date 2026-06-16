@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { archivePostAction } from "@/modules/posts/admin-posts.actions";
+import { dispatchAutosavePause, dispatchAutosaveResume } from "@/modules/posts/post-editor-payload";
 
 export function ArchiveButton({ postId }: { postId: string }) {
   const router = useRouter();
@@ -17,8 +18,13 @@ export function ArchiveButton({ postId }: { postId: string }) {
           return;
         }
         startTransition(async () => {
-          await archivePostAction(postId);
-          router.refresh();
+          dispatchAutosavePause();
+          try {
+            await archivePostAction(postId);
+            router.refresh();
+          } finally {
+            dispatchAutosaveResume();
+          }
         });
       }}
       className="rounded-md border border-red-300 bg-[var(--card)] px-3 py-2 text-sm text-red-700 disabled:opacity-50"

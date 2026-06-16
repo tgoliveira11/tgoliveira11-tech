@@ -70,6 +70,8 @@ Guidelines for admin and authoring surfaces in PostForge. Use this when building
 
 - Tabs: **Write**, **Preview**, **Split** (desktop split; stack on small screens).
 - Helper text: “Supports Markdown. Images can be inserted from the assets panel.”
+- Editor toolbar: keyboard-accessible buttons that wrap the current selection (or insert a useful placeholder when nothing is selected).
+- After inserting formatting, focus returns to the editor so the author can keep typing.
 - Textarea must keep `name="contentMarkdown"` for form submission.
 
 ## SEO settings
@@ -115,6 +117,11 @@ Guidelines for admin and authoring surfaces in PostForge. Use this when building
 - Manual slug edits are preserved when the title changes.
 - Clearing the slug and blurring the field resumes auto-generation from the current title.
 - Server-side slug validation remains authoritative.
+
+## Autosave
+
+- Debounced autosave runs after edits (no-op on initial render) and persists the same fields as manual save.
+- Autosave never changes post status and never triggers publish/unpublish/archive/duplicate flows.
 
 ## Deferred
 

@@ -20,3 +20,7 @@ export function getSaveSuccessMessage(status: PostStatus): string {
 export function getSaveButtonLabel(status: PostStatus): string {
   return status === "draft" ? "Save draft" : "Save changes";
 }
+
+export function getAutosaveSuccessMessage(status: PostStatus): string {
+  return status === "draft" ? "Draft saved" : "Changes saved";
+}

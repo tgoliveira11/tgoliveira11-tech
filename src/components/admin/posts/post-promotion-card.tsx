@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { notifyPostEditorDirty } from "@/modules/posts/post-editor-payload";
 import { EditorCard } from "./editor-card";
 
 export function PostPromotionCard({
@@ -30,7 +31,10 @@ export function PostPromotionCard({
         <input
           type="checkbox"
           checked={featuredChecked}
-          onChange={(event) => setFeaturedChecked(event.target.checked)}
+          onChange={(event) => {
+            setFeaturedChecked(event.target.checked);
+            notifyPostEditorDirty(formId);
+          }}
         />
         Featured post
       </label>
@@ -38,7 +42,10 @@ export function PostPromotionCard({
         <input
           type="checkbox"
           checked={pinnedChecked}
-          onChange={(event) => setPinnedChecked(event.target.checked)}
+          onChange={(event) => {
+            setPinnedChecked(event.target.checked);
+            notifyPostEditorDirty(formId);
+          }}
         />
         Pinned post
       </label>

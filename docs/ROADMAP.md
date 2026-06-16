@@ -101,7 +101,7 @@ High-level milestone roadmap for building PostForge from the current auth founda
 
 **Editor UX (follow-up):** Post editor redesigned as a writing-first workspace — sticky header, two-column layout, compact assets sidebar, promotion/SEO/schedule cards. See `docs/UI_UX_SKILL.md`.
 
-**Deferred:** Autosave, revisions UI, scheduler cron, dedicated tag/category admin list screens, `/api/admin/*` REST routes.
+**Deferred:** revisions UI, scheduler cron, dedicated tag/category admin list screens, `/api/admin/*` REST routes.
 
 ---
 
@@ -176,6 +176,10 @@ High-level milestone roadmap for building PostForge from the current auth founda
 | 7.6 | Security review | XSS, upload, draft leakage, admin protection |
 
 **Exit gate:** All acceptance criteria in [POSTFORGE_TDR.md §20](./POSTFORGE_TDR.md#20-acceptance-criteria-production-ready-mvp) checked.
+
+Implementation notes for M7:
+- Admin editor now includes debounced autosave and a Markdown formatting toolbar (keyboard-accessible), plus debounced preview to reduce server/DB load.
+- Initial route-level security integration tests were added for admin guard behavior, public analytics endpoint authorization, and asset path traversal rejection.
 
 **Depends on:** M2–M6
 

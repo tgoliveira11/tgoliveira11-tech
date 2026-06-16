@@ -6,10 +6,12 @@ import type { Asset } from "@/modules/assets/assets.types";
 import type { AdminPostBundle } from "@/modules/posts/posts.types";
 import type { Category } from "@/modules/categories/categories.types";
 import type { Tag } from "@/modules/tags/tags.types";
+import { AUTOSAVE_FAILED_MESSAGE } from "@/lib/action-errors";
 import { type ActionResult, updatePostAction } from "@/modules/posts/admin-posts.actions";
 import { getSaveButtonLabel } from "@/modules/posts/admin-posts.messages";
 import { generateDatedSlugFromTitle } from "@/modules/posts/slug";
 import { CompactPostAssetsPanel } from "@/components/admin/assets/compact-post-assets-panel";
+import { AdminErrorState } from "@/components/admin/admin-error-state";
 import { EditorStickyHeader } from "./editor-sticky-header";
 import { EDITOR_EXCERPT_CLASS, POST_EDITOR_FORM_ID } from "./editor-constants";
 import { MarkdownEditor } from "./markdown-editor";
@@ -19,6 +21,9 @@ import { PostPublishingCard } from "./post-publishing-card";
 import { PostSeoCard } from "./post-seo-card";
 import { PostStatusCard } from "./post-status-card";
 import { PostTaxonomyCard } from "./post-taxonomy-card";
+import { formatAutosaveTime, useAutosavePost } from "./use-autosave-post";
+import { notifyPostEditorDirty } from "@/modules/posts/post-editor-payload";
+import { buildImageMarkdown } from "@/modules/assets/assets.utils";
 
 const initialState: ActionResult = { ok: true };
 
@@ -41,19 +46,30 @@ export function PostEditorForm({
   const [state, formAction, pending] = useActionState(boundAction, initialState);
   const [insertMarkdown, setInsertMarkdown] = useState<((markdown: string) => void) | null>(null);
   const slugInputRef = useRef<HTMLInputElement>(null);
+  const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
   const slugTouchedRef = useRef(Boolean(post.slug.trim()));
+  const [autosavePaused, setAutosavePaused] = useState(false);
   const registerInsert = useCallback((insert: (markdown: string) => void) => {
     setInsertMarkdown(() => insert);
   }, []);
+
+  const autosave = useAutosavePost({
+    postId: post.id,
+    postStatus: post.status,
+    formId: POST_EDITOR_FORM_ID,
+    paused: pending || autosavePaused,
+    onSaved: () => router.refresh(),
+  });
 
   const editorKey = `${post.id}:${post.updatedAt.toISOString()}`;
   const fieldKey = editorKey;
 
   useEffect(() => {
     if (state.ok && state.message && !state.error) {
+      autosave.syncBaseline();
       router.refresh();
     }
-  }, [router, state.error, state.message, state.ok]);
+  }, [autosave, router, state.error, state.message, state.ok]);
 
   useEffect(() => {
     slugTouchedRef.current = Boolean(post.slug.trim());
@@ -62,6 +78,7 @@ export function PostEditorForm({
   function handleTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (!slugTouchedRef.current && slugInputRef.current) {
       slugInputRef.current.value = generateDatedSlugFromTitle(event.target.value);
+      notifyPostEditorDirty(POST_EDITOR_FORM_ID);
     }
   }
 
@@ -77,8 +94,24 @@ export function PostEditorForm({
         titleInput instanceof HTMLInputElement ? titleInput.value.trim() : "";
       if (titleValue) {
         event.target.value = generateDatedSlugFromTitle(titleValue);
+        notifyPostEditorDirty(POST_EDITOR_FORM_ID);
       }
     }
+  }
+
+  function pauseAutosave() {
+    setAutosavePaused(true);
+  }
+
+  function resumeAutosave() {
+    setAutosavePaused(false);
+  }
+
+  function handleInsertImageFromAssets() {
+    if (!insertMarkdown) return;
+    const firstAsset = assets[0];
+    if (!firstAsset) return;
+    insertMarkdown(buildImageMarkdown(firstAsset));
   }
 
   const saveLabel = getSaveButtonLabel(post.status);
@@ -91,18 +124,25 @@ export function PostEditorForm({
         saveLabel={saveLabel}
         publishLabel="Save and publish"
         lastMessage={state.ok ? state.message : undefined}
+        autosaveStatus={autosave.status}
+        autosaveMessage={autosave.message}
+        autosaveError={autosave.error}
+        autosaveLastSavedAt={autosave.lastSavedAt}
+        onPauseAutosave={pauseAutosave}
+        onResumeAutosave={resumeAutosave}
       />
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-        >
-          {state.error}
-        </p>
+      {state.error ? <AdminErrorState message={state.error} /> : null}
+      {autosave.status === "error" && autosave.error ? (
+        <div className="mt-4">
+          <AdminErrorState title="Autosave failed" message={AUTOSAVE_FAILED_MESSAGE} />
+        </div>
       ) : null}
       {state.message && !state.error ? (
-        <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <p
+          role="status"
+          className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-200"
+        >
           {state.message}
         </p>
       ) : null}
@@ -149,11 +189,13 @@ export function PostEditorForm({
 
           <div className="flex min-h-0 flex-1 flex-col">
             <MarkdownEditor
-            key={editorKey}
-            name="contentMarkdown"
-            defaultValue={post.contentMarkdown}
-            onRegisterInsert={registerInsert}
-          />
+              key={editorKey}
+              name="contentMarkdown"
+              defaultValue={post.contentMarkdown}
+              onRegisterInsert={registerInsert}
+              textareaRef={contentTextareaRef}
+              onInsertImage={assets.length > 0 ? handleInsertImageFromAssets : undefined}
+            />
           </div>
         </form>
 
@@ -188,6 +230,18 @@ export function PostEditorForm({
           <PostEditorDangerZone postId={post.id} />
         </aside>
       </div>
+
+      <p className="sr-only" aria-live="polite">
+        {autosave.status === "saving"
+          ? "Saving"
+          : autosave.status === "unsaved"
+            ? "Unsaved changes"
+            : autosave.status === "error"
+              ? "Autosave failed"
+              : autosave.lastSavedAt
+                ? `Saved at ${formatAutosaveTime(autosave.lastSavedAt)}`
+                : "Saved"}
+      </p>
     </div>
   );
 }
