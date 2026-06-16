@@ -101,6 +101,13 @@ Guidelines for admin and authoring surfaces in PostForge. Use this when building
 - Create-or-reuse: normalized names, slug from existing utility, duplicate slugs/names reuse existing records.
 - Helper text explains category (broad) vs tags (specific).
 - Admin taxonomy management: `/admin/tags` and `/admin/categories` list, create, edit, and safe delete unused records.
+- Taxonomy inline edit mounts a dedicated edit row per selected ID so saving one row does not block editing another.
+
+## Admin analytics
+
+- `/admin/analytics` shows summary cards, top posts, views over time, and enriched breakdowns (referrer hosts, countries, devices, browsers, OS, UTM).
+- `/admin/analytics/posts/[id]` includes a back link to `/admin/analytics`, edit/public post icon actions, and post-specific enriched breakdowns.
+- Recent visits table shows privacy-safe fields by default; raw IP appears only when `ANALYTICS_STORE_RAW_IP=true`.
 
 ## Post slug auto-generation
 
@@ -203,6 +210,8 @@ PublicLayout
 - **Not** the same as pinned/featured — those control home hero promotion only
 - Schedule action is not shown on `/admin/posts`; use the post editor to schedule
 - Flags column uses star/pin icons with tooltips for featured and pinned posts; `—` when neither is set
+- Row actions use shared icon buttons (`AdminActionIconLink` / `AdminActionIconButton`) with `title` and `aria-label`
+- Taxonomy admin (`/admin/tags`, `/admin/categories`) uses the same icon action pattern for edit/delete
 - RSS feed stays `publishedAt DESC`; search stays relevance / date
 
 ### Public page layout (detail/index)

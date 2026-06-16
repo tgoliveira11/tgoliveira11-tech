@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useCallback, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { AdminActionIconButton } from "@/components/admin/admin-action-icon";
 import type { AdminTagRow } from "@/modules/tags/tags.repository";
 import {
   createTagAction,
@@ -9,6 +10,7 @@ import {
   updateTagAction,
   type TaxonomyActionResult,
 } from "@/modules/tags/admin-tags.actions";
+import { shouldCompleteTaxonomyEdit } from "@/modules/taxonomy/taxonomy-edit-state";
 
 const initialState: TaxonomyActionResult = { ok: false };
 
@@ -18,6 +20,11 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [createState, createAction, createPending] = useActionState(createTagAction, initialState);
   const [pending, startTransition] = useTransition();
+
+  const handleSaved = useCallback(() => {
+    setEditingId(null);
+    router.refresh();
+  }, [router]);
 
   const filtered = tags.filter((tag) => {
     const needle = query.trim().toLowerCase();
@@ -110,21 +117,19 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((tag) => (
-                  <TagRow
-                    key={tag.id}
-                    tag={tag}
-                    editing={editingId === tag.id}
-                    pending={pending}
-                    onEdit={() => setEditingId(tag.id)}
-                    onCancel={() => setEditingId(null)}
-                    onSaved={() => {
-                      setEditingId(null);
-                      router.refresh();
-                    }}
-                    onDelete={() => handleDelete(tag)}
-                  />
-                ))}
+                {filtered.map((tag) =>
+                  editingId === tag.id ? (
+                    <TagEditRow key={tag.id} tag={tag} onCancel={() => setEditingId(null)} onSaved={handleSaved} />
+                  ) : (
+                    <TagDisplayRow
+                      key={tag.id}
+                      tag={tag}
+                      pending={pending}
+                      onEdit={() => setEditingId(tag.id)}
+                      onDelete={() => handleDelete(tag)}
+                    />
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -134,77 +139,80 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
   );
 }
 
-function TagRow({
+function TagEditRow({
   tag,
-  editing,
-  pending,
-  onEdit,
   onCancel,
   onSaved,
-  onDelete,
 }: {
   tag: AdminTagRow;
-  editing: boolean;
-  pending: boolean;
-  onEdit: () => void;
   onCancel: () => void;
   onSaved: () => void;
-  onDelete: () => void;
 }) {
   const boundUpdate = updateTagAction.bind(null, tag.id);
   const [state, formAction, updatePending] = useActionState(boundUpdate, initialState);
 
   useEffect(() => {
-    if (state.ok && state.message && !state.error) {
+    if (shouldCompleteTaxonomyEdit(true, state)) {
       onSaved();
     }
-  }, [onSaved, state.error, state.message, state.ok]);
+  }, [onSaved, state]);
 
-  if (editing) {
-    return (
-      <tr className="border-b border-[var(--border)]">
-        <td colSpan={5} className="px-3 py-3">
-          <form action={formAction} className="grid gap-3 sm:grid-cols-2">
-            <label className="block text-sm">
-              <span className="mb-1 block font-medium">Name</span>
-              <input
-                name="name"
-                defaultValue={tag.name}
-                required
-                className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2"
-              />
-            </label>
-            <label className="block text-sm">
-              <span className="mb-1 block font-medium">Slug</span>
-              <input
-                name="slug"
-                defaultValue={tag.slug}
-                className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm"
-              />
-            </label>
-            <div className="flex gap-2 sm:col-span-2">
-              <button
-                type="submit"
-                disabled={updatePending}
-                className="rounded-md bg-[var(--primary)] px-3 py-2 text-sm text-white"
-              >
-                Save
-              </button>
-              <button type="button" onClick={onCancel} className="rounded-md border px-3 py-2 text-sm">
-                Cancel
-              </button>
-            </div>
-          </form>
-          {state.error ? (
-            <p role="alert" className="mt-2 text-sm text-red-600">
-              {state.error}
-            </p>
-          ) : null}
-        </td>
-      </tr>
-    );
-  }
+  return (
+    <tr className="border-b border-[var(--border)]">
+      <td colSpan={5} className="px-3 py-3">
+        <form action={formAction} className="grid gap-3 sm:grid-cols-2">
+          <input type="hidden" name="tagId" value={tag.id} />
+          <label className="block text-sm">
+            <span className="mb-1 block font-medium">Name</span>
+            <input
+              name="name"
+              defaultValue={tag.name}
+              required
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block font-medium">Slug</span>
+            <input
+              name="slug"
+              defaultValue={tag.slug}
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm"
+            />
+          </label>
+          <div className="flex gap-2 sm:col-span-2">
+            <button
+              type="submit"
+              disabled={updatePending}
+              className="rounded-md bg-[var(--primary)] px-3 py-2 text-sm text-white"
+            >
+              Save
+            </button>
+            <button type="button" onClick={onCancel} className="rounded-md border px-3 py-2 text-sm">
+              Cancel
+            </button>
+          </div>
+        </form>
+        {state.error ? (
+          <p role="alert" className="mt-2 text-sm text-red-600">
+            {state.error}
+          </p>
+        ) : null}
+      </td>
+    </tr>
+  );
+}
 
+function TagDisplayRow({
+  tag,
+  pending,
+  onEdit,
+  onDelete,
+}: {
+  tag: AdminTagRow;
+  pending: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
   return (
     <tr className="border-b border-[var(--border)]">
       <td className="px-3 py-3">{tag.name}</td>
@@ -212,23 +220,20 @@ function TagRow({
       <td className="px-3 py-3">{tag.publishedPostCount}</td>
       <td className="px-3 py-3">{tag.totalPostCount}</td>
       <td className="px-3 py-3">
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={onEdit} className="text-sm text-[var(--primary)]">
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            disabled={pending || tag.totalPostCount > 0}
+        <div className="flex flex-wrap items-center gap-1">
+          <AdminActionIconButton icon="edit" label={`Edit ${tag.name}`} title="Edit" onClick={onEdit} />
+          <AdminActionIconButton
+            icon="delete"
+            label={`Delete ${tag.name}`}
             title={
               tag.totalPostCount > 0
                 ? "This tag is used by posts and cannot be deleted."
-                : "Delete tag"
+                : "Delete"
             }
-            className="text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Delete
-          </button>
+            destructive
+            disabled={pending || tag.totalPostCount > 0}
+            onClick={onDelete}
+          />
         </div>
       </td>
     </tr>

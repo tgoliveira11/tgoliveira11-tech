@@ -264,3 +264,125 @@ export async function getRecentPostViews(
     .orderBy(desc(analyticsEvents.occurredAt))
     .limit(limit);
 }
+
+type AnalyticsEventFilter = {
+  postId?: string;
+  since?: Date;
+};
+
+function buildEventFilter(filter: AnalyticsEventFilter) {
+  const conditions = [eq(analyticsEvents.eventType, "post_view")];
+  if (filter.postId) {
+    conditions.push(eq(analyticsEvents.postId, filter.postId));
+  }
+  if (filter.since) {
+    conditions.push(gte(analyticsEvents.occurredAt, filter.since));
+  }
+  return and(...conditions);
+}
+
+async function getTopFieldCounts(
+  column:
+    | typeof analyticsEvents.referrerHost
+    | typeof analyticsEvents.country
+    | typeof analyticsEvents.deviceType
+    | typeof analyticsEvents.browserName
+    | typeof analyticsEvents.osName
+    | typeof analyticsEvents.utmSource
+    | typeof analyticsEvents.utmCampaign,
+  filter: AnalyticsEventFilter,
+  limit = 8,
+  unknownLabel = "Unknown"
+): Promise<Array<{ label: string; count: number }>> {
+  const rows = await db
+    .select({
+      label: sql<string>`coalesce(nullif(trim(${column}), ''), ${unknownLabel})`,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(analyticsEvents)
+    .where(buildEventFilter(filter))
+    .groupBy(sql`coalesce(nullif(trim(${column}), ''), ${unknownLabel})`)
+    .orderBy(desc(sql`count(*)`))
+    .limit(limit);
+
+  return rows.map((row) => ({
+    label: String(row.label),
+    count: Number(row.count),
+  }));
+}
+
+export async function getTopReferrerHosts(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.referrerHost, filter, limit, "Direct / none");
+}
+
+export async function getTopCountries(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.country, filter, limit, "Unknown");
+}
+
+export async function getTopDeviceTypes(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.deviceType, filter, limit, "unknown");
+}
+
+export async function getTopBrowsers(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.browserName, filter, limit, "Unknown");
+}
+
+export async function getTopOperatingSystems(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.osName, filter, limit, "Unknown");
+}
+
+export async function getTopUtmSources(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.utmSource, filter, limit, "None");
+}
+
+export async function getTopUtmCampaigns(
+  filter: AnalyticsEventFilter,
+  limit = 8
+): Promise<Array<{ label: string; count: number }>> {
+  return getTopFieldCounts(analyticsEvents.utmCampaign, filter, limit, "None");
+}
+
+export async function getRecentAnalyticsEvents(filter: AnalyticsEventFilter & { limit?: number }) {
+  const limit = filter.limit ?? 20;
+
+  return db
+    .select({
+      occurredAt: analyticsEvents.occurredAt,
+      postTitle: posts.title,
+      path: sql<string | null>`${analyticsEvents.requestMetadata} ->> 'path'`,
+      referrerHost: analyticsEvents.referrerHost,
+      country: analyticsEvents.country,
+      city: analyticsEvents.city,
+      deviceType: analyticsEvents.deviceType,
+      browserName: analyticsEvents.browserName,
+      osName: analyticsEvents.osName,
+      utmSource: analyticsEvents.utmSource,
+      utmCampaign: analyticsEvents.utmCampaign,
+      ipAddress: analyticsEvents.ipAddress,
+      ipHash: analyticsEvents.ipHash,
+      requestMetadata: analyticsEvents.requestMetadata,
+    })
+    .from(analyticsEvents)
+    .innerJoin(posts, eq(analyticsEvents.postId, posts.id))
+    .where(buildEventFilter(filter))
+    .orderBy(desc(analyticsEvents.occurredAt))
+    .limit(limit);
+}

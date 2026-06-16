@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { AdminActionIconLink } from "@/components/admin/admin-action-icon";
 import type { TopPostAnalyticsRow } from "@/modules/analytics/analytics.types";
 import { publicPostPath } from "@/modules/posts/slug";
 import type { PostStatus } from "@/modules/posts/posts.types";
@@ -34,14 +34,22 @@ export function TopPostsTable({ posts }: { posts: TopPostAnalyticsRow[] }) {
               <td className="px-3 py-3">{post.totalViews.toLocaleString()}</td>
               <td className="px-3 py-3">{post.viewsLast7Days.toLocaleString()}</td>
               <td className="px-3 py-3">
-                <div className="flex flex-col gap-1">
-                  <Link href={`/admin/analytics/posts/${post.postId}`} className="text-[var(--primary)] underline">
-                    Analytics
-                  </Link>
+                <div className="flex flex-wrap items-center gap-1">
+                  <AdminActionIconLink
+                    href={`/admin/analytics/posts/${post.postId}`}
+                    icon="analytics"
+                    label={`Analytics for ${post.title}`}
+                    title="Analytics"
+                  />
                   {post.status === "published" ? (
-                    <Link href={publicPostPath(post.slug)} className="text-[var(--primary)] underline" target="_blank" rel="noreferrer">
-                      Public post ↗
-                    </Link>
+                    <AdminActionIconLink
+                      href={publicPostPath(post.slug)}
+                      icon="external"
+                      label={`Open public post ${post.title}`}
+                      title="Public post"
+                      target="_blank"
+                      rel="noreferrer"
+                    />
                   ) : null}
                 </div>
               </td>

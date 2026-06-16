@@ -19,6 +19,14 @@ vi.mock("@/modules/analytics/analytics.repository", () => ({
   getPostReferrerEvents: vi.fn(),
   getPostDeviceEvents: vi.fn(),
   getRecentPostViews: vi.fn(),
+  getTopReferrerHosts: vi.fn(),
+  getTopCountries: vi.fn(),
+  getTopDeviceTypes: vi.fn(),
+  getTopBrowsers: vi.fn(),
+  getTopOperatingSystems: vi.fn(),
+  getTopUtmSources: vi.fn(),
+  getTopUtmCampaigns: vi.fn(),
+  getRecentAnalyticsEvents: vi.fn(),
 }));
 
 import * as postsRepo from "@/modules/posts/posts.repository";
@@ -111,11 +119,38 @@ describe("analytics service", () => {
     vi.mocked(repo.getRecentPostViews).mockResolvedValue([
       { occurredAt: new Date("2026-06-14T12:00:00.000Z"), referrer: null, deviceType: "mobile" },
     ]);
+    vi.mocked(repo.getTopReferrerHosts).mockResolvedValue([{ label: "google.com", count: 2 }]);
+    vi.mocked(repo.getTopCountries).mockResolvedValue([{ label: "US", count: 2 }]);
+    vi.mocked(repo.getTopDeviceTypes).mockResolvedValue([{ label: "mobile", count: 2 }]);
+    vi.mocked(repo.getTopBrowsers).mockResolvedValue([{ label: "Chrome", count: 2 }]);
+    vi.mocked(repo.getTopOperatingSystems).mockResolvedValue([{ label: "macOS", count: 2 }]);
+    vi.mocked(repo.getTopUtmSources).mockResolvedValue([]);
+    vi.mocked(repo.getTopUtmCampaigns).mockResolvedValue([]);
+    vi.mocked(repo.getRecentAnalyticsEvents).mockResolvedValue([
+      {
+        occurredAt: new Date("2026-06-14T12:00:00.000Z"),
+        postTitle: "Post",
+        path: "/blog/post",
+        referrerHost: "google.com",
+        country: "US",
+        city: "NYC",
+        deviceType: "mobile",
+        browserName: "Chrome",
+        osName: "macOS",
+        utmSource: null,
+        utmCampaign: null,
+        ipAddress: null,
+        ipHash: "abc123",
+        requestMetadata: { path: "/blog/post" },
+      },
+    ]);
 
     const detail = await getPostAnalyticsDetail("post-1");
     expect(detail.summary.totalViews).toBe(12);
     expect(detail.referrers[0]?.referrer).toBe("google.com");
     expect(detail.devices[0]?.deviceType).toBe("mobile");
     expect(detail.recentViews).toHaveLength(1);
+    expect(detail.enriched.referrerHosts[0]?.label).toBe("google.com");
+    expect(detail.enriched.recentVisits[0]?.ipAddress).toBeNull();
   });
 });

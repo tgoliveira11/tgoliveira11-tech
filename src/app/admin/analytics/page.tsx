@@ -1,22 +1,14 @@
 import { AdminPageTitle } from "@/components/admin/admin-page-title";
 import { AnalyticsEmptyState } from "@/components/admin/analytics/analytics-empty-state";
 import { AnalyticsSummaryCards } from "@/components/admin/analytics/analytics-summary-cards";
+import { EnrichedAnalyticsPanel } from "@/components/admin/analytics/enriched-analytics-panel";
 import { TopPostsTable } from "@/components/admin/analytics/top-posts-table";
 import { ViewsOverTime } from "@/components/admin/analytics/views-over-time";
-import {
-  getBlogAnalyticsSummary,
-  getTopPostsByViews,
-  getViewsByDay,
-} from "@/modules/analytics/analytics.service";
+import { getBlogAnalyticsDetail } from "@/modules/analytics/analytics.service";
 
 export default async function AdminAnalyticsPage() {
-  const [summary, topPosts, viewsByDay] = await Promise.all([
-    getBlogAnalyticsSummary(),
-    getTopPostsByViews(10),
-    getViewsByDay(30),
-  ]);
-
-  const hasData = summary.totalViews > 0;
+  const detail = await getBlogAnalyticsDetail();
+  const hasData = detail.summary.totalViews > 0;
 
   return (
     <div className="space-y-6">
@@ -26,11 +18,11 @@ export default async function AdminAnalyticsPage() {
       />
 
       <AnalyticsSummaryCards
-        summary={summary}
+        summary={detail.summary}
         extra={
           <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
             <p className="text-sm text-[var(--muted)]">Posts with views</p>
-            <p className="mt-1 text-2xl font-semibold">{summary.postsWithViews.toLocaleString()}</p>
+            <p className="mt-1 text-2xl font-semibold">{detail.summary.postsWithViews.toLocaleString()}</p>
           </div>
         }
       />
@@ -44,15 +36,18 @@ export default async function AdminAnalyticsPage() {
         <>
           <section>
             <h2 className="mb-3 text-lg font-semibold">Top posts</h2>
-            <TopPostsTable posts={topPosts} />
+            <TopPostsTable posts={detail.topPosts} />
           </section>
 
-          <ViewsOverTime title="Blog views over time (last 30 days)" points={viewsByDay} />
+          <ViewsOverTime title="Blog views over time (last 30 days)" points={detail.viewsByDay} />
+
+          <EnrichedAnalyticsPanel enriched={detail.enriched} showPostTitle />
         </>
       )}
 
       <p className="text-xs text-[var(--muted)]">
-        Unique views are approximated per day using session hashes. Rate limiting is in-memory per server instance.
+        Unique views are approximated per day using session hashes. Raw IP is hidden unless
+        ANALYTICS_STORE_RAW_IP is enabled.
       </p>
     </div>
   );

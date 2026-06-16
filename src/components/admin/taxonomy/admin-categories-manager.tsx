@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useCallback, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { AdminActionIconButton } from "@/components/admin/admin-action-icon";
 import type { AdminCategoryRow } from "@/modules/categories/categories.repository";
 import {
   createCategoryAction,
@@ -9,6 +10,7 @@ import {
   updateCategoryAction,
   type TaxonomyActionResult,
 } from "@/modules/categories/admin-categories.actions";
+import { shouldCompleteTaxonomyEdit } from "@/modules/taxonomy/taxonomy-edit-state";
 
 const initialState: TaxonomyActionResult = { ok: false };
 
@@ -18,6 +20,11 @@ export function AdminCategoriesManager({ categories }: { categories: AdminCatego
   const [editingId, setEditingId] = useState<string | null>(null);
   const [createState, createAction, createPending] = useActionState(createCategoryAction, initialState);
   const [pending, startTransition] = useTransition();
+
+  const handleSaved = useCallback(() => {
+    setEditingId(null);
+    router.refresh();
+  }, [router]);
 
   const filtered = categories.filter((category) => {
     const needle = query.trim().toLowerCase();
@@ -123,21 +130,24 @@ export function AdminCategoriesManager({ categories }: { categories: AdminCatego
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((category) => (
-                  <CategoryRow
-                    key={category.id}
-                    category={category}
-                    editing={editingId === category.id}
-                    pending={pending}
-                    onEdit={() => setEditingId(category.id)}
-                    onCancel={() => setEditingId(null)}
-                    onSaved={() => {
-                      setEditingId(null);
-                      router.refresh();
-                    }}
-                    onDelete={() => handleDelete(category)}
-                  />
-                ))}
+                {filtered.map((category) =>
+                  editingId === category.id ? (
+                    <CategoryEditRow
+                      key={category.id}
+                      category={category}
+                      onCancel={() => setEditingId(null)}
+                      onSaved={handleSaved}
+                    />
+                  ) : (
+                    <CategoryDisplayRow
+                      key={category.id}
+                      category={category}
+                      pending={pending}
+                      onEdit={() => setEditingId(category.id)}
+                      onDelete={() => handleDelete(category)}
+                    />
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -147,86 +157,89 @@ export function AdminCategoriesManager({ categories }: { categories: AdminCatego
   );
 }
 
-function CategoryRow({
+function CategoryEditRow({
   category,
-  editing,
-  pending,
-  onEdit,
   onCancel,
   onSaved,
-  onDelete,
 }: {
   category: AdminCategoryRow;
-  editing: boolean;
-  pending: boolean;
-  onEdit: () => void;
   onCancel: () => void;
   onSaved: () => void;
-  onDelete: () => void;
 }) {
   const boundUpdate = updateCategoryAction.bind(null, category.id);
   const [state, formAction, updatePending] = useActionState(boundUpdate, initialState);
 
   useEffect(() => {
-    if (state.ok && state.message && !state.error) {
+    if (shouldCompleteTaxonomyEdit(true, state)) {
       onSaved();
     }
-  }, [onSaved, state.error, state.message, state.ok]);
+  }, [onSaved, state]);
 
-  if (editing) {
-    return (
-      <tr className="border-b border-[var(--border)]">
-        <td colSpan={6} className="px-3 py-3">
-          <form action={formAction} className="grid gap-3">
-            <label className="block text-sm">
-              <span className="mb-1 block font-medium">Name</span>
-              <input
-                name="name"
-                defaultValue={category.name}
-                required
-                className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2"
-              />
-            </label>
-            <label className="block text-sm">
-              <span className="mb-1 block font-medium">Slug</span>
-              <input
-                name="slug"
-                defaultValue={category.slug}
-                className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm"
-              />
-            </label>
-            <label className="block text-sm">
-              <span className="mb-1 block font-medium">Description</span>
-              <textarea
-                name="description"
-                defaultValue={category.description ?? ""}
-                rows={3}
-                className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2"
-              />
-            </label>
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={updatePending}
-                className="rounded-md bg-[var(--primary)] px-3 py-2 text-sm text-white"
-              >
-                Save
-              </button>
-              <button type="button" onClick={onCancel} className="rounded-md border px-3 py-2 text-sm">
-                Cancel
-              </button>
-            </div>
-          </form>
-          {state.error ? (
-            <p role="alert" className="mt-2 text-sm text-red-600">
-              {state.error}
-            </p>
-          ) : null}
-        </td>
-      </tr>
-    );
-  }
+  return (
+    <tr className="border-b border-[var(--border)]">
+      <td colSpan={6} className="px-3 py-3">
+        <form action={formAction} className="grid gap-3">
+          <input type="hidden" name="categoryId" value={category.id} />
+          <label className="block text-sm">
+            <span className="mb-1 block font-medium">Name</span>
+            <input
+              name="name"
+              defaultValue={category.name}
+              required
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block font-medium">Slug</span>
+            <input
+              name="slug"
+              defaultValue={category.slug}
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block font-medium">Description</span>
+            <textarea
+              name="description"
+              defaultValue={category.description ?? ""}
+              rows={3}
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2"
+            />
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={updatePending}
+              className="rounded-md bg-[var(--primary)] px-3 py-2 text-sm text-white"
+            >
+              Save
+            </button>
+            <button type="button" onClick={onCancel} className="rounded-md border px-3 py-2 text-sm">
+              Cancel
+            </button>
+          </div>
+        </form>
+        {state.error ? (
+          <p role="alert" className="mt-2 text-sm text-red-600">
+            {state.error}
+          </p>
+        ) : null}
+      </td>
+    </tr>
+  );
+}
 
+function CategoryDisplayRow({
+  category,
+  pending,
+  onEdit,
+  onDelete,
+}: {
+  category: AdminCategoryRow;
+  pending: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
   return (
     <tr className="border-b border-[var(--border)]">
       <td className="px-3 py-3">{category.name}</td>
@@ -235,23 +248,20 @@ function CategoryRow({
       <td className="px-3 py-3">{category.publishedPostCount}</td>
       <td className="px-3 py-3">{category.totalPostCount}</td>
       <td className="px-3 py-3">
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={onEdit} className="text-sm text-[var(--primary)]">
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            disabled={pending || category.totalPostCount > 0}
+        <div className="flex flex-wrap items-center gap-1">
+          <AdminActionIconButton icon="edit" label={`Edit ${category.name}`} title="Edit" onClick={onEdit} />
+          <AdminActionIconButton
+            icon="delete"
+            label={`Delete ${category.name}`}
             title={
               category.totalPostCount > 0
                 ? "This category is used by posts and cannot be deleted."
-                : "Delete category"
+                : "Delete"
             }
-            className="text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Delete
-          </button>
+            destructive
+            disabled={pending || category.totalPostCount > 0}
+            onClick={onDelete}
+          />
         </div>
       </td>
     </tr>
