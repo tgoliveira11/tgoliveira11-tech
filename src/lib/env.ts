@@ -70,6 +70,11 @@ export function readPublicSiteTheme(): ForcedPublicTheme | null {
   return null;
 }
 
+export function readAnalyticsStoreRawIp(): boolean {
+  const value = readEnv("ANALYTICS_STORE_RAW_IP")?.toLowerCase();
+  return value === "true" || value === "1" || value === "yes";
+}
+
 export function readUploadProvider(): string | undefined {
   return readEnv("UPLOAD_PROVIDER");
 }

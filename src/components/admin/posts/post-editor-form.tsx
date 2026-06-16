@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState, useCallback, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Asset } from "@/modules/assets/assets.types";
 import type { AdminPostBundle } from "@/modules/posts/posts.types";
 import type { Category } from "@/modules/categories/categories.types";
 import type { Tag } from "@/modules/tags/tags.types";
 import { type ActionResult, updatePostAction } from "@/modules/posts/admin-posts.actions";
 import { getSaveButtonLabel } from "@/modules/posts/admin-posts.messages";
+import { generateDatedSlugFromTitle } from "@/modules/posts/slug";
 import { CompactPostAssetsPanel } from "@/components/admin/assets/compact-post-assets-panel";
 import { EditorStickyHeader } from "./editor-sticky-header";
 import { EDITOR_EXCERPT_CLASS, POST_EDITOR_FORM_ID } from "./editor-constants";
@@ -34,14 +36,51 @@ export function PostEditorForm({
   uploadMaxFileSizeBytes?: number;
 }) {
   const { post, tagIds } = bundle;
+  const router = useRouter();
   const boundAction = updatePostAction.bind(null, post.id);
   const [state, formAction, pending] = useActionState(boundAction, initialState);
   const [insertMarkdown, setInsertMarkdown] = useState<((markdown: string) => void) | null>(null);
+  const slugInputRef = useRef<HTMLInputElement>(null);
+  const slugTouchedRef = useRef(Boolean(post.slug.trim()));
   const registerInsert = useCallback((insert: (markdown: string) => void) => {
     setInsertMarkdown(() => insert);
   }, []);
 
   const editorKey = `${post.id}:${post.updatedAt.toISOString()}`;
+  const fieldKey = editorKey;
+
+  useEffect(() => {
+    if (state.ok && state.message && !state.error) {
+      router.refresh();
+    }
+  }, [router, state.error, state.message, state.ok]);
+
+  useEffect(() => {
+    slugTouchedRef.current = Boolean(post.slug.trim());
+  }, [fieldKey, post.slug]);
+
+  function handleTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!slugTouchedRef.current && slugInputRef.current) {
+      slugInputRef.current.value = generateDatedSlugFromTitle(event.target.value);
+    }
+  }
+
+  function handleSlugChange(event: React.ChangeEvent<HTMLInputElement>) {
+    slugTouchedRef.current = event.target.value.trim().length > 0;
+  }
+
+  function handleSlugBlur(event: React.FocusEvent<HTMLInputElement>) {
+    if (!event.target.value.trim()) {
+      slugTouchedRef.current = false;
+      const titleInput = event.currentTarget.form?.elements.namedItem("title");
+      const titleValue =
+        titleInput instanceof HTMLInputElement ? titleInput.value.trim() : "";
+      if (titleValue) {
+        event.target.value = generateDatedSlugFromTitle(titleValue);
+      }
+    }
+  }
+
   const saveLabel = getSaveButtonLabel(post.status);
 
   return (
@@ -75,8 +114,10 @@ export function PostEditorForm({
           <label className="block text-sm">
             <span className="mb-1 block text-base font-semibold">Title</span>
             <input
+              key={fieldKey}
               name="title"
               defaultValue={post.title}
+              onChange={handleTitleChange}
               required
               className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
             />
@@ -85,8 +126,12 @@ export function PostEditorForm({
           <label className="block text-sm">
             <span className="mb-1 block font-medium">Slug</span>
             <input
+              key={fieldKey}
+              ref={slugInputRef}
               name="slug"
               defaultValue={post.slug}
+              onChange={handleSlugChange}
+              onBlur={handleSlugBlur}
               className="w-full rounded-md border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
             />
             <span className="mt-1 block text-xs text-[var(--muted)]">Public URL: /blog/{post.slug}</span>

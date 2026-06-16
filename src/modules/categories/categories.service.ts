@@ -17,6 +17,10 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
     throw new ConflictError("Invalid category slug");
   }
 
+  if (await repo.findCategoryByNameCaseInsensitive(parsed.name)) {
+    throw new ConflictError("Category name already exists");
+  }
+
   if (await repo.findCategoryBySlug(slug)) {
     throw new ConflictError("Category slug already exists");
   }
@@ -68,7 +72,20 @@ export async function listCategories(): Promise<Category[]> {
   return repo.listCategories();
 }
 
+export async function listAdminCategories() {
+  return repo.listAdminCategories();
+}
+
+export async function getCategoryUsageCount(id: string): Promise<number> {
+  return repo.countCategoryUsage(id);
+}
+
 export async function deleteCategory(id: string): Promise<void> {
+  const usageCount = await repo.countCategoryUsage(id);
+  if (usageCount > 0) {
+    throw new ConflictError("This category is used by posts and cannot be deleted.");
+  }
+
   const deleted = await repo.deleteCategoryById(id);
   if (!deleted) {
     throw new NotFoundError("Category not found");

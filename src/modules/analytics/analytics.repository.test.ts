@@ -79,8 +79,8 @@ describe("analytics repository", () => {
       postId: "post-1",
       sessionHash: "hashed-client-key",
       eventType: "post_view",
+      ipAddress: null,
     });
-    expect(eventValues).not.toHaveProperty("ipAddress");
     expect(eventValues).not.toHaveProperty("ip");
   });
 });

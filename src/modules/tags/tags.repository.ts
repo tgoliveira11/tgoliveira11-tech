@@ -1,5 +1,6 @@
-import { asc, eq, ilike, sql } from "drizzle-orm";
+import { asc, count, eq, ilike, sql } from "drizzle-orm";
 import { db } from "@/db/get-db";
+import { postTags, posts } from "@/modules/posts/posts.schema";
 import { tags } from "./tags.schema";
 import type { NewTag, Tag } from "./tags.types";
 
@@ -57,6 +58,43 @@ export async function searchTagsByName(query: string, limit = 8): Promise<Tag[]>
 
 export async function listTags(): Promise<Tag[]> {
   return db.select().from(tags).orderBy(asc(tags.name));
+}
+
+export type AdminTagRow = Tag & {
+  totalPostCount: number;
+  publishedPostCount: number;
+};
+
+export async function listAdminTags(): Promise<AdminTagRow[]> {
+  const rows = await db
+    .select({
+      id: tags.id,
+      name: tags.name,
+      slug: tags.slug,
+      createdAt: tags.createdAt,
+      updatedAt: tags.updatedAt,
+      totalPostCount: sql<number>`count(distinct ${postTags.postId})::int`,
+      publishedPostCount: sql<number>`count(distinct case when ${posts.status} = 'published' and ${posts.publishedAt} is not null and ${posts.publishedAt} <= now() then ${posts.id} end)::int`,
+    })
+    .from(tags)
+    .leftJoin(postTags, eq(tags.id, postTags.tagId))
+    .leftJoin(posts, eq(postTags.postId, posts.id))
+    .groupBy(tags.id, tags.name, tags.slug, tags.createdAt, tags.updatedAt)
+    .orderBy(asc(tags.name));
+
+  return rows.map((row) => ({
+    ...row,
+    totalPostCount: Number(row.totalPostCount),
+    publishedPostCount: Number(row.publishedPostCount),
+  }));
+}
+
+export async function countTagUsage(tagId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(postTags)
+    .where(eq(postTags.tagId, tagId));
+  return Number(row?.count ?? 0);
 }
 
 export async function deleteTagById(id: string): Promise<boolean> {

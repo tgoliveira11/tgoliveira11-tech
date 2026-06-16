@@ -17,6 +17,7 @@ import {
 } from "@/modules/posts/admin-posts.actions";
 import { AdminStatusBadge } from "../admin-status-badge";
 import { PublicOrderControls } from "./public-order-controls";
+import { PostFlagsIcons } from "./post-flags-icons";
 
 function formatDate(value: Date | null | undefined) {
   if (!value) return "—";
@@ -229,14 +230,7 @@ export function PostTable({
               <td className="px-3 py-3 align-top">{formatDate(post.scheduledAt)}</td>
               <td className="px-3 py-3 align-top">{formatDate(post.updatedAt)}</td>
               <td className="px-3 py-3 align-top">
-                <div className="flex flex-wrap gap-1 text-xs">
-                  {post.featured ? <span className="rounded bg-blue-100 px-1.5 py-0.5">Featured</span> : null}
-                  {post.pinned ? (
-                    <span className="rounded bg-purple-100 px-1.5 py-0.5">
-                      Pinned ({post.pinnedPriority})
-                    </span>
-                  ) : null}
-                </div>
+                <PostFlagsIcons post={post} />
               </td>
               <td className="px-3 py-3 align-top">
                 <PublicOrderControls

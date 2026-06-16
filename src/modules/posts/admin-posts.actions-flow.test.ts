@@ -29,6 +29,10 @@ vi.mock("@/modules/admin/revalidate-public", () => ({
   revalidatePublicPaths: vi.fn(),
 }));
 
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
 }));

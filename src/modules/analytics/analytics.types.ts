@@ -5,13 +5,27 @@ export type AnalyticsEvent = InferSelectModel<typeof analyticsEvents>;
 export type NewAnalyticsEvent = InferInsertModel<typeof analyticsEvents>;
 export type PostDailyStat = InferSelectModel<typeof postDailyStats>;
 
+import type { AnalyticsRequestMetadata } from "./analytics.schema";
+
 export type TrackPostViewInput = {
   postId: string;
   referrer?: string | null;
+  referrerHost?: string | null;
   userAgentFamily?: string | null;
+  browserName?: string | null;
+  osName?: string | null;
   deviceType?: string | null;
   country?: string | null;
+  region?: string | null;
+  city?: string | null;
+  acceptLanguage?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  ipHash?: string | null;
+  ipAddress?: string | null;
   sessionHash?: string | null;
+  requestMetadata?: AnalyticsRequestMetadata | null;
 };
 
 export type PostAnalyticsSummary = {

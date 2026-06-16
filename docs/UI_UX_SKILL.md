@@ -100,6 +100,14 @@ Guidelines for admin and authoring surfaces in PostForge. Use this when building
 - Keyboard: arrow keys navigate suggestions; Backspace on empty input removes last chip.
 - Create-or-reuse: normalized names, slug from existing utility, duplicate slugs/names reuse existing records.
 - Helper text explains category (broad) vs tags (specific).
+- Admin taxonomy management: `/admin/tags` and `/admin/categories` list, create, edit, and safe delete unused records.
+
+## Post slug auto-generation
+
+- While the slug field is empty and has not been manually edited, typing a title auto-generates `yyyy-MM-dd-title-slug`.
+- Manual slug edits are preserved when the title changes.
+- Clearing the slug and blurring the field resumes auto-generation from the current title.
+- Server-side slug validation remains authoritative.
 
 ## Deferred
 
@@ -194,6 +202,7 @@ PublicLayout
 - Arrow controls swap order with adjacent published posts; disabled when order is unset or at list boundary
 - **Not** the same as pinned/featured — those control home hero promotion only
 - Schedule action is not shown on `/admin/posts`; use the post editor to schedule
+- Flags column uses star/pin icons with tooltips for featured and pinned posts; `—` when neither is set
 - RSS feed stays `publishedAt DESC`; search stays relevance / date
 
 ### Public page layout (detail/index)
@@ -213,7 +222,8 @@ PublicLayout
 
 ### Topic index/detail layout
 
-- Tags index: `TopicPill` grid — show all public tags, no fake counts
+- Tags index: `TopicPill` grid — tags with published posts only, ordered by published post count (desc), name (asc); show count badge when available
+- Categories index: `TopicCard` grid — same relevance ordering and published-only visibility
 - Categories index: `TopicCard` grid with optional description
 - Detail pages: hero with context line + `PostList` with default cards
 
@@ -224,7 +234,8 @@ PublicLayout
 | Home cards | Max 4 tags + “+N more” |
 | Blog/search cards | Max 4 tags + “+N more” |
 | Post detail | All tags, pill style below cover |
-| Tags index | All tags with published posts |
+| Tags index | Tags with published posts, relevance order, count badge |
+| Categories index | Categories with published posts, relevance order, count badge |
 | Home popular tags | Top tags by published post count (max 16) |
 | Home categories | Top categories by published post count (`HOME_POPULAR_CATEGORIES_LIMIT`) |
 

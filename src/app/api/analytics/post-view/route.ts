@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { extractPostViewRequest } from "@/modules/analytics/analytics.request";
 import { trackPostView } from "@/modules/analytics/analytics.service";
-import { getAnalyticsClientKey, isRateLimited } from "@/modules/analytics/rate-limit";
+import { isRateLimited } from "@/modules/analytics/rate-limit";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { getPublishedPostBundleBySlug } from "@/modules/public/public-posts.service";
 import * as postsRepo from "@/modules/posts/posts.repository";
@@ -15,22 +16,14 @@ const bodySchema = z
     message: "slug or postId is required",
   });
 
-function detectDeviceType(userAgent: string | null): string {
-  if (!userAgent) return "unknown";
-  const ua = userAgent.toLowerCase();
-  if (ua.includes("mobile")) return "mobile";
-  if (ua.includes("tablet")) return "tablet";
-  return "desktop";
-}
-
 export async function POST(request: Request) {
   const config = await getBlogConfig();
   if (!config.analyticsEnabled) {
     return NextResponse.json({ ok: false, reason: "disabled" }, { status: 404 });
   }
 
-  const clientKey = getAnalyticsClientKey(request);
-  if (isRateLimited(clientKey)) {
+  const requestContext = extractPostViewRequest(request);
+  if (isRateLimited(requestContext.sessionHash)) {
     return NextResponse.json({ ok: false, reason: "rate_limited" }, { status: 429 });
   }
 
@@ -47,6 +40,7 @@ export async function POST(request: Request) {
   }
 
   let postId: string | undefined;
+  let postSlug: string | null = parsed.data.slug ?? null;
 
   if (parsed.data.slug) {
     const bundle = await getPublishedPostBundleBySlug(parsed.data.slug);
@@ -54,6 +48,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, reason: "not_found" }, { status: 404 });
     }
     postId = bundle.post.id;
+    postSlug = bundle.post.slug;
   } else if (parsed.data.postId) {
     const post = await postsRepo.findPostById(parsed.data.postId);
     if (!post) {
@@ -64,24 +59,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, reason: "not_found" }, { status: 404 });
     }
     postId = published.id;
+    postSlug = published.slug;
   }
 
   if (!postId) {
     return NextResponse.json({ ok: false, reason: "not_found" }, { status: 404 });
   }
 
-  const referrer = request.headers.get("referer");
-  const userAgent = request.headers.get("user-agent");
-  const country = request.headers.get("x-vercel-ip-country");
-
   try {
     await trackPostView({
       postId,
-      referrer,
-      userAgentFamily: userAgent?.split(" ")[0] ?? null,
-      deviceType: detectDeviceType(userAgent),
-      country,
-      sessionHash: clientKey,
+      ...requestContext,
+      requestMetadata: {
+        ...requestContext.requestMetadata,
+        postSlug,
+      },
     });
   } catch {
     return NextResponse.json({ ok: false, reason: "track_failed" }, { status: 500 });
