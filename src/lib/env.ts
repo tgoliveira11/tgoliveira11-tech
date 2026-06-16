@@ -44,3 +44,16 @@ export function readUploadProvider(): string | undefined {
 export function readBlobReadWriteToken(): string | undefined {
   return readEnv("BLOB_READ_WRITE_TOKEN");
 }
+
+const DEFAULT_PUBLIC_POSTS_PAGE_SIZE = 5;
+const MAX_PUBLIC_POSTS_PAGE_SIZE = 50;
+
+export function readPublicPostsPageSize(): number {
+  const raw = readEnv("PUBLIC_POSTS_PAGE_SIZE");
+  if (!raw) return DEFAULT_PUBLIC_POSTS_PAGE_SIZE;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return DEFAULT_PUBLIC_POSTS_PAGE_SIZE;
+  }
+  return Math.min(parsed, MAX_PUBLIC_POSTS_PAGE_SIZE);
+}

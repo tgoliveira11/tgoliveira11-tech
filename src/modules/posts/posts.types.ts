@@ -13,7 +13,7 @@ export type AdminPostListFilters = {
   featured?: boolean;
   pinned?: boolean;
   search?: string;
-  sort?: "updatedAt" | "publishedAt";
+  sort?: "updatedAt" | "publishedAt" | "publicOrder";
   limit?: number;
   offset?: number;
 };

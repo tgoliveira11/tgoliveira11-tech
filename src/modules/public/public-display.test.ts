@@ -26,6 +26,7 @@ function makeBundle(
       featured: false,
       pinned: false,
       pinnedPriority: 0,
+      publicOrder: null,
       categoryId: null,
       publishedAt: now,
       scheduledAt: null,

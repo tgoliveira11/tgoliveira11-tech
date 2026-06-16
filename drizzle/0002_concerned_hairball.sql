@@ -1,0 +1,2 @@
+ALTER TABLE "posts" ADD COLUMN "public_order" integer;--> statement-breakpoint
+CREATE INDEX "posts_status_public_order_published_at_idx" ON "posts" USING btree ("status","public_order","published_at");

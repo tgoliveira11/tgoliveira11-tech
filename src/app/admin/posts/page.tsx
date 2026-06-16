@@ -50,6 +50,15 @@ export default async function AdminPostsPage({ searchParams }: PageProps) {
 
       <PostFilters categories={categories} current={params} />
 
+      <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--muted)]">
+        <p className="font-medium text-[var(--foreground)]">Manual public order</p>
+        <p className="mt-1">
+          Controls how posts appear on the home page and blog listing. Lower numbers appear first.
+          Posts without a manual order are sorted by publish date. Only published posts appear in
+          public ordering. Pinned and featured posts still control home-page promotion separately.
+        </p>
+      </div>
+
       {posts.length === 0 ? (
         <AdminEmptyState
           title="No posts found"

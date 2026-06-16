@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
 import type { Category } from "@/modules/categories/categories.types";
@@ -90,7 +90,9 @@ export async function listAdminPosts(filters: AdminPostListFilters = {}): Promis
   const orderBy =
     filters.sort === "publishedAt"
       ? [desc(posts.publishedAt), desc(posts.updatedAt)]
-      : [desc(posts.updatedAt)];
+      : filters.sort === "publicOrder"
+        ? [sql`${posts.publicOrder} IS NULL`, asc(posts.publicOrder), desc(posts.publishedAt)]
+        : [desc(posts.updatedAt)];
 
   return db
     .select()
@@ -148,9 +150,17 @@ export async function listPublishedPosts(
     .select()
     .from(posts)
     .where(publishedPostFilter())
-    .orderBy(desc(posts.pinned), desc(posts.pinnedPriority), desc(posts.publishedAt))
+    .orderBy(sql`${posts.publicOrder} IS NULL`, asc(posts.publicOrder), desc(posts.publishedAt))
     .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
+}
+
+export async function listPublishedPostsWithPublicOrder(): Promise<Post[]> {
+  return db
+    .select()
+    .from(posts)
+    .where(and(publishedPostFilter(), isNotNull(posts.publicOrder)))
+    .orderBy(asc(posts.publicOrder), desc(posts.publishedAt));
 }
 
 export async function insertPostRevision(input: {

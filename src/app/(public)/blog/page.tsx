@@ -4,6 +4,7 @@ import { PublicPageShell } from "@/components/public/public-page-shell";
 import { PostList } from "@/components/public/post-list";
 import { PublicPagination } from "@/components/public/public-pagination";
 import { SearchForm } from "@/components/public/search-form";
+import { normalizePage } from "@/lib/pagination";
 import { getBlogListingPage } from "@/modules/public/public-posts.service";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { buildSiteMetadata } from "@/modules/public/seo";
@@ -23,7 +24,7 @@ export default async function BlogListingPage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const params = await searchParams;
-  const page = Math.max(1, Number(params.page ?? "1") || 1);
+  const page = normalizePage(params.page);
   const { config, posts, totalPages } = await getBlogListingPage(page);
 
   return (

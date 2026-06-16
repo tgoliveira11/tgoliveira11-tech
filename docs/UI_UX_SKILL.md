@@ -174,7 +174,17 @@ PublicLayout
        └─ content section (PostList, TagList, CategoryList, article)
 ```
 
-- Blog listing: hero + search + post list + pagination
+- Blog listing: hero + search + post list + pagination (`/blog?page=N`)
+- Page size on `/blog` from `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`)
+- Home page: featured hero + recent grid (no pagination; recent count from `blog_settings.postsPerPage`)
+
+### Manual public order (admin)
+
+- Set on `/admin/posts` per published post (`publicOrder` column)
+- Lower numbers appear first on home recent list, `/blog`, tag, and category pages
+- Posts without manual order fall back to `publishedAt DESC`
+- **Not** the same as pinned/featured — those control home hero promotion only
+- RSS feed stays `publishedAt DESC`; search stays relevance / date
 - Post detail: back link + article header + `prose-article` body + prev/next nav
 - Search: hero search; empty state with recent posts; results with count label
 - Tags/Categories index: hero + pill/card grid

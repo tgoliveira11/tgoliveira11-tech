@@ -15,6 +15,13 @@
       "when": 1781456272971,
       "tag": "0001_messy_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781581132445,
+      "tag": "0002_concerned_hairball",
+      "breakpoints": true
     }
   ]
 }
