@@ -12,6 +12,7 @@
     "audit": "npm audit",
     "audit:prod": "npm audit --omit=dev",
     "audit:ci": "npm audit --audit-level=moderate",
+    "audit:security": "npm audit --audit-level=high",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

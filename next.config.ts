@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { getSecurityHeaders } from "./src/lib/security/http-security-headers";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["next-auth"],
@@ -14,6 +15,14 @@ const nextConfig: NextConfig = {
         hostname: "*.blob.vercel-storage.com",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: getSecurityHeaders(),
+      },
+    ];
   },
   async rewrites() {
     return {

@@ -1,0 +1,8 @@
+# OWASP ZAP baseline rule suppressions for tgoliveira11-tech.
+# Format: Rule ID<TAB>URL regex<TAB>Parameter<TAB>Attack<TAB>Evidence
+#
+# Add rows only for reviewed false positives. Include a comment in docs/security-scanning.md.
+
+# Example (disabled):
+# 10038	.*	.*	.*	.*
+
