@@ -11,9 +11,11 @@ How to deploy a blog created from the PostForge template.
 | Source | GitHub repo (from template) | Your independent blog repo |
 | App hosting | [Vercel](https://vercel.com) Hobby | Native Next.js support |
 | Database | [Neon](https://neon.tech) Free or [Supabase](https://supabase.com) Free | Managed PostgreSQL |
-| File storage | Cloudflare R2, AWS S3, Supabase Storage | **Required** for durable uploads on serverless |
+| File storage | **Vercel Blob** (built-in) or R2/S3 | Set `UPLOAD_PROVIDER=vercel-blob` on Vercel |
 
 PostForge is a standard Next.js app — other Node hosts (Railway, Fly.io, a VPS) also work.
+
+**Vercel + Neon guide:** [deployment-vercel-neon.md](deployment-vercel-neon.md)
 
 ---
 
@@ -21,18 +23,100 @@ PostForge is a standard Next.js app — other Node hosts (Railway, Fly.io, a VPS
 
 **Do not rely on local filesystem uploads on Vercel or similar serverless platforms.**
 
-The default `LocalStorageProvider` writes to `UPLOAD_LOCAL_DIR` on disk. On serverless:
+Use **`UPLOAD_PROVIDER=vercel-blob`** with a connected Vercel Blob store:
 
-- The filesystem is **ephemeral**
-- Uploads may **disappear** after deploys or cold starts
-- Multiple instances do not share disk
+```env
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=<set-by-vercel>
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+```
+
+The default `LocalStorageProvider` (`UPLOAD_PROVIDER=local`) writes to disk — ephemeral on serverless.
 
 **Acceptable uses of local storage:**
 
 - Local development
 - Persistent VPS / dedicated server with a mounted volume
 
-**Production serverless:** plan for object storage (R2, S3, etc.). See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
+See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md).
+
+---
+
+## Deploying to Vercel with Neon and Vercel Blob
+
+Recommended production stack for blogs created from the PostForge template.
+
+### Architecture
+
+| Component | Service | Purpose |
+|-----------|---------|---------|
+| Next.js app | **Vercel** | Hosting, serverless functions, Blob integration |
+| PostgreSQL | **Neon** (or Supabase) | Posts, assets metadata, auth tables |
+| File storage | **Vercel Blob** | Durable image uploads (`UPLOAD_PROVIDER=vercel-blob`) |
+
+Local filesystem uploads are **not durable** on Vercel — use Blob for production.
+
+### Step-by-step
+
+1. **Create blog repo** from the PostForge template — [CREATE_A_BLOG.md](CREATE_A_BLOG.md).
+2. **Import to Vercel** — connect GitHub repo, Next.js preset, `npm run build`.
+3. **Neon Postgres** — create project, copy `DATABASE_URL`, set in Vercel env.
+4. **Run migrations** once against production:
+
+```bash
+DATABASE_URL="postgres://..." npm run db:migrate
+```
+
+5. **Vercel Blob** — Vercel project → **Storage** → create/connect **Blob** store (public access).
+6. **Confirm token** — `BLOB_READ_WRITE_TOKEN` appears in env when store is connected.
+7. **Set production env vars:**
+
+```env
+DATABASE_URL=postgres://...
+APP_BASE_URL=https://your-domain.com
+NEXTAUTH_URL=https://your-domain.com
+NEXTAUTH_SECRET=<long-random-secret>
+ADMIN_EMAIL=you@example.com
+CRON_SECRET=<long-random-secret>
+AUTH_COOKIE_SECURE=true
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=<set-by-vercel>
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+```
+
+8. **Deploy** — push to `main` or redeploy after env changes.
+9. **Post-deploy smoke test:**
+   - Register/login with `ADMIN_EMAIL`
+   - Upload image → `publicUrl` is `https://...blob.vercel-storage.com/...`
+   - Publish post → image renders on `/blog/<slug>`
+   - Delete asset → Blob removal works
+   - `/rss.xml` and `/sitemap.xml` respond
+
+**No DB migration** is required for Vercel Blob — existing `assets` table fields are reused.
+
+**Full guide:** [deployment-vercel-neon.md](deployment-vercel-neon.md)
+
+### Downstream blog adoption
+
+If your blog was created before Vercel Blob support shipped in the template:
+
+```bash
+git remote add upstream https://github.com/tgoliveira11/postforge.git
+git fetch upstream
+git merge upstream/main
+npm install
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run db:generate
+```
+
+Then set Vercel env (`UPLOAD_PROVIDER=vercel-blob`, `BLOB_READ_WRITE_TOKEN=...`) and redeploy.
+
+- Existing local assets keep `/api/assets/...` URLs in the database
+- New uploads use Blob URLs
+- No schema migration expected
 
 ---
 
@@ -94,8 +178,12 @@ Full list: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)
 
 ### 7. Uploads
 
-- [ ] Confirm storage strategy matches your host (local VPS vs object storage)
-- [ ] Test image upload and public `/api/assets/...` URLs
+- [ ] Confirm storage strategy matches your host (local VPS vs Vercel Blob)
+- [ ] **Vercel:** `UPLOAD_PROVIDER=vercel-blob` + connected Blob store
+- [ ] **Local/VPS:** `UPLOAD_PROVIDER=local` + persistent `UPLOAD_LOCAL_DIR`
+- [ ] Test upload → publish → image visible on public post
+- [ ] **Vercel:** confirm `publicUrl` is `blob.vercel-storage.com`
+- [ ] **Local:** confirm `/api/assets/...` URLs work
 
 ### 8. Public site
 

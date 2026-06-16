@@ -111,16 +111,54 @@ See `.env.example` for:
 
 ## Uploads / storage
 
-| Variable | Purpose | Default | Notes |
-|----------|---------|---------|-------|
-| `UPLOAD_PROVIDER` | Storage backend | `local` | Only `local` is implemented today; use for documentation / future providers |
-| `UPLOAD_LOCAL_DIR` | Local upload directory | `./storage/uploads` | Dev and VPS |
-| `UPLOAD_PUBLIC_BASE_URL` | Public URL prefix for assets | `/api/assets` | Served by Next.js API route |
-| `UPLOAD_MAX_FILE_SIZE_BYTES` | Max upload size in bytes | `5242880` (5 MB) | |
+| Variable | Purpose | Default | Used when |
+|----------|---------|---------|-----------|
+| `UPLOAD_PROVIDER` | Storage backend selector | `local` | Always — `local` or `vercel-blob` |
+| `UPLOAD_LOCAL_DIR` | Local upload directory | `./storage/uploads` | **`local` only** — ignored for `vercel-blob` |
+| `UPLOAD_PUBLIC_BASE_URL` | Public URL prefix for assets | `/api/assets` | **`local` only** — ignored for `vercel-blob` |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read-write token | — | **`vercel-blob` only** — auto-set when Blob store is connected |
+| `UPLOAD_MAX_FILE_SIZE_BYTES` | Max upload size in bytes | `5242880` (5 MB) | Both providers |
 | `UPLOAD_MAX_FILE_SIZE` | Alias for max size | — | Same as above |
 | `STORAGE_MAX_UPLOAD_BYTES` | Another alias | — | Supported in code |
 
-See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md) for production guidance.
+### Which vars apply where
+
+| Variable | Local dev / VPS | Vercel production |
+|----------|-----------------|-------------------|
+| `UPLOAD_PROVIDER` | `local` | `vercel-blob` |
+| `UPLOAD_LOCAL_DIR` | Required (or default) | **Not used** |
+| `UPLOAD_PUBLIC_BASE_URL` | Required (or default) | **Not used** |
+| `BLOB_READ_WRITE_TOKEN` | **Not used** | **Required** |
+| `UPLOAD_MAX_FILE_SIZE_BYTES` | Optional (default 5 MB) | Optional (default 5 MB) |
+
+### Provider rules
+
+- `UPLOAD_PROVIDER=local` → files on disk, served via `/api/assets/[...path]`; no Blob token
+- `UPLOAD_PROVIDER=vercel-blob` → files in Vercel Blob, public URLs from `put()`; `BLOB_READ_WRITE_TOKEN` required at upload/delete time
+- Provider is selected at runtime by `storage-provider-factory.ts` from `UPLOAD_PROVIDER`
+- Storage keys use shared convention: `posts/{postId}/{safeFilename}` via `buildPostAssetStorageKey()`
+- **No database migration** — `assets.storageProvider`, `assets.storageKey`, `assets.publicUrl` are reused
+
+### Example: local development
+
+```env
+UPLOAD_PROVIDER=local
+UPLOAD_LOCAL_DIR=./storage/uploads
+UPLOAD_PUBLIC_BASE_URL=/api/assets
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+```
+
+### Example: Vercel production
+
+```env
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=<set-by-vercel-when-blob-connected>
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+```
+
+Do **not** set `UPLOAD_LOCAL_DIR` or `UPLOAD_PUBLIC_BASE_URL` for `vercel-blob` — they are ignored.
+
+See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md) and [deployment-vercel-neon.md](deployment-vercel-neon.md).
 
 ---
 
@@ -153,21 +191,28 @@ APP_BASE_URL
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 ADMIN_EMAIL
-UPLOAD_LOCAL_DIR
-UPLOAD_PUBLIC_BASE_URL
+UPLOAD_PROVIDER=local
+UPLOAD_LOCAL_DIR=./storage/uploads
+UPLOAD_PUBLIC_BASE_URL=/api/assets
 ```
 
-OAuth, email SMTP, and `CRON_SECRET` can stay empty for basic local blogging.
+OAuth, email SMTP, `CRON_SECRET`, and `BLOB_READ_WRITE_TOKEN` can stay empty for basic local blogging.
 
-### Production (additional)
+### Production on Vercel (additional)
 
 - Strong `NEXTAUTH_SECRET` and `CRON_SECRET`
 - `APP_BASE_URL` / `NEXTAUTH_URL` set to your HTTPS domain
 - `AUTH_COOKIE_SECURE=true` (HTTPS)
 - Managed PostgreSQL `DATABASE_URL`
-- Object storage strategy (not local disk on serverless) — see [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md)
+- `UPLOAD_PROVIDER=vercel-blob` + `BLOB_READ_WRITE_TOKEN` (from connected Blob store)
+- **Do not** rely on `UPLOAD_LOCAL_DIR` on serverless — see [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md)
 - OAuth secrets if using social login
 - Real email provider when beyond dev
+
+### Production on VPS (alternative)
+
+- `UPLOAD_PROVIDER=local` with persistent `UPLOAD_LOCAL_DIR` on mounted disk
+- No `BLOB_READ_WRITE_TOKEN` required
 
 ---
 

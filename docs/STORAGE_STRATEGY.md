@@ -2,109 +2,222 @@
 
 How PostForge stores uploaded images and how to choose a strategy for your blog.
 
----
-
-## Current implementation (MVP)
-
-PostForge uses a `StorageProvider` abstraction. The only production-ready implementation today is:
-
-### `LocalStorageProvider`
-
-- Files written to `UPLOAD_LOCAL_DIR` (default `./storage/uploads`)
-- Public URLs under `UPLOAD_PUBLIC_BASE_URL` (default `/api/assets`)
-- Served by `GET /api/assets/[...path]`
-- Max size from `UPLOAD_MAX_FILE_SIZE_BYTES` (default 5 MB)
-
-Assets are organized with server-generated keys (post-scoped paths) — not raw user filenames.
+PostForge is a **GitHub template** — production-ready Vercel Blob support ships in the template so every new blog can deploy to Vercel without ephemeral filesystem uploads.
 
 ---
 
-## Environment variables
+## Architecture
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `UPLOAD_PROVIDER` | `local` | Documented for future providers; code uses local today |
-| `UPLOAD_LOCAL_DIR` | `./storage/uploads` | Disk directory |
-| `UPLOAD_PUBLIC_BASE_URL` | `/api/assets` | URL prefix |
-| `UPLOAD_MAX_FILE_SIZE_BYTES` | `5242880` | 5 MB |
+```
+Admin upload (POST /api/admin/posts/[id]/assets)
+        │
+        ▼
+  assets.service.uploadPostAsset()
+        │
+        ▼
+  storage-provider-factory.createStorageProvider()
+        │
+   ┌────┴────┐
+   ▼         ▼
+ local    vercel-blob
+   │         │
+   ▼         ▼
+ disk    @vercel/blob put()
+   │         │
+   ▼         ▼
+/api/assets  https://...blob.vercel-storage.com/...
+```
+
+### `StorageProvider` interface (unchanged)
+
+| Method | Purpose |
+|--------|---------|
+| `upload(input)` | Store binary, return `storageKey` + `publicUrl` |
+| `delete(storageKey)` | Remove binary |
+| `getPublicUrl(storageKey)` | Derive URL (local only; Blob uses URL from `put`) |
+
+### Provider selection
+
+`src/modules/assets/storage-provider-factory.ts` reads `UPLOAD_PROVIDER`:
+
+| Value | Provider class |
+|-------|----------------|
+| `local` (default) | `LocalStorageProvider` |
+| `vercel-blob` | `VercelBlobStorageProvider` |
+| other | Configuration error |
+
+`BLOB_READ_WRITE_TOKEN` is required **only** when `UPLOAD_PROVIDER=vercel-blob`.
+
+### Storage key convention
+
+Shared helper: `buildPostAssetStorageKey(postId, safeFilename)`
+
+```
+posts/{postId}/{safeFilename}
+```
+
+- `safeFilename` — sanitized, collision-avoided via `buildUniqueSafeFilename()`
+- Same convention for local and Blob providers
+- Path traversal blocked by `assertSafeStorageKey()`
+
+### Database fields (no migration needed)
+
+Existing `assets` table columns:
+
+| Column | Local example | Blob example |
+|--------|---------------|--------------|
+| `storageProvider` | `local` | `vercel-blob` |
+| `storageKey` | `posts/{id}/photo.png` | `posts/{id}/photo.png` |
+| `publicUrl` | `/api/assets/posts/...` | `https://...blob.vercel-storage.com/...` |
 
 ---
 
-## How images flow
+## Local storage (`UPLOAD_PROVIDER=local`)
 
-1. Admin uploads via `/api/admin/posts/[id]/assets` or editor assets panel.
-2. File saved to local disk (or future object store).
-3. Database `assets` row stores metadata + `storageKey` + `publicUrl`.
-4. Markdown, cover, and OG reference asset IDs.
-5. Public pages render images via `PostImage` → `/api/assets/...` or stored public URL.
+| Aspect | Behavior |
+|--------|----------|
+| Storage | `UPLOAD_LOCAL_DIR` (default `./storage/uploads`) |
+| Public URL | `UPLOAD_PUBLIC_BASE_URL` + path (default `/api/assets`) |
+| Serving | `GET /api/assets/[...path]` streams from disk |
+| Delete | Remove file from disk |
+| Token | Not required |
+
+**Use for:** local development, VPS with persistent disk.
+
+### Local manual test
+
+1. Set `UPLOAD_PROVIDER=local`, `UPLOAD_LOCAL_DIR=./storage/uploads`, `UPLOAD_PUBLIC_BASE_URL=/api/assets`.
+2. `npm run dev` → login as admin.
+3. Upload image on a post.
+4. Confirm file under `storage/uploads/posts/{postId}/`.
+5. Set cover → publish → public page shows `/api/assets/...`.
+6. Delete → file removed from disk.
 
 ---
 
-## When local storage is enough
+## Vercel Blob (`UPLOAD_PROVIDER=vercel-blob`)
 
-| Scenario | Local storage OK? |
-|----------|-------------------|
-| Local development | Yes |
-| Single VPS with persistent disk | Yes |
-| Docker on a server with a mounted volume | Yes |
-| Vercel / serverless | **No** (ephemeral disk) |
-| Multiple app instances without shared disk | **No** |
+| Aspect | Behavior |
+|--------|----------|
+| Package | `@vercel/blob` |
+| Upload | `put(pathname, buffer, { access: "public", contentType, token })` |
+| Public URL | Returned by `put()` — stored in `assets.publicUrl` |
+| Storage key | Blob `pathname` — stored in `assets.storageKey` |
+| Serving | **Direct Blob URL** — no `/api/assets` proxy |
+| Delete | `del(storageKey, { token })` |
+| Token | `BLOB_READ_WRITE_TOKEN` **required** |
+
+**Ignored env vars:** `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`
+
+**Use for:** Vercel and other serverless production deployments.
+
+### Vercel production manual test
+
+1. Connect Vercel Blob store (public) → confirm `BLOB_READ_WRITE_TOKEN`.
+2. Set `UPLOAD_PROVIDER=vercel-blob` → redeploy.
+3. Upload image → `publicUrl` contains `blob.vercel-storage.com`.
+4. Publish post → image renders on public site.
+5. Delete asset → Blob deletion via `del()`.
+
+Full guide: [deployment-vercel-neon.md](deployment-vercel-neon.md)
 
 ---
 
-## Serverless / Vercel warning
+## Provider comparison
 
-On Vercel and similar platforms:
+| | **Local** | **Vercel Blob** |
+|--|-----------|-----------------|
+| `UPLOAD_PROVIDER` | `local` | `vercel-blob` |
+| Binary storage | `./storage/uploads` | Vercel Blob |
+| `publicUrl` | `/api/assets/posts/...` | `https://...blob.vercel-storage.com/...` |
+| Serving | `/api/assets/[...path]` | Direct URL |
+| Delete | Filesystem `rm` | `del(storageKey)` |
+| `BLOB_READ_WRITE_TOKEN` | Not required | Required |
+| `UPLOAD_LOCAL_DIR` | Used | Ignored |
+| `UPLOAD_PUBLIC_BASE_URL` | Used | Ignored |
+| `UPLOAD_MAX_FILE_SIZE_BYTES` | Used | Used |
 
-- Uploaded files may be **lost** on redeploy
-- Instances do **not** share local disk
-- You need **object storage** with a durable provider
+---
 
-Planned future providers (not all implemented yet):
+## Upload flow
+
+1. Admin POST to `/api/admin/posts/[id]/assets` (requires `ADMIN_EMAIL` session).
+2. Validate MIME, extension, size; reject SVG.
+3. Build `safeFilename` and `storageKey` via `buildPostAssetStorageKey()`.
+4. Provider `upload()` → persist metadata in `assets` table.
+5. Cover/OG/Markdown reference asset by ID or `publicUrl`.
+
+---
+
+## Remote URL rendering
+
+`PostImage` and `isRemoteAssetUrl()` in `assets.utils.ts`:
+
+- Local URLs (`/api/assets/...`) — served via API route; `next/image` unoptimized when dimensions missing
+- Blob URLs (`https://...`) — rendered directly; `unoptimized` for remote assets
+- `next.config.ts` — `images.remotePatterns` for `*.blob.vercel-storage.com`
+
+Blob assets are **not** proxied through `/api/assets`.
+
+---
+
+## Asset deletion
+
+When admin deletes an asset:
+
+1. Clear `coverAssetId` / `ogAssetId` on post if referenced.
+2. Delete binary only if `asset.storageProvider` matches active provider.
+3. Remove `assets` database row.
+4. Markdown references are **not** rewritten (UI warning).
+
+---
+
+## Downstream blog adoption
+
+Existing blogs merge upstream PostForge:
+
+```bash
+git remote add upstream https://github.com/tgoliveira11/postforge.git
+git fetch upstream && git merge upstream/main
+npm install
+```
+
+Configure Vercel:
+
+```env
+UPLOAD_PROVIDER=vercel-blob
+BLOB_READ_WRITE_TOKEN=...
+```
+
+- **Existing local assets** — keep `/api/assets/...` URLs in DB
+- **New uploads** — use Blob URLs
+- **No DB migration**
+
+---
+
+## Future storage providers
+
+The `StorageProvider` abstraction allows additional backends:
 
 - Cloudflare R2
 - AWS S3
 - Supabase Storage
-- Compatible S3 APIs
 
-Until an object storage provider ships in PostForge, VPS + local disk is the simplest production path for image-heavy blogs.
-
----
-
-## Choosing a strategy for your blog
-
-| Your deployment | Recommendation |
-|-----------------|----------------|
-| Learning locally | `UPLOAD_LOCAL_DIR=./storage/uploads` |
-| Personal blog on a $5 VPS | Local storage on persistent volume |
-| Vercel + Neon free tier | Plan object storage before going live with images |
-| Import-only (few images) | Local may work short-term; still risky on serverless |
+Not implemented yet. Vercel Blob is the production default for Vercel deployments.
 
 ---
 
 ## Git and backups
 
-- **Do not commit** `storage/uploads/` to Git (add to `.gitignore`).
-- Back up uploaded files with your deployment backup strategy.
-- Database `assets` table references storage keys — backup DB **and** files together.
-
----
-
-## Migration between storage backends
-
-When object storage providers are added:
-
-1. Export/copy files from old backend to new bucket.
-2. Update asset `storageKey` / `publicUrl` records (migration script).
-3. Update env to new provider.
-4. Verify `/api/assets` or CDN URLs on public posts.
-
-Document your migration in your blog repo when you perform it.
+- Do not commit `storage/uploads/` to Git.
+- Blob files: manage via Vercel Storage dashboard.
+- Backup `assets` table with your database — it holds `publicUrl` and `storageKey`.
 
 ---
 
 ## Related docs
 
+- [deployment-vercel-neon.md](deployment-vercel-neon.md)
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)
-- [ARCHITECTURE.md](ARCHITECTURE.md) — storage architecture section
+- [FAQ.md](FAQ.md)
