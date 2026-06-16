@@ -237,3 +237,14 @@ PublicLayout
 - `SiteNav` (client): active state for Blog, Tags, Categories, Search
 - Home `/` does not highlight nav items
 - Sticky header with backdrop blur
+- Footer RSS link opens `/rss.xml` in a new tab (`target="_blank"`, `rel="noopener noreferrer"`)
+
+### Admin posts filters
+
+- Status, category, and search use the filter form with **Apply filters**
+- Tag filter uses a searchable combobox:
+
+  - type to filter tags by name
+  - dropdown arrow shows all tags with **All tags** first
+  - selecting a tag navigates immediately and preserves other query params
+  - **All tags** or **Clear tag filter** removes `tagId` from the URL

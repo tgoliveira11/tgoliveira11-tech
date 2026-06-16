@@ -1,6 +1,8 @@
 import Link from "next/link";
-import type { PostStatus } from "@/modules/posts/posts.types";
+import { TagFilterCombobox } from "@/components/admin/posts/tag-filter-combobox";
+import type { AdminPostsFilterParams } from "@/modules/admin/admin-posts-filter-url";
 import type { Category } from "@/modules/categories/categories.types";
+import type { PostStatus } from "@/modules/posts/posts.types";
 import type { Tag } from "@/modules/tags/tags.types";
 
 const statuses: Array<PostStatus | ""> = [
@@ -19,15 +21,19 @@ export function PostFilters({
 }: {
   categories: Category[];
   tags: Tag[];
-  current: {
+  current: AdminPostsFilterParams & {
     status?: string;
-    search?: string;
-    categoryId?: string;
-    tagId?: string;
-    sort?: string;
-    direction?: string;
   };
 }) {
+  const filterParams: AdminPostsFilterParams = {
+    status: current.status,
+    search: current.search,
+    categoryId: current.categoryId,
+    tagId: current.tagId,
+    sort: current.sort,
+    direction: current.direction,
+  };
+
   return (
     <form
       method="get"
@@ -68,28 +74,9 @@ export function PostFilters({
         </select>
       </label>
 
-      <label className="text-sm">
-        <span className="mb-1 block font-medium">Tag</span>
-        <select
-          name="tagId"
-          defaultValue={current.tagId ?? ""}
-          disabled={tags.length === 0}
-          className="w-full rounded-md border border-[var(--border)] px-3 py-2 disabled:cursor-not-allowed disabled:opacity-60"
-          aria-describedby={tags.length === 0 ? "tag-filter-empty" : undefined}
-        >
-          <option value="">All tags</option>
-          {tags.map((tag) => (
-            <option key={tag.id} value={tag.id}>
-              {tag.name}
-            </option>
-          ))}
-        </select>
-        {tags.length === 0 ? (
-          <span id="tag-filter-empty" className="mt-1 block text-xs text-[var(--muted)]">
-            No tags yet
-          </span>
-        ) : null}
-      </label>
+      {current.tagId ? <input type="hidden" name="tagId" value={current.tagId} /> : null}
+
+      <TagFilterCombobox tags={tags} current={filterParams} />
 
       <label className="text-sm md:col-span-4">
         <span className="mb-1 block font-medium">Search</span>
