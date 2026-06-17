@@ -198,7 +198,7 @@ PublicLayout
 
 - Blog listing: hero + search + post list + pagination (`/blog?page=N`)
 - Page size on `/blog` from `PUBLIC_POSTS_PAGE_SIZE` env (default `5`, max `50`)
-- Home recent grid from `HOME_RECENT_POSTS_LIMIT` env (default `12`, max `48`); compact 4-column layout on desktop
+- Home “Recent posts” grid from `HOME_RECENT_POSTS_LIMIT` env (default `12`, max `48`); same public ordering as `/blog`; compact 4-column layout on desktop
 - Home popular tags ordered by published post count (desc); home categories from `HOME_POPULAR_CATEGORIES_LIMIT` (default `6`)
 - `/blog` listing shows total published post count aligned with “All published articles.”
 

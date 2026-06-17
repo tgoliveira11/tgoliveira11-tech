@@ -49,9 +49,9 @@ Set **manual public order** on `/admin/posts` for published posts (`publicOrder`
 
 This is separate from **pinned** and **featured**, which only control the home-page hero promotion.
 
-Pagination size is configured with `PUBLIC_POSTS_PAGE_SIZE` (default `5`) for `/blog`. The home recent grid uses `HOME_RECENT_POSTS_LIMIT` (default `12`).
+Pagination size is configured with `PUBLIC_POSTS_PAGE_SIZE` (default `5`) for `/blog`. The home “Recent posts” grid uses `HOME_RECENT_POSTS_LIMIT` (default `12`) and follows the same public ordering as `/blog`.
 
-RSS and search use their own ordering (search uses relevance / date). `/blog`, previous/next navigation, and RSS share the same public listing order.
+RSS and search use their own ordering (search uses relevance / date). `/blog`, home “Recent posts”, previous/next navigation, and RSS share the same public listing order.
 
 ---
 
