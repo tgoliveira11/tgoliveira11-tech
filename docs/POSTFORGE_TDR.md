@@ -517,7 +517,7 @@ Posts with `status = scheduled` AND `scheduledAt <= now()` are published by a cr
 | Twitter/X cards | `summary_large_image` from OG fields |
 | JSON-LD | `BlogPosting` schema on post detail |
 | Sitemap | `/sitemap.xml` — published posts, tags, categories |
-| RSS | `/rss.xml` — published posts, ordered by `publishedAt` |
+| RSS | `/rss.xml` — published posts only; same order as `/blog` (`publicOrder`, then date desc) |
 | Robots.txt | `/robots.txt` — allow public, disallow `/admin` |
 | Redirects | `redirects` table for slug/GitHub Pages URL changes |
 | URLs | Clean, lowercase slugs; no trailing slashes inconsistency |

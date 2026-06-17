@@ -207,7 +207,7 @@ PublicLayout
 - Set on `/admin/posts` per published post (`publicOrder` column)
 - New drafts start with `publicOrder = 0`; use Set or arrows to adjust
 - Lower numbers appear first on public listings
-- Posts with the same `publicOrder` fall back to `COALESCE(publishedAt, updatedAt) DESC` on public pages
+- Posts with the same `publicOrder` fall back to `COALESCE(publishedAt, updatedAt) DESC`, then `updatedAt DESC`, then `id ASC`
 - Admin table default sort: `publicOrder ASC`, then `COALESCE(publishedAt, updatedAt) DESC`, then `updatedAt DESC`
 - Filtered results counter: `N total posts` with no filters, `N posts found` when filters/search are active
 - Reset navigates to `/admin/posts` and clears all filter/sort query params
@@ -219,7 +219,8 @@ PublicLayout
 - Flags column uses star/pin icons with tooltips for featured and pinned posts; `—` when neither is set
 - Row actions use shared icon buttons (`AdminActionIconLink` / `AdminActionIconButton`) with `title` and `aria-label`
 - Taxonomy admin (`/admin/tags`, `/admin/categories`) uses the same icon action pattern for edit/delete
-- RSS feed stays `publishedAt DESC`; search stays relevance / date
+- `/blog`, home recent lists, previous/next navigation, and `/rss.xml` share the same public ordering
+- Search stays relevance / date based; sitemap remains published-only without a required order
 
 ### Public page layout (detail/index)
 

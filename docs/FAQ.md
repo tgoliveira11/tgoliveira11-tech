@@ -51,7 +51,7 @@ This is separate from **pinned** and **featured**, which only control the home-p
 
 Pagination size is configured with `PUBLIC_POSTS_PAGE_SIZE` (default `5`) for `/blog`. The home recent grid uses `HOME_RECENT_POSTS_LIMIT` (default `12`).
 
-RSS and search use their own ordering (latest published / relevance).
+RSS and search use their own ordering (search uses relevance / date). `/blog`, previous/next navigation, and RSS share the same public listing order.
 
 ---
 

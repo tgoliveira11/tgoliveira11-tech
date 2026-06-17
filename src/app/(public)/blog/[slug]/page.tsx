@@ -47,7 +47,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const config = await getBlogConfig();
   const [html, neighbors, seo] = await Promise.all([
     getPostHtmlContent(bundle.post),
-    getPublishedNeighbors(bundle.post.publishedAt!, bundle.post.id),
+    getPublishedNeighbors(bundle.post.id),
     resolvePostSeoWithImages({ bundle, config }),
   ]);
 
