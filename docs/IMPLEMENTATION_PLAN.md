@@ -194,8 +194,8 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 ### 2.8 Public listing order and pagination ✅
 
 - [x] `posts.publicOrder` nullable integer + index `(status, publicOrder, publishedAt)`
-- [x] Manual order on home recent, `/blog`, tag, category listings (`publicOrder IS NULL ASC`, `publicOrder ASC`, `publishedAt DESC`)
-- [x] RSS feed remains `publishedAt DESC`; search remains FTS / date order
+- [x] Manual order on home recent, `/blog`, tag, category listings, previous/next navigation, and RSS (`publicOrder ASC`, `COALESCE(publishedAt, updatedAt) DESC`, `updatedAt DESC`, `id ASC`)
+- [x] Search remains FTS / date order
 - [x] `HOME_RECENT_POSTS_LIMIT` env (default `12`, max `48`) for home recent grid
 - [x] `HOME_POPULAR_CATEGORIES_LIMIT` env (default `6`, max `24`) for home category popularity
 - [x] `/blog` total published posts counter

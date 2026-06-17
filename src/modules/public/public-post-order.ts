@@ -1,36 +1,81 @@
 import type { Post } from "@/modules/posts/posts.types";
-import { asc, desc, sql } from "drizzle-orm";
+import { asc, desc, sql, type SQL } from "drizzle-orm";
 import { posts } from "@/modules/posts/posts.schema";
 
-/**
- * Manual public listing order:
- * 1. Posts with publicOrder set (lower numbers first)
- * 2. Posts without publicOrder (publishedAt DESC)
- *
- * Used on home recent lists, /blog, tag, and category pages.
- * Not used for RSS (publishedAt DESC) or search (relevance / publishedAt).
- */
-export const publicPostListingOrder = [
-  sql`${posts.publicOrder} IS NULL`,
-  asc(posts.publicOrder),
-  desc(posts.publishedAt),
-] as const;
+export type PublicPostOrderable = Pick<Post, "id" | "publicOrder" | "publishedAt" | "updatedAt">;
 
-/** In-memory comparator mirroring {@link publicPostListingOrder} for tests. */
-export function comparePublicPostListing(a: Post, b: Post): number {
-  const aHasOrder = a.publicOrder != null;
-  const bHasOrder = b.publicOrder != null;
-  if (aHasOrder !== bHasOrder) {
-    return aHasOrder ? -1 : 1;
-  }
-  if (aHasOrder && bHasOrder && a.publicOrder !== b.publicOrder) {
-    return a.publicOrder! - b.publicOrder!;
-  }
-  const aTime = a.publishedAt?.getTime() ?? 0;
-  const bTime = b.publishedAt?.getTime() ?? 0;
-  return bTime - aTime;
+/**
+ * Shared public listing order for `/blog`, home recent lists, tag/category pages,
+ * previous/next navigation, and RSS.
+ *
+ * 1. publicOrder ASC (nulls last, matching PostgreSQL default)
+ * 2. COALESCE(publishedAt, updatedAt) DESC
+ * 3. updatedAt DESC
+ * 4. id ASC (stable tie-breaker)
+ */
+export function getPublicPostOrderBy(): SQL[] {
+  return [
+    asc(posts.publicOrder),
+    sql`COALESCE(${posts.publishedAt}, ${posts.updatedAt}) DESC`,
+    desc(posts.updatedAt),
+    asc(posts.id),
+  ];
 }
 
-export function sortPublicPostListing<T extends { post: Post }>(bundles: T[]): T[] {
-  return [...bundles].sort((left, right) => comparePublicPostListing(left.post, right.post));
+/** @deprecated Use {@link getPublicPostOrderBy} */
+export const publicPostListingOrder = getPublicPostOrderBy();
+
+function getPublicSortDate(post: PublicPostOrderable): number {
+  return (post.publishedAt ?? post.updatedAt).getTime();
+}
+
+function comparePublicOrderValue(left: number | null, right: number | null): number {
+  const leftOrder = left ?? Number.MAX_SAFE_INTEGER;
+  const rightOrder = right ?? Number.MAX_SAFE_INTEGER;
+  return leftOrder - rightOrder;
+}
+
+/** In-memory comparator mirroring {@link getPublicPostOrderBy} for tests. */
+export function comparePublicPostOrder(left: PublicPostOrderable, right: PublicPostOrderable): number {
+  const orderDiff = comparePublicOrderValue(left.publicOrder, right.publicOrder);
+  if (orderDiff !== 0) {
+    return orderDiff;
+  }
+
+  const dateDiff = getPublicSortDate(right) - getPublicSortDate(left);
+  if (dateDiff !== 0) {
+    return dateDiff;
+  }
+
+  const updatedDiff = right.updatedAt.getTime() - left.updatedAt.getTime();
+  if (updatedDiff !== 0) {
+    return updatedDiff;
+  }
+
+  return left.id.localeCompare(right.id);
+}
+
+/** @deprecated Use {@link comparePublicPostOrder} */
+export const comparePublicPostListing = comparePublicPostOrder;
+
+export function sortPublicPostOrder<T extends PublicPostOrderable>(items: T[]): T[] {
+  return [...items].sort(comparePublicPostOrder);
+}
+
+/** @deprecated Use {@link sortPublicPostOrder} */
+export const sortPublicPostListing = sortPublicPostOrder;
+
+export function findPublicPostNeighbors<T extends PublicPostOrderable>(
+  orderedPosts: T[],
+  currentPostId: string
+): { previous: T | null; next: T | null } {
+  const index = orderedPosts.findIndex((post) => post.id === currentPostId);
+  if (index === -1) {
+    return { previous: null, next: null };
+  }
+
+  return {
+    previous: index > 0 ? orderedPosts[index - 1] : null,
+    next: index < orderedPosts.length - 1 ? orderedPosts[index + 1] : null,
+  };
 }

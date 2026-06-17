@@ -28,6 +28,7 @@ function makeBundle(slug: string, title: string): PublicPostBundle {
       featured: false,
       pinned: false,
       pinnedPriority: 0,
+      publicOrder: null,
       categoryId: null,
       publishedAt: now,
       scheduledAt: null,
@@ -61,5 +62,31 @@ describe("rss builder", () => {
   it("escapes XML entities", () => {
     const xml = buildRssXml(config, [makeBundle("unsafe", "Title & <More>")]);
     expect(xml).toContain("Title &amp; &lt;More&gt;");
+  });
+
+  it("preserves blog listing order and keeps actual published dates in pubDate", () => {
+    const bundles = [
+      makeBundle("post-a", "Post A"),
+      makeBundle("post-b", "Post B"),
+      makeBundle("post-c", "Post C"),
+    ];
+    bundles[0].post.publicOrder = 0;
+    bundles[0].post.publishedAt = new Date("2026-06-16T12:00:00.000Z");
+    bundles[1].post.publicOrder = 0;
+    bundles[1].post.publishedAt = new Date("2026-06-15T12:00:00.000Z");
+    bundles[2].post.publicOrder = 1;
+    bundles[2].post.publishedAt = new Date("2026-06-20T12:00:00.000Z");
+
+    const xml = buildRssXml(config, bundles);
+    const postAIndex = xml.indexOf("<title>Post A</title>");
+    const postBIndex = xml.indexOf("<title>Post B</title>");
+    const postCIndex = xml.indexOf("<title>Post C</title>");
+
+    expect(postAIndex).toBeGreaterThan(-1);
+    expect(postBIndex).toBeGreaterThan(postAIndex);
+    expect(postCIndex).toBeGreaterThan(postBIndex);
+    expect(xml).toContain("<pubDate>Tue, 16 Jun 2026 12:00:00 GMT</pubDate>");
+    expect(xml).toContain("<pubDate>Mon, 15 Jun 2026 12:00:00 GMT</pubDate>");
+    expect(xml).toContain("<pubDate>Sat, 20 Jun 2026 12:00:00 GMT</pubDate>");
   });
 });

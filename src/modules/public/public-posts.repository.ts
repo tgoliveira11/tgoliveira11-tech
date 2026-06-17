@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, isNotNull, lt, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, ne, sql } from "drizzle-orm";
 import { buildPaginatedResult, type PaginatedResult } from "@/lib/pagination";
 import { db } from "@/db/get-db";
 import { categories } from "@/modules/categories/categories.schema";
@@ -10,7 +10,7 @@ import { publishedPostFilter } from "@/modules/posts/posts.repository";
 import type { Post } from "@/modules/posts/posts.types";
 import { tags } from "@/modules/tags/tags.schema";
 import type { Tag } from "@/modules/tags/tags.types";
-import { publicPostListingOrder } from "./public-post-order";
+import { findPublicPostNeighbors, getPublicPostOrderBy } from "./public-post-order";
 
 export type { PaginatedResult } from "@/lib/pagination";
 export type PublicPostBundle = {
@@ -51,7 +51,7 @@ export async function listPublishedPostBundles(
     .select()
     .from(posts)
     .where(where)
-    .orderBy(...publicPostListingOrder)
+    .orderBy(...getPublicPostOrderBy())
     .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
@@ -73,7 +73,7 @@ export async function listPublishedPostBundlesPaginated(options: {
       .select()
       .from(posts)
       .where(where)
-      .orderBy(...publicPostListingOrder)
+      .orderBy(...getPublicPostOrderBy())
       .limit(options.pageSize)
       .offset(offset),
     countPublishedPosts({ excludePostId: options.excludePostId }),
@@ -138,7 +138,7 @@ export async function listPublishedPostBundlesByCategorySlug(
     .select()
     .from(posts)
     .where(and(eq(posts.categoryId, category.id), publishedPostFilter()))
-    .orderBy(...publicPostListingOrder)
+    .orderBy(...getPublicPostOrderBy())
     .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
@@ -158,7 +158,7 @@ export async function listPublishedPostBundlesByTagSlug(
     .from(postTags)
     .innerJoin(posts, eq(postTags.postId, posts.id))
     .where(and(eq(postTags.tagId, tag.id), publishedPostFilter()))
-    .orderBy(...publicPostListingOrder)
+    .orderBy(...getPublicPostOrderBy())
     .limit(options.limit ?? 12)
     .offset(options.offset ?? 0);
 
@@ -228,36 +228,15 @@ export async function listAllCategories(): Promise<Category[]> {
 }
 
 export async function getPublishedNeighbors(
-  publishedAt: Date,
   currentPostId: string
 ): Promise<{ previous: Post | null; next: Post | null }> {
-  const [previous] = await db
+  const rows = await db
     .select()
     .from(posts)
-    .where(
-      and(
-        publishedPostFilter(),
-        lt(posts.publishedAt, publishedAt),
-        ne(posts.id, currentPostId)
-      )
-    )
-    .orderBy(desc(posts.publishedAt))
-    .limit(1);
+    .where(publishedPostFilter())
+    .orderBy(...getPublicPostOrderBy());
 
-  const [next] = await db
-    .select()
-    .from(posts)
-    .where(
-      and(
-        publishedPostFilter(),
-        gt(posts.publishedAt, publishedAt),
-        ne(posts.id, currentPostId)
-      )
-    )
-    .orderBy(asc(posts.publishedAt))
-    .limit(1);
-
-  return { previous: previous ?? null, next: next ?? null };
+  return findPublicPostNeighbors(rows, currentPostId);
 }
 
 export async function listPublishedPostsForFeed(limit = 50): Promise<PublicPostBundle[]> {
@@ -265,7 +244,7 @@ export async function listPublishedPostsForFeed(limit = 50): Promise<PublicPostB
     .select()
     .from(posts)
     .where(publishedPostFilter())
-    .orderBy(desc(posts.publishedAt))
+    .orderBy(...getPublicPostOrderBy())
     .limit(limit);
 
   return Promise.all(rows.map((post) => hydratePostBundle(post)));
