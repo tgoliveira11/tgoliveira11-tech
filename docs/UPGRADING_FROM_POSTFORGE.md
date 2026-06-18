@@ -116,6 +116,17 @@ npm run build
 
 Follow secure-auth release notes for breaking changes.
 
+### `>= 0.1.20-internal` — authenticated guest-page redirects
+
+The package redirects fully authenticated users away from `/login`, `/register`, and `/forgot-password` by default. This repo maps:
+
+- `AUTH_REDIRECT_AUTHENTICATED_FROM_GUEST_PAGES` (default `true`)
+- `AUTH_AUTHENTICATED_REDIRECT_PATH` (default `/admin` via `AUTH_AFTER_LOGIN_PATH`)
+
+`SecureAuthUIProvider` already receives `secureAuth.uiConfig` from the root layout. Optional server-side defense is wired in `src/proxy.ts` via `createSecureAuthMiddleware` (no DB import). Token recovery (`/reset-password?token=`), email verification, pending 2FA, and `/check-email` flows remain allowed per package rules.
+
+Do **not** duplicate custom guest-route redirects unless intentionally overriding package behavior.
+
 ---
 
 ## Adopting Vercel Blob storage (upstream feature)

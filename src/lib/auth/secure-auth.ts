@@ -6,8 +6,8 @@ import { createEmailProvider } from "@/lib/email/email-provider-factory";
 import { createSecureAuthEmailTemplates } from "@/lib/email/templates";
 import { buildSecureAuthConfigFromEnv } from "@/lib/env/secure-auth-from-env";
 import { readEmailFrom } from "@/lib/env";
-import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
 import { createSecureAuthServicesPatcher } from "@/lib/auth/patch-secure-auth-services";
+import { SECURE_AUTH_UI_PATHS } from "@/lib/auth/secure-auth-ui-paths";
 
 type SecureAuthRouteHandler = (
   request: Request,
@@ -33,20 +33,7 @@ const baseSecureAuth = createSecureAuth({
   },
   ui: {
     ...envConfig.ui,
-    paths: {
-      login: "/login",
-      register: "/register",
-      forgotPassword: "/forgot-password",
-      resetPassword: "/reset-password",
-      verifyEmail: "/verify-email",
-      checkEmail: "/check-email",
-      loginTwoFactor: "/login/2fa",
-      loginComplete: "/login/complete",
-      account: SECURE_AUTH_ADMIN_PATHS.account,
-      security: SECURE_AUTH_ADMIN_PATHS.security,
-      sessions: SECURE_AUTH_ADMIN_PATHS.sessions,
-      accountDeleted: "/account-deleted",
-    },
+    paths: SECURE_AUTH_UI_PATHS,
     messages: {
       loginTitle: "Sign in to PostForge",
       registerTitle: "Create your PostForge account",
