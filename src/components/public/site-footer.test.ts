@@ -14,7 +14,7 @@ describe("site footer links", () => {
     expect(source).toContain('rel="noopener noreferrer"');
   });
 
-  it("renders LTG external link after RSS", () => {
+  it("renders SK external link after RSS", () => {
     const footerSource = readFileSync(
       resolve(process.cwd(), "src/components/public/site-footer.tsx"),
       "utf8"
@@ -25,13 +25,13 @@ describe("site footer links", () => {
     );
 
     const rssIndex = footerSource.indexOf("RSS");
-    const ltgIndex = footerSource.indexOf("LTG");
+    const skIndex = footerSource.indexOf("SK");
 
-    expect(configSource).toContain("https://ltg.tgoliveira11.tech");
-    expect(footerSource).toContain("PUBLIC_SITE_CONFIG.footer.ltgUrl");
+    expect(configSource).toContain("https://selahkeep.com");
+    expect(footerSource).toContain("PUBLIC_SITE_CONFIG.footer.skUrl");
     expect(footerSource).toContain('target="_blank"');
     expect(footerSource).toContain('rel="noopener noreferrer"');
     expect(rssIndex).toBeGreaterThan(-1);
-    expect(ltgIndex).toBeGreaterThan(rssIndex);
+    expect(skIndex).toBeGreaterThan(rssIndex);
   });
 });

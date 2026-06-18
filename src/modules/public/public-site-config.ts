@@ -13,8 +13,8 @@ export const PUBLIC_SITE_CONFIG = {
   footer: {
     showDescription: false,
     compact: true,
-    /** External Letters to God site — shown after RSS in the public footer. */
-    ltgUrl: "https://ltg.tgoliveira11.tech",
+    /** External Selah Keep site — shown after RSS in the public footer. */
+    skUrl: "https://selahkeep.com",
   },
 } as const;
 

@@ -62,12 +62,12 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
               </li>
               <li>
                 <a
-                  href={PUBLIC_SITE_CONFIG.footer.ltgUrl}
+                  href={PUBLIC_SITE_CONFIG.footer.skUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-[var(--primary)]"
                 >
-                  LTG
+                  SK
                 </a>
               </li>
             </ul>
