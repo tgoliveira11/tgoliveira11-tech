@@ -46,6 +46,8 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 | `NEXTAUTH_SECRET` | Session encryption secret | — | **Required** in production |
 | `AUTH_AFTER_LOGIN_PATH` | Post-login redirect | `/admin` | |
 | `AUTH_AFTER_LOGOUT_PATH` | Post-logout redirect | `/login` | |
+| `AUTH_REDIRECT_AUTHENTICATED_FROM_GUEST_PAGES` | Redirect signed-in users away from `/login`, `/register`, `/forgot-password` | `true` | Client + middleware (secure-auth ≥ 0.1.20) |
+| `AUTH_AUTHENTICATED_REDIRECT_PATH` | Target when redirecting from guest auth pages | same as `AUTH_AFTER_LOGIN_PATH` | Usually `/admin` in PostForge |
 
 > **Note:** Some docs refer to `AUTH_SECRET` generically. In this project the actual variable is **`NEXTAUTH_SECRET`** (NextAuth convention used by `@tgoliveira/secure-auth`).
 

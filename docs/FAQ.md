@@ -197,10 +197,12 @@ Yes. The attribution is in `src/components/public/site-footer.tsx` in **your** r
 ## How do I update `@tgoliveira/secure-auth`?
 
 ```bash
-npm update @tgoliveira/secure-auth
+npm install @tgoliveira/secure-auth@0.1.20-internal
 npm run db:migrate
 npm test && npm run build
 ```
+
+From **0.1.20-internal**, signed-in users are redirected away from guest auth pages (`/login`, `/register`, `/forgot-password`) to `AUTH_AUTHENTICATED_REDIRECT_PATH` (default: `/admin`). PostForge maps this in `buildSecureAuthConfigFromEnv()` and uses `createSecureAuthMiddleware` for defense in depth. Token flows (`/reset-password`, `/verify-email`, pending 2FA) remain accessible.
 
 Auth is versioned separately from your blog template merges.
 
