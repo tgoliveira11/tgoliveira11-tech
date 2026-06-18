@@ -83,6 +83,10 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 | `EMAIL_REPLY_TO` | Optional reply-to address | — | Yes | No |
 | `EMAIL_VERIFICATION_SEND_ON_REGISTER` | Send verification on register | `true` | Yes | No |
 | `EMAIL_VERIFICATION_REQUIRE_BEFORE_SIGN_IN` | Block login until verified | `false` | Yes | No |
+| `EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS` | Block sensitive account/passkey/session APIs until verified | `true` | Yes | No |
+| `AUTH_SAME_ORIGIN_PROTECTION_ENABLED` | Reject cross-origin mutating account API calls | `true` | Yes | No |
+| `AUTH_ALLOWED_ORIGINS` | Extra allowed origins (comma-separated) | — | Yes | No |
+| `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` | Expose `GET /api/auth/login/trace` (requires `AUTH_TRACE=true` too) | `false` | Yes | No |
 
 **Providers:**
 

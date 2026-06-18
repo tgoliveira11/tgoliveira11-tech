@@ -127,6 +127,19 @@ The package redirects fully authenticated users away from `/login`, `/register`,
 
 Do **not** duplicate custom guest-route redirects unless intentionally overriding package behavior.
 
+### `>= 0.1.21-internal` — API security hardening
+
+Package API handlers enforce their own auth tiers. This repo already delegates all auth/account routes to `secureAuth.routes.*` — do not reimplement passkey, 2FA, session, or account APIs.
+
+Env mapped in `buildSecureAuthConfigFromEnv()`:
+
+- `EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS` (default `true`)
+- `AUTH_SAME_ORIGIN_PROTECTION_ENABLED` (default `true`)
+- `AUTH_ALLOWED_ORIGINS` (optional comma-separated preview/staging origins)
+- `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` (default `false`; requires `AUTH_TRACE=true` to expose trace route)
+
+Ensure production `APP_BASE_URL` and `NEXTAUTH_URL` match the deployed origin. Middleware in `src/proxy.ts` remains defense-in-depth only.
+
 ---
 
 ## Adopting Vercel Blob storage (upstream feature)

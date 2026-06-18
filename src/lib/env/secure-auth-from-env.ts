@@ -31,11 +31,24 @@ export type SecureAuthEnvSlice = Pick<
   | "sessions"
   | "rateLimit"
   | "server"
+  | "security"
   | "debug"
   | "oauth"
   | "webauthn"
   | "ui"
 >;
+
+function readListEnv(env: NodeJS.ProcessEnv, keys: string[]): string[] {
+  const raw = readFirstEnv(env, keys);
+  if (!raw) {
+    return [];
+  }
+
+  return raw
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+}
 
 /** Maps PostForge environment variables to `createSecureAuth(config)` fields. */
 export function buildSecureAuthConfigFromEnv(
@@ -116,6 +129,11 @@ export function buildSecureAuthConfigFromEnv(
         true
       ),
       requireEmailVerificationBeforeSignIn: requireEmailVerification,
+      requireEmailVerificationForAccountApis: readBooleanEnv(
+        env,
+        ["EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS"],
+        true
+      ),
     },
     passwordPolicy: {
       enforcement: passwordEnforcement,
@@ -181,8 +199,15 @@ export function buildSecureAuthConfigFromEnv(
     server: {
       cookieSecure,
     },
+    security: {
+      sameOriginProtection: {
+        enabled: readBooleanEnv(env, ["AUTH_SAME_ORIGIN_PROTECTION_ENABLED"], true),
+        allowedOrigins: readListEnv(env, ["AUTH_ALLOWED_ORIGINS"]),
+      },
+    },
     debug: {
       authTrace: readBooleanEnv(env, ["AUTH_TRACE", "AUTH_DEBUG_TRACE"], false),
+      exposeTraceRoute: readBooleanEnv(env, ["AUTH_DEBUG_EXPOSE_TRACE_ROUTE"], false),
     },
     oauth: {
       google: readOAuthPair(
