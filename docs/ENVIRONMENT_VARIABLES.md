@@ -83,6 +83,15 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 | `EMAIL_REPLY_TO` | Optional reply-to address | — | Yes | No |
 | `EMAIL_VERIFICATION_SEND_ON_REGISTER` | Send verification on register | `true` | Yes | No |
 | `EMAIL_VERIFICATION_REQUIRE_BEFORE_SIGN_IN` | Block login until verified | `false` | Yes | No |
+| `EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS` | Block sensitive account APIs until verified | `true` | Yes | No (secure-auth ≥ 0.1.21) |
+
+### API security (secure-auth ≥ 0.1.21)
+
+| Variable | Purpose | Default | Notes |
+|----------|---------|---------|-------|
+| `AUTH_SAME_ORIGIN_PROTECTION_ENABLED` | Reject cross-origin mutating account/auth API calls | `true` | Uses `APP_BASE_URL` and `WEBAUTHN_ORIGIN` |
+| `AUTH_ALLOWED_ORIGINS` | Extra allowed origins (comma-separated) | — | Optional preview/staging URLs |
+| `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` | Expose `GET /api/auth/login/trace` | `false` | Requires `AUTH_TRACE=true` too; never in production |
 
 **Providers:**
 
@@ -118,6 +127,7 @@ See `.env.example` for:
 - `AUTH_RATE_LIMIT_STORE`
 - `AUTH_COOKIE_SECURE` — set `true` in HTTPS production
 - `AUTH_TRACE` — debug only
+- `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` — never enable in production (requires `AUTH_TRACE=true`)
 
 ---
 

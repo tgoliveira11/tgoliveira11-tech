@@ -2,6 +2,7 @@ import type { SecureAuthConfig } from "@tgoliveira/secure-auth";
 import type { PasswordPolicyEnforcement } from "@tgoliveira/secure-auth/client/password-policy";
 import {
   readBooleanEnv,
+  readCsvEnv,
   readEnumEnv,
   readEnv,
   readFirstEnv,
@@ -26,6 +27,7 @@ export type SecureAuthEnvSlice = Pick<
   | "app"
   | "auth"
   | "accountPolicy"
+  | "security"
   | "passwordPolicy"
   | "sessions"
   | "rateLimit"
@@ -116,6 +118,17 @@ export function buildSecureAuthConfigFromEnv(
         true
       ),
       requireEmailVerificationBeforeSignIn: requireEmailVerification,
+      requireEmailVerificationForAccountApis: readBooleanEnv(
+        env,
+        ["EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS"],
+        true
+      ),
+    },
+    security: {
+      sameOriginProtection: {
+        enabled: readBooleanEnv(env, ["AUTH_SAME_ORIGIN_PROTECTION_ENABLED"], true),
+        allowedOrigins: readCsvEnv(env, "AUTH_ALLOWED_ORIGINS"),
+      },
     },
     passwordPolicy: {
       enforcement: passwordEnforcement,
@@ -183,6 +196,7 @@ export function buildSecureAuthConfigFromEnv(
     },
     debug: {
       authTrace: readBooleanEnv(env, ["AUTH_TRACE", "AUTH_DEBUG_TRACE"], false),
+      exposeTraceRoute: readBooleanEnv(env, ["AUTH_DEBUG_EXPOSE_TRACE_ROUTE"], false),
     },
     oauth: {
       google: readOAuthPair(
