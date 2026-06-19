@@ -27,7 +27,7 @@
     }
   },
   "dependencies": {
-    "@tgoliveira/secure-auth": "^0.1.22-internal",
+    "@tgoliveira/secure-auth": "^0.1.23",
     "@vercel/blob": "^2.4.0",
     "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.2",
