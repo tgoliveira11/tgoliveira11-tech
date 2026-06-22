@@ -74,3 +74,12 @@ export function readOAuthPair(
   }
   return undefined;
 }
+
+export function readCsvEnv(env: NodeJS.ProcessEnv, key: string): string[] {
+  const raw = readEnv(env, key);
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+}

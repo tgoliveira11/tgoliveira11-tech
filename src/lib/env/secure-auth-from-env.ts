@@ -3,6 +3,7 @@ import type { PasswordPolicyEnforcement } from "@tgoliveira/secure-auth/client/p
 import { resolveAuthCookiePrefix } from "@/lib/auth/auth-cookie-prefix";
 import {
   readBooleanEnv,
+  readCsvEnv,
   readEnumEnv,
   readEnv,
   readFirstEnv,
@@ -27,28 +28,16 @@ export type SecureAuthEnvSlice = Pick<
   | "app"
   | "auth"
   | "accountPolicy"
+  | "security"
   | "passwordPolicy"
   | "sessions"
   | "rateLimit"
   | "server"
-  | "security"
   | "debug"
   | "oauth"
   | "webauthn"
   | "ui"
 >;
-
-function readListEnv(env: NodeJS.ProcessEnv, keys: string[]): string[] {
-  const raw = readFirstEnv(env, keys);
-  if (!raw) {
-    return [];
-  }
-
-  return raw
-    .split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0);
-}
 
 /** Maps PostForge environment variables to `createSecureAuth(config)` fields. */
 export function buildSecureAuthConfigFromEnv(
@@ -100,6 +89,7 @@ export function buildSecureAuthConfigFromEnv(
   );
 
   const afterLoginPath = readEnv(env, "AUTH_AFTER_LOGIN_PATH") ?? defaults.afterLoginPath ?? "/";
+  const afterLogoutPath = readEnv(env, "AUTH_AFTER_LOGOUT_PATH") ?? defaults.afterLogoutPath ?? "/login";
   const authenticatedRedirectPath =
     readEnv(env, "AUTH_AUTHENTICATED_REDIRECT_PATH") ?? afterLoginPath;
 
@@ -111,7 +101,7 @@ export function buildSecureAuthConfigFromEnv(
     },
     auth: {
       afterLoginPath,
-      afterLogoutPath: readEnv(env, "AUTH_AFTER_LOGOUT_PATH") ?? defaults.afterLogoutPath ?? "/login",
+      afterLogoutPath,
       authenticatedRedirectPath,
       redirectAuthenticatedFromGuestPages: readBooleanEnv(
         env,
@@ -134,6 +124,12 @@ export function buildSecureAuthConfigFromEnv(
         ["EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS"],
         true
       ),
+    },
+    security: {
+      sameOriginProtection: {
+        enabled: readBooleanEnv(env, ["AUTH_SAME_ORIGIN_PROTECTION_ENABLED"], true),
+        allowedOrigins: readCsvEnv(env, "AUTH_ALLOWED_ORIGINS"),
+      },
     },
     passwordPolicy: {
       enforcement: passwordEnforcement,
@@ -198,12 +194,6 @@ export function buildSecureAuthConfigFromEnv(
     },
     server: {
       cookieSecure,
-    },
-    security: {
-      sameOriginProtection: {
-        enabled: readBooleanEnv(env, ["AUTH_SAME_ORIGIN_PROTECTION_ENABLED"], true),
-        allowedOrigins: readListEnv(env, ["AUTH_ALLOWED_ORIGINS"]),
-      },
     },
     debug: {
       authTrace: readBooleanEnv(env, ["AUTH_TRACE", "AUTH_DEBUG_TRACE"], false),

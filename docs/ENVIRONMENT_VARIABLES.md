@@ -46,8 +46,8 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 | `NEXTAUTH_SECRET` | Session encryption secret | — | **Required** in production |
 | `AUTH_AFTER_LOGIN_PATH` | Post-login redirect | `/admin` | |
 | `AUTH_AFTER_LOGOUT_PATH` | Post-logout redirect | `/login` | |
-| `AUTH_REDIRECT_AUTHENTICATED_FROM_GUEST_PAGES` | Redirect signed-in users away from `/login`, `/register`, `/forgot-password` | `true` | secure-auth `>= 0.1.20-internal` |
-| `AUTH_AUTHENTICATED_REDIRECT_PATH` | Target for authenticated guest-page redirects | `AUTH_AFTER_LOGIN_PATH` (`/admin`) | secure-auth `>= 0.1.20-internal` |
+| `AUTH_REDIRECT_AUTHENTICATED_FROM_GUEST_PAGES` | Redirect signed-in users away from `/login`, `/register`, `/forgot-password` | `true` | Client + proxy middleware (secure-auth ≥ 0.1.20) |
+| `AUTH_AUTHENTICATED_REDIRECT_PATH` | Target when redirecting from guest auth pages | `AUTH_AFTER_LOGIN_PATH` (`/admin`) | Usually `/admin` in this repo |
 
 > **Note:** Some docs refer to `AUTH_SECRET` generically. In this project the actual variable is **`NEXTAUTH_SECRET`** (NextAuth convention used by `@tgoliveira/secure-auth`).
 
@@ -83,10 +83,15 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 | `EMAIL_REPLY_TO` | Optional reply-to address | — | Yes | No |
 | `EMAIL_VERIFICATION_SEND_ON_REGISTER` | Send verification on register | `true` | Yes | No |
 | `EMAIL_VERIFICATION_REQUIRE_BEFORE_SIGN_IN` | Block login until verified | `false` | Yes | No |
-| `EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS` | Block sensitive account/passkey/session APIs until verified | `true` | Yes | No |
-| `AUTH_SAME_ORIGIN_PROTECTION_ENABLED` | Reject cross-origin mutating account API calls | `true` | Yes | No |
-| `AUTH_ALLOWED_ORIGINS` | Extra allowed origins (comma-separated) | — | Yes | No |
-| `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` | Expose `GET /api/auth/login/trace` (requires `AUTH_TRACE=true` too) | `false` | Yes | No |
+| `EMAIL_VERIFICATION_REQUIRE_FOR_ACCOUNT_APIS` | Block sensitive account/passkey/session APIs until verified | `true` | Yes | No (secure-auth ≥ 0.1.21) |
+
+### API security (secure-auth ≥ 0.1.21)
+
+| Variable | Purpose | Default | Notes |
+|----------|---------|---------|-------|
+| `AUTH_SAME_ORIGIN_PROTECTION_ENABLED` | Reject cross-origin mutating account/auth API calls | `true` | Uses `APP_BASE_URL` and `WEBAUTHN_ORIGIN` |
+| `AUTH_ALLOWED_ORIGINS` | Extra allowed origins (comma-separated) | — | Optional preview/staging URLs |
+| `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` | Expose `GET /api/auth/login/trace` | `false` | Requires `AUTH_TRACE=true` too; never in production |
 
 **Providers:**
 
@@ -122,6 +127,7 @@ See `.env.example` for:
 - `AUTH_RATE_LIMIT_STORE`
 - `AUTH_COOKIE_SECURE` — set `true` in HTTPS production
 - `AUTH_TRACE` — debug only
+- `AUTH_DEBUG_EXPOSE_TRACE_ROUTE` — never enable in production (requires `AUTH_TRACE=true`)
 
 ---
 
