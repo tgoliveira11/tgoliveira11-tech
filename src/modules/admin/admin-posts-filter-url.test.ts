@@ -34,6 +34,11 @@ describe("admin posts filter url helpers", () => {
   it("filters tags by typed query", () => {
     expect(filterTagsByQuery(tags, "dev")).toEqual([tags[1]]);
     expect(filterTagsByQuery(tags, "design")).toEqual([tags[2]]);
+    expect(filterTagsByQuery(tags, "  ")).toEqual(tags);
+  });
+
+  it("filters tags in combobox when showAllTags is false", () => {
+    expect(getTagFilterOptions(tags, "dev", false).map((tag) => tag.slug)).toEqual(["devops"]);
   });
 
   it("returns all tags when showAllTags is true", () => {
@@ -78,6 +83,10 @@ describe("admin posts filter url helpers", () => {
         { tagId: null }
       )
     ).toBe("/admin/posts?status=draft&sort=publicOrder&direction=desc");
+  });
+
+  it("builds base admin posts url without filters", () => {
+    expect(buildAdminPostsFilterUrl({}, { tagId: null })).toBe("/admin/posts");
   });
 
   it("returns no tag matches for unknown query", () => {

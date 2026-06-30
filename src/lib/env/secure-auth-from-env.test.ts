@@ -34,6 +34,19 @@ describe("buildSecureAuthConfigFromEnv auth redirects", () => {
   });
 });
 
+describe("buildSecureAuthConfigFromEnv admin panel", () => {
+  it("enables admin panel with bootstrap email from ADMIN_EMAIL", () => {
+    const config = buildSecureAuthConfigFromEnv(defaults, {
+      ...secrets,
+      ADMIN_EMAIL: "tgoliveira11@gmail.com",
+    });
+
+    expect(config.admin?.enabled).toBe(true);
+    expect(config.admin?.path).toBe("/admin/core");
+    expect(config.admin?.bootstrapEmail).toBe("tgoliveira11@gmail.com");
+  });
+});
+
 describe("buildSecureAuthConfigFromEnv API security (0.1.21+)", () => {
   it("requires email verification for account APIs by default", () => {
     const config = buildSecureAuthConfigFromEnv(defaults, secrets);

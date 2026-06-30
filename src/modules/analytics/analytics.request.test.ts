@@ -59,4 +59,35 @@ describe("parseUserAgent", () => {
     expect(parsed.deviceType).toBe("mobile");
     expect(parsed.osName).toBe("iOS");
   });
+
+  it("detects tablet, desktop browsers, and operating systems", () => {
+    expect(parseUserAgent("Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)").deviceType).toBe("tablet");
+    expect(parseUserAgent("Mozilla/5.0 (Android 14; Mobile)").deviceType).toBe("mobile");
+    expect(parseUserAgent("Mozilla/5.0 Edg/120.0").browserName).toBe("Edge");
+    expect(parseUserAgent("Mozilla/5.0 Firefox/121.0").browserName).toBe("Firefox");
+    expect(parseUserAgent("Mozilla/5.0 Version/17.0 Safari/605.1.15").browserName).toBe("Safari");
+    expect(parseUserAgent("Mozilla/5.0 (Windows NT 10.0)").osName).toBe("Windows");
+    expect(parseUserAgent("Mozilla/5.0 X11; Linux x86_64").osName).toBe("Linux");
+  });
+
+  it("returns unknown device for missing user agent", () => {
+    expect(parseUserAgent(null).deviceType).toBe("unknown");
+  });
+});
+
+describe("buildAnalyticsSessionHash", () => {
+  it("builds stable session hashes", async () => {
+    const { buildAnalyticsSessionHash } = await import("@/modules/analytics/analytics.request");
+    const request = new Request("https://example.com/blog/post", {
+      headers: {
+        "x-forwarded-for": "203.0.113.10",
+        "user-agent": "Mozilla/5.0",
+      },
+    });
+
+    const first = buildAnalyticsSessionHash(request);
+    const second = buildAnalyticsSessionHash(request);
+    expect(first).toBe(second);
+    expect(first).toHaveLength(48);
+  });
 });

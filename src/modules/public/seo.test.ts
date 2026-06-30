@@ -9,6 +9,7 @@ import type { PublicPostBundle } from "@/modules/public/public-posts.repository"
 import {
   buildBlogPostingJsonLd,
   buildPostMetadata,
+  buildSiteMetadata,
   resolvePostSeo,
   resolvePostSeoWithImages,
 } from "@/modules/public/seo";
@@ -105,5 +106,62 @@ describe("seo helpers", () => {
 
     const resolved = await resolvePostSeoWithImages({ bundle, config });
     expect(resolved.ogImageUrl).toBe("https://example.com/default.png");
+  });
+
+  it("resolves absolute and relative asset image URLs", async () => {
+    const { findAssetById } = await import("@/modules/public/public-posts.repository");
+    vi.mocked(findAssetById)
+      .mockResolvedValueOnce({
+        id: "asset-1",
+        publicUrl: "https://cdn.example.com/og.png",
+      } as never)
+      .mockResolvedValueOnce({
+        id: "asset-2",
+        publicUrl: "images/cover.png",
+      } as never);
+
+    const absolute = await resolvePostSeoWithImages({
+      bundle: makeBundle({ ogAssetId: "asset-1" }),
+      config,
+    });
+    expect(absolute.ogImageUrl).toBe("https://cdn.example.com/og.png");
+
+    const relative = await resolvePostSeoWithImages({
+      bundle: makeBundle({ coverAssetId: "asset-2" }),
+      config,
+    });
+    expect(relative.ogImageUrl).toBe("https://example.com/images/cover.png");
+  });
+
+  it("builds site metadata and JSON-LD with category and tags", () => {
+    const bundle = makeBundle({
+      excerpt: "",
+      seoDescription: null,
+    });
+    const resolved = resolvePostSeo({ bundle, config });
+    expect(resolved.description).toBe("A test blog");
+
+    const metadata = buildPostMetadata({
+      ...resolved,
+      ogImageUrl: "https://example.com/og.png",
+    });
+    expect(metadata.openGraph?.images).toEqual([{ url: "https://example.com/og.png" }]);
+    expect(metadata.twitter?.card).toBe("summary_large_image");
+
+    const jsonLd = buildBlogPostingJsonLd(
+      {
+        ...bundle,
+        category: { id: "cat-1", name: "Engineering", slug: "engineering", description: null, createdAt: new Date(), updatedAt: new Date() },
+      },
+      resolved
+    );
+    expect(jsonLd.articleSection).toBe("Engineering");
+    expect(jsonLd.keywords).toBe("News");
+  });
+
+  it("builds site-level metadata", () => {
+    const metadata = buildSiteMetadata(config);
+    expect(metadata.title).toEqual({ default: "PostForge", template: "%s | PostForge" });
+    expect(metadata.metadataBase?.toString()).toBe("https://example.com/");
   });
 });

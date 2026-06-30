@@ -14,4 +14,5 @@ export const SECURE_AUTH_UI_PATHS = {
   security: SECURE_AUTH_ADMIN_PATHS.security,
   sessions: SECURE_AUTH_ADMIN_PATHS.sessions,
   accountDeleted: "/account-deleted",
+  adminPanel: "/admin/core",
 } as const;

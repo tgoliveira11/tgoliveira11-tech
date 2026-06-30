@@ -58,7 +58,7 @@ Guest-page redirects for authenticated users are configured in `src/lib/env/secu
 
 ## Admin workspace
 
-Requires secure-auth session + `ADMIN_EMAIL` match.
+Requires secure-auth session + (`ADMIN_EMAIL` match **or** `users.role = admin`).
 
 | Route | Status | Notes |
 |-------|--------|-------|
@@ -77,6 +77,15 @@ Requires secure-auth session + `ADMIN_EMAIL` match.
 | `/admin/account` | shipped | `AccountSettingsPage` (secure-auth) |
 | `/admin/security` | shipped | `SecuritySettingsPage` (2FA, passkeys) |
 | `/admin/sessions` | shipped | `SessionsSettingsPage` |
+| `/admin/core` | shipped | secure-auth admin panel (users, locks, API keys, config) |
+| `/admin/core/users` | shipped | User management (`AdminUsersPage`) |
+| `/admin/core/locks` | shipped | Account lock management |
+| `/admin/core/api-keys` | shipped | API key management |
+| `/admin/core/config` | shipped | Runtime auth config overrides |
+| `/admin/outpost` | shipped | Outpost operator panel (transactional email outbox) |
+| `/admin/outpost/queue` | shipped | Email queue + manual send worker |
+| `/admin/outpost/config` | shipped | Outpost env/config overrides |
+| `/admin/outpost/observability` | shipped | Queue depth and worker metrics |
 
 ---
 
@@ -128,7 +137,8 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Integration | Status | Notes |
 |-------------|--------|-------|
 | PostgreSQL (Drizzle) | shipped | Neon in prod; Docker `5434` locally |
-| `@tgoliveira/secure-auth` | shipped | `^0.1.25` |
+| `@tgoliveira/secure-auth` | shipped | `^0.4.1` |
+| `@tgoliveira/outpost` | shipped | `^1.2.0` — transactional email outbox + admin UI |
 | Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |

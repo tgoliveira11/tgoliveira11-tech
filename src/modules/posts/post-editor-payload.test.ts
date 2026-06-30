@@ -89,6 +89,28 @@ describe("post editor autosave payload helpers", () => {
       })
     ).toBe(true);
   });
+
+  it("shouldRunAutosave returns false when paused", () => {
+    expect(
+      shouldRunAutosave({
+        userEdited: true,
+        paused: true,
+        payload: "x",
+        lastSavedPayload: null,
+      })
+    ).toBe(false);
+  });
+
+  it("shouldRunAutosave runs on first edit when lastSavedPayload is null", () => {
+    expect(
+      shouldRunAutosave({
+        userEdited: true,
+        paused: false,
+        payload: "x",
+        lastSavedPayload: null,
+      })
+    ).toBe(true);
+  });
 });
 
 describe("autosavePostAction", () => {
@@ -105,6 +127,11 @@ describe("autosavePostAction", () => {
       status: "draft",
       slug: "my-post",
     });
+  });
+
+  it("returns error when post id is missing", async () => {
+    const result = await autosavePostAction("", new FormData());
+    expect(result).toEqual({ ok: false, error: "Post ID is required" });
   });
 
   it("does not create revisions and does not publish", async () => {
@@ -141,6 +168,28 @@ describe("autosavePostAction", () => {
 
     expect(result.ok).toBe(false);
     expect(result.error).toBe("Boom");
+  });
+
+  it("revalidates published posts after autosave", async () => {
+    const { revalidatePublicPaths } = await import("@/modules/admin/revalidate-public");
+    getByIdMock.mockResolvedValue({
+      id: "post-1",
+      status: "published",
+      slug: "my-post",
+    });
+    updateDraftMock.mockResolvedValue({
+      id: "post-1",
+      status: "published",
+      slug: "my-post",
+    });
+
+    const formData = new FormData();
+    formData.set("title", "Published title");
+    formData.set("contentMarkdown", "Body");
+
+    const result = await autosavePostAction("post-1", formData);
+    expect(result.ok).toBe(true);
+    expect(revalidatePublicPaths).toHaveBeenCalledWith("my-post");
   });
 });
 

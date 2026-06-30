@@ -64,6 +64,31 @@ describe("rss builder", () => {
     expect(xml).toContain("Title &amp; &lt;More&gt;");
   });
 
+  it("includes category and tag metadata", () => {
+    const bundle = makeBundle("categorized", "Categorized");
+    bundle.category = {
+      id: "cat-1",
+      name: "Engineering & Ops",
+      slug: "engineering",
+      description: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    bundle.tags = [
+      {
+        id: "tag-1",
+        name: "Release",
+        slug: "release",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    const xml = buildRssXml(config, [bundle]);
+    expect(xml).toContain("<category>Engineering &amp; Ops</category>");
+    expect(xml).toContain("<category>Release</category>");
+  });
+
   it("preserves blog listing order and keeps actual published dates in pubDate", () => {
     const bundles = [
       makeBundle("post-a", "Post A"),

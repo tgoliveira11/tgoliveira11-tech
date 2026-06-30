@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@tgoliveira/secure-auth/styles.css";
+@import "@tgoliveira/outpost/styles.css";
 
 :root,
 [data-theme="light"] {
@@ -204,4 +205,16 @@ body {
 
 .prose-article strong {
   font-weight: 600;
+}
+
+.admin-secure-auth-core > main {
+  max-width: none;
+  padding-inline: 0;
+  padding-top: 0;
+}
+
+.admin-outpost-core > main {
+  max-width: none;
+  padding-inline: 0;
+  padding-top: 0;
 }

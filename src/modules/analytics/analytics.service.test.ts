@@ -57,6 +57,26 @@ describe("analytics service", () => {
     expect(repo.trackPostViewEvent).not.toHaveBeenCalled();
   });
 
+  it("trackPostView rejects missing posts and mismatched published ids", async () => {
+    vi.mocked(postsRepo.findPostById).mockResolvedValue(undefined);
+    await expect(trackPostView({ postId: "missing", sessionHash: "hash" })).rejects.toBeInstanceOf(
+      NotFoundError
+    );
+
+    vi.mocked(postsRepo.findPostById).mockResolvedValue({
+      id: "post-1",
+      slug: "published-post",
+    } as never);
+    vi.mocked(postsRepo.findPublishedPostBySlug).mockResolvedValue({
+      id: "other",
+      slug: "published-post",
+    } as never);
+
+    await expect(trackPostView({ postId: "post-1", sessionHash: "hash" })).rejects.toBeInstanceOf(
+      NotFoundError
+    );
+  });
+
   it("trackPostView records published post views", async () => {
     vi.mocked(postsRepo.findPostById).mockResolvedValue({
       id: "post-1",
@@ -108,6 +128,11 @@ describe("analytics service", () => {
     const rows = await getTopPostsByViews();
     expect(rows).toHaveLength(1);
     expect(rows[0]?.postId).toBe("a");
+  });
+
+  it("getPostAnalyticsDetail rejects missing posts", async () => {
+    vi.mocked(postsRepo.findPostById).mockResolvedValue(undefined);
+    await expect(getPostAnalyticsDetail("missing")).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it("getPostAnalyticsDetail loads breakdown data", async () => {
