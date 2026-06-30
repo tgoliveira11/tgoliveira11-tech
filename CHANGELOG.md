@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-30
+
 ### Added
 
 - Branch/PR/release workflow documentation, CI branch-name check, and manual GitHub Release pipeline.
 - `@tgoliveira/secure-auth` 0.4.1 admin panel UI at `/admin/core/*` with role-based access (`ADMIN_EMAIL` or `users.role = admin`).
 - `@tgoliveira/outpost` 1.2.0 operator admin at `/admin/outpost/*` (email queue, config, observability).
+
+### Fixed
+
+- Outpost admin API routes return JSON errors when Outpost env is missing or admin access is denied (instead of empty 500 responses).
+
 
 ## [0.1.0] - 2026-06-15
 
@@ -23,5 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Local dev on port `3011`; Docker Postgres on host port `5434`.
 - Upstream sync from [tgoliveira11/postforge](https://github.com/tgoliveira11/postforge).
 
-[Unreleased]: https://github.com/tgoliveira11/tgoliveira11-tech/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/tgoliveira11/tgoliveira11-tech/compare/v0.1.1...HEAD
 [0.1.0]: https://github.com/tgoliveira11/tgoliveira11-tech/releases/tag/v0.1.0
+[0.1.1]: https://github.com/tgoliveira11/tgoliveira11-tech/releases/tag/v0.1.1

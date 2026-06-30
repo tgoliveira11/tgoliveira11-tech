@@ -1,5 +1,5 @@
-import { getOutpostAdmin } from "@/lib/outpost/outpost-admin";
+import { handleOutpostAdminRoute } from "@/lib/outpost/handle-outpost-admin-route";
 
 export async function POST(request: Request) {
-  return getOutpostAdmin().routes.adminWorkerSend.POST(request);
+  return handleOutpostAdminRoute((admin) => admin.routes.adminWorkerSend.POST, request);
 }
