@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import type { RequireAdminFn } from "@tgoliveira/outpost/admin";
 import { bootstrapSecureAuthAdmin } from "@/lib/auth/bootstrap-secure-auth-admin";
 import { getAuthOptions } from "@/lib/auth/auth-options";
+import { outpostAdminForbidden } from "@/lib/outpost/outpost-admin-forbidden";
 import { isAuthorizedAdmin } from "@/modules/admin/is-authorized-admin";
 
 /** Gate Outpost admin HTTP routes with the same policy as `/admin`. */
@@ -14,7 +15,7 @@ export const requireOutpostAdmin: RequireAdminFn = async () => {
   const user = session?.user as { id?: string; email?: string | null; role?: string | null };
 
   if (!user?.id) {
-    throw new Error("Authentication required");
+    throw outpostAdminForbidden("Authentication required");
   }
 
   const normalized = {
@@ -24,7 +25,7 @@ export const requireOutpostAdmin: RequireAdminFn = async () => {
   };
 
   if (!(await isAuthorizedAdmin(normalized))) {
-    throw new Error("Admin access required");
+    throw outpostAdminForbidden("Admin access required");
   }
 
   return { actor: user.id };

@@ -1,5 +1,5 @@
-import { getOutpostAdmin } from "@/lib/outpost/outpost-admin";
+import { handleOutpostAdminRoute } from "@/lib/outpost/handle-outpost-admin-route";
 
 export async function GET(request: Request) {
-  return getOutpostAdmin().routes.adminObservability.GET(request);
+  return handleOutpostAdminRoute((admin) => admin.routes.adminObservability.GET, request);
 }
