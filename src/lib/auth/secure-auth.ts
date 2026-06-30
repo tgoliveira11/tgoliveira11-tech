@@ -55,6 +55,7 @@ const wrappedRoutes = wrapRoutes(
 /** secure-auth instance with app-specific NextAuth cookie names on all API routes. */
 export const secureAuth = {
   config: baseSecureAuth.config,
+  passwordPolicy: baseSecureAuth.passwordPolicy,
   uiConfig: baseSecureAuth.uiConfig,
   get ui() {
     return baseSecureAuth.ui;

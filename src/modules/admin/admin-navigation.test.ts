@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { adminNavItems, isAdminNavItemActive } from "@/modules/admin/admin-navigation";
+import { OUTPOST_ADMIN_BASE } from "@/modules/admin/outpost-admin-paths";
 import { SECURE_AUTH_ADMIN_PATHS } from "@/modules/admin/secure-auth-admin-paths";
+import { SECURE_AUTH_CORE_BASE } from "@/modules/admin/secure-auth-core-paths";
 
 describe("admin navigation", () => {
   it("links account, security, and sessions to canonical /admin routes", () => {
@@ -32,6 +34,40 @@ describe("admin navigation", () => {
     expect(isAdminNavItemActive("/admin/posts", postsItem)).toBe(true);
     expect(isAdminNavItemActive("/admin/posts/abc/edit", postsItem)).toBe(true);
     expect(isAdminNavItemActive("/admin/posts/new", postsItem)).toBe(false);
+  });
+
+  it("includes secure-auth core and outpost admin routes", () => {
+    const hrefs = adminNavItems.map((item) => item.href);
+    expect(hrefs).toContain(SECURE_AUTH_CORE_BASE);
+    expect(hrefs).toContain(`${SECURE_AUTH_CORE_BASE}/users`);
+    expect(hrefs).toContain(OUTPOST_ADMIN_BASE);
+    expect(hrefs).toContain(`${OUTPOST_ADMIN_BASE}/queue`);
+  });
+
+  it("highlights secure-auth core and outpost roots independently", () => {
+    expect(
+      isAdminNavItemActive(SECURE_AUTH_CORE_BASE, { href: SECURE_AUTH_CORE_BASE, label: "Auth admin" })
+    ).toBe(true);
+    expect(
+      isAdminNavItemActive(`${SECURE_AUTH_CORE_BASE}/users`, {
+        href: SECURE_AUTH_CORE_BASE,
+        label: "Auth admin",
+      })
+    ).toBe(false);
+    expect(
+      isAdminNavItemActive(OUTPOST_ADMIN_BASE, { href: OUTPOST_ADMIN_BASE, label: "Outpost admin" })
+    ).toBe(true);
+  });
+
+  it("ignores external links and highlights dashboard exactly", () => {
+    expect(isAdminNavItemActive("/admin", { href: "/", label: "Public Blog", external: true })).toBe(
+      false
+    );
+    expect(isAdminNavItemActive("/admin", { href: "/admin", label: "Dashboard" })).toBe(true);
+    expect(isAdminNavItemActive("/admin/posts", { href: "/admin", label: "Dashboard" })).toBe(false);
+    expect(
+      isAdminNavItemActive("/admin/tags/new", { href: "/admin/tags", label: "Tags" })
+    ).toBe(true);
   });
 });
 

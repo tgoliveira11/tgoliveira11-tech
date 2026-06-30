@@ -6,7 +6,7 @@ import { readEnv } from "@/lib/env";
 
 export const fullSchema = { ...authSchema, ...blogSchema };
 
-export type DbClient = PostgresJsDatabase<typeof fullSchema & typeof authSchema>;
+export type DbClient = PostgresJsDatabase<typeof fullSchema>;
 
 type DbGlobal = typeof globalThis & {
   __postforgePostgres?: Sql;

@@ -3,14 +3,17 @@ import "server-only";
 import { getServerSession } from "next-auth";
 import { forbidden, redirect } from "next/navigation";
 import { ForbiddenError } from "@/lib/errors";
+import { bootstrapSecureAuthAdmin } from "@/lib/auth/bootstrap-secure-auth-admin";
 import { getAuthOptions } from "@/lib/auth/auth-options";
-import { isAdminEmail } from "./is-admin-email";
+import { isAuthorizedAdmin } from "./is-authorized-admin";
 
 export { isAdminEmail } from "./is-admin-email";
+export { isAuthorizedAdmin } from "./is-authorized-admin";
 
 type AdminUser = {
   id: string;
   email: string | null;
+  role?: string | null;
 };
 
 async function getAuthenticatedAdminUser(): Promise<AdminUser | null> {
@@ -20,41 +23,55 @@ async function getAuthenticatedAdminUser(): Promise<AdminUser | null> {
     return null;
   }
 
-  const user = session.user as { id?: string; email?: string | null };
+  const user = session.user as { id?: string; email?: string | null; role?: string | null };
 
-  if (!user.id || !isAdminEmail(user.email)) {
+  if (!user.id) {
     return null;
   }
 
-  return {
+  const normalized: AdminUser = {
     id: user.id,
     email: user.email ?? null,
+    role: user.role ?? null,
   };
+
+  await bootstrapSecureAuthAdmin();
+
+  if (!(await isAuthorizedAdmin(normalized))) {
+    return null;
+  }
+
+  return normalized;
 }
 
 export async function requireAdminSession() {
+  await bootstrapSecureAuthAdmin();
+
   const session = await getServerSession(await getAuthOptions());
 
   if (!session?.user) {
     redirect("/login?callbackUrl=/admin");
   }
 
-  const user = session.user as { id?: string; email?: string | null };
+  const user = session.user as { id?: string; email?: string | null; role?: string | null };
 
   if (!user.id) {
     redirect("/login?callbackUrl=/admin");
   }
 
-  if (!isAdminEmail(user.email)) {
+  const normalized: AdminUser = {
+    id: user.id,
+    email: user.email ?? null,
+    role: user.role ?? null,
+  };
+
+  if (!(await isAuthorizedAdmin(normalized))) {
     forbidden();
   }
 
   return {
     ...session,
-    user: {
-      id: user.id,
-      email: user.email ?? null,
-    },
+    user: normalized,
   };
 }
 

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  adminListRequiresCategoryJoin,
   buildAdminPostOrderBy,
+  buildFlagsOrderBy,
   compareDefaultAdminPostOrder,
   DEFAULT_ADMIN_POST_ORDER,
   getAdminPostsDefaultOrderBy,
@@ -28,6 +30,22 @@ describe("admin post order by", () => {
   it("explicit sort overrides default admin ordering", () => {
     const clauses = buildAdminPostOrderBy({ sort: "title", direction: "asc" });
     expect(clauses).not.toEqual(DEFAULT_ADMIN_POST_ORDER);
+    expect(buildAdminPostOrderBy({ sort: "publicOrder", direction: "desc" })).toHaveLength(3);
+    expect(buildAdminPostOrderBy({ sort: "flags", direction: "asc" })).toEqual(buildFlagsOrderBy("asc"));
+    expect(buildAdminPostOrderBy({ sort: "flags", direction: "desc" })).toEqual(buildFlagsOrderBy("desc"));
+    expect(buildAdminPostOrderBy({ sort: "status", direction: "desc" })).toHaveLength(2);
+    expect(buildAdminPostOrderBy({ sort: "published", direction: "asc" })).toHaveLength(2);
+    expect(buildAdminPostOrderBy({ sort: "scheduled", direction: "desc" })).toHaveLength(2);
+    expect(buildAdminPostOrderBy({ sort: "updated", direction: "asc" })).toHaveLength(1);
+    expect(buildAdminPostOrderBy({ sort: "category", direction: "desc" })).toHaveLength(2);
+    expect(buildAdminPostOrderBy({ sort: "unknown" as "title", direction: "asc" })).toEqual(
+      DEFAULT_ADMIN_POST_ORDER
+    );
+  });
+
+  it("requires category join when sorting by category", () => {
+    expect(adminListRequiresCategoryJoin({ sort: "category", direction: "asc" })).toBe(true);
+    expect(adminListRequiresCategoryJoin({ sort: "title", direction: "asc" })).toBe(false);
   });
 });
 
@@ -72,5 +90,19 @@ describe("default admin post ordering rules", () => {
   it("orders the documented example set as E, B, A, C, D", () => {
     const ordered = sortPostsByDefaultAdminOrder([postD, postB, postA, postE, postC]);
     expect(ordered.map((post) => post.id)).toEqual(["E", "B", "A", "C", "D"]);
+  });
+
+  it("uses updatedAt as tiebreaker when dates match", () => {
+    const left = makePost({
+      id: "left",
+      publishedAt: new Date("2026-06-16T10:00:00Z"),
+      updatedAt: new Date("2026-06-16T10:00:00Z"),
+    });
+    const right = makePost({
+      id: "right",
+      publishedAt: new Date("2026-06-16T10:00:00Z"),
+      updatedAt: new Date("2026-06-16T11:00:00Z"),
+    });
+    expect(compareDefaultAdminPostOrder(left, right)).toBeGreaterThan(0);
   });
 });

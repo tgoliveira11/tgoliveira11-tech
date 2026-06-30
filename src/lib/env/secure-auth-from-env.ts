@@ -37,6 +37,9 @@ export type SecureAuthEnvSlice = Pick<
   | "oauth"
   | "webauthn"
   | "ui"
+  | "admin"
+  | "accountLockout"
+  | "apiKeys"
 >;
 
 /** Maps PostForge environment variables to `createSecureAuth(config)` fields. */
@@ -229,6 +232,17 @@ export function buildSecureAuthConfigFromEnv(
       passwordStrength: {
         position: passwordStrengthPosition,
       },
+    },
+    admin: {
+      enabled: readBooleanEnv(env, ["AUTH_ADMIN_ENABLED"], true),
+      path: readEnv(env, "AUTH_ADMIN_PATH") ?? "/admin/core",
+      bootstrapEmail: readEnv(env, "ADMIN_EMAIL")?.toLowerCase(),
+    },
+    accountLockout: {
+      enabled: readBooleanEnv(env, ["AUTH_ACCOUNT_LOCKOUT_ENABLED"], true),
+    },
+    apiKeys: {
+      enabled: readBooleanEnv(env, ["AUTH_API_KEYS_ENABLED"], true),
     },
   };
 }

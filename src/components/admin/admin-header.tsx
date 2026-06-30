@@ -9,7 +9,7 @@ const viewSiteLinkClassName =
 export function AdminHeader({ adminEmail }: { adminEmail: string }) {
   return (
     <header className="border-b border-[var(--border)] bg-[var(--card)]">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
+      <div className="mx-auto flex max-w-[1000px] items-center justify-between gap-4 px-4 py-4">
         <div>
           <Link href="/admin" className="text-lg font-semibold">
             PostForge Admin

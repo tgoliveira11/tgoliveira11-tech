@@ -30,6 +30,12 @@ describe("LocalStorageProvider", () => {
     expect(stored).toBe("fake-image");
   });
 
+  it("uses default upload paths from env when constructed without args", () => {
+    const provider = new LocalStorageProvider();
+    expect(provider.name).toBe("local");
+    expect(provider.getPublicUrl("posts/demo/file.png")).toContain("/api/assets/");
+  });
+
   it("rejects path traversal on delete", async () => {
     await expect(provider.delete("../outside.txt")).rejects.toThrow(/Invalid storage key|Path traversal/);
   });
@@ -43,5 +49,17 @@ describe("LocalStorageProvider", () => {
 
     expect(await provider.read(firstKey)).toEqual(Buffer.from("one"));
     expect(await provider.read(secondKey)).toEqual(Buffer.from("two"));
+  });
+
+  it("deletes stored files", async () => {
+    const storageKey = provider.buildStorageKey("post-id", "photo.png");
+    await provider.upload({
+      storageKey,
+      buffer: Buffer.from("fake-image"),
+      mimeType: "image/png",
+    });
+
+    await provider.delete(storageKey);
+    await expect(provider.read(storageKey)).rejects.toThrow();
   });
 });

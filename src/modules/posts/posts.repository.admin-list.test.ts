@@ -139,4 +139,19 @@ describe("posts repository admin helpers", () => {
     expect(selectMock).toHaveBeenCalled();
     expect(selectDistinctMock).not.toHaveBeenCalled();
   });
+
+  it("listAdminPosts joins categories when sorting by category", async () => {
+    offsetMock.mockResolvedValueOnce([{ post: { id: "post-1", title: "Category sorted" } }]);
+    whereMock.mockReturnValueOnce({ orderBy: orderByMock });
+    whereMock.mockResolvedValueOnce([{ count: 1 }]);
+    fromMock.mockReturnValueOnce({
+      leftJoin: leftJoinMock,
+      where: whereMock,
+    });
+    selectMock.mockReturnValueOnce({ from: fromMock });
+
+    const rows = await listAdminPosts({ sort: "category", direction: "asc" });
+    expect(leftJoinMock).toHaveBeenCalled();
+    expect(rows).toEqual([{ id: "post-1", title: "Category sorted" }]);
+  });
 });
