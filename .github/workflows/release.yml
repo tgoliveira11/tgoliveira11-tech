@@ -1,0 +1,117 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Bump: auto, patch, minor, major, or exact X.Y.Z"
+        required: false
+        default: auto
+        type: string
+      recovery:
+        description: "Recovery — create tag/release for current VERSION without bump"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-tgoliveira11-tech
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Prepare release metadata
+        id: prepare
+        env:
+          RECOVERY: ${{ inputs.recovery }}
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          ARGS=(--bump "${VERSION_INPUT}")
+          if [ "${RECOVERY}" = "true" ]; then
+            ARGS+=(--recovery)
+          fi
+          node scripts/prepare-release.mjs "${ARGS[@]}"
+
+      - name: Commit and push version metadata
+        if: steps.prepare.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.prepare.outputs.version }}"
+          git add VERSION CHANGELOG.md package.json
+          git diff --cached --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "chore(release): ${VERSION}"
+          git push origin HEAD:main
+
+      - name: Create annotated tag
+        id: tag
+        env:
+          VERSION: ${{ steps.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          TAG="v${VERSION}"
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag ${TAG} already exists."
+          else
+            git tag -a "${TAG}" -m "tgoliveira11-tech ${VERSION}"
+            git push origin "${TAG}"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Created and pushed ${TAG}."
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          TAG="v${VERSION}"
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "GitHub Release ${TAG} already exists."
+            exit 0
+          fi
+
+          NOTES_FILE="$(mktemp)"
+          if node scripts/prepare-release.mjs extract-notes "${VERSION}" > "${NOTES_FILE}" && [ -s "${NOTES_FILE}" ]; then
+            gh release create "${TAG}" \
+              --title "tgoliveira11-tech ${VERSION}" \
+              --notes-file "${NOTES_FILE}"
+          else
+            echo "CHANGELOG section empty; using generated notes."
+            gh release create "${TAG}" \
+              --title "tgoliveira11-tech ${VERSION}" \
+              --generate-notes
+          fi
+
+      - name: Summary
+        run: |
+          {
+            echo "### Release summary"
+            echo "- Version: \`${{ steps.prepare.outputs.version }}\`"
+            echo "- Metadata changed: \`${{ steps.prepare.outputs.changed }}\`"
+            echo "- Recovery mode: \`${{ steps.prepare.outputs.recovery }}\`"
+            echo "- Tag: \`v${{ steps.prepare.outputs.version }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

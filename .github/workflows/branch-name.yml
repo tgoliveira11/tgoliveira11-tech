@@ -1,0 +1,32 @@
+name: Branch name
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch prefix
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          echo "PR branch: ${BRANCH}"
+
+          if [[ "${BRANCH}" =~ ^(feature|fix|docs|chore)/.+ ]]; then
+            echo "Branch name OK."
+            exit 0
+          fi
+
+          if [[ "${BRANCH}" == sync/postforge-upstream ]]; then
+            echo "Upstream sync branch OK."
+            exit 0
+          fi
+
+          echo "::error::Branch \"${BRANCH}\" must start with feature/, fix/, docs/, or chore/ (or be sync/postforge-upstream)."
+          exit 1
