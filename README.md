@@ -195,11 +195,21 @@ Blogs created from the template **do not auto-update** when PostForge upstream c
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript check |
 | `npm test` | Vitest unit tests |
+| `npm run validate` | typecheck + lint + test + build (pre-PR checklist) |
 | `npm run db:generate` | Generate Drizzle migrations (schema changes only) |
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:studio` | Drizzle Studio |
 | `npm run import:github-pages` | Import from GitHub Pages / Jekyll |
 | `npm run audit` | `npm audit` security check |
+
+---
+
+## Contributing & releases
+
+- **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) → [docs/contributing.md](docs/contributing.md)
+- **Releases:** manual GitHub Releases only — [docs/releasing.md](docs/releasing.md)
+- **Version source:** [`VERSION`](VERSION) (canonical); `package.json` `version` is synced metadata
+- **Product surface:** [docs/CURRENT_PRODUCT_SURFACE.md](docs/CURRENT_PRODUCT_SURFACE.md)
 
 ---
 

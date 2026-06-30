@@ -1,0 +1,46 @@
+---
+description: Branch-first workflow, PR discipline, changelog, and manual releases for tgoliveira11-tech
+alwaysApply: true
+---
+
+# Branch, PR & release guardrails
+
+Read [docs/contributing.md](docs/contributing.md) and [docs/releasing.md](docs/releasing.md) for full detail.
+
+## Branch & git
+
+- Base branch: **`main`**. No direct commits to `main` unless the user explicitly asks.
+- Before substantive work: `git checkout main && git pull && git checkout -b feature|fix|docs|chore/...`
+- **Never push to `main`** without explicit user approval.
+- **Never** run destructive git (`push --force`, `reset --hard`, etc.) unless explicitly asked.
+- Commits only when the user asks; otherwise leave changes uncommitted.
+
+## Commits & PRs
+
+- Use Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `ci:`.
+- Open PRs with `gh pr create` **only when asked**. Do not merge or approve without explicit approval.
+- Prefer squash merge.
+
+## Before claiming code work is done
+
+1. Run **`npm run validate`**.
+2. Update tests for behavior changes.
+3. Update **`CHANGELOG.md`** `## [Unreleased]` for user-visible changes.
+4. Update **`docs/CURRENT_PRODUCT_SURFACE.md`** when routes/endpoints/jobs/integrations change.
+5. Never stage secrets (`.env`, credentials).
+
+Trivial docs-only edits may skip validate.
+
+## Releases
+
+- **Manual only** — never run `.github/workflows/release.yml` or create tags/releases unless explicitly asked.
+- **Invariant:** `VERSION` = git tag `vX.Y.Z` = GitHub Release `vX.Y.Z`.
+- This repo does not publish to npm. Deploy (Vercel) is separate and manual.
+
+## Protected fork customizations
+
+Preserve unless the task says otherwise:
+
+- `AUTH_COOKIE_PREFIX=tgoliveira11-tech`, ports `3011` / `5434`
+- `src/proxy.ts` (not `middleware.ts`) for legacy redirects + auth guest pages
+- Footer SK → `https://selahkeep.com` in `public-site-config.ts`
