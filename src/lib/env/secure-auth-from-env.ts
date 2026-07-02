@@ -14,6 +14,7 @@ import {
 const PASSWORD_ENFORCEMENT_VALUES = ["off", "warn", "enforce"] as const;
 const PASSWORD_STRENGTH_POSITION_VALUES = ["above", "below"] as const;
 const RATE_LIMIT_STORE_VALUES = ["memory", "postgres"] as const;
+const SERVER_ENVIRONMENT_VALUES = ["development", "test", "production"] as const;
 
 export type PostForgeAppEnvDefaults = {
   appName: string;
@@ -72,11 +73,25 @@ export function buildSecureAuthConfigFromEnv(
     "above"
   );
 
+  const serverEnvironment = readEnumEnv(
+    env,
+    ["AUTH_SERVER_ENVIRONMENT", "NODE_ENV"],
+    SERVER_ENVIRONMENT_VALUES,
+    env.NODE_ENV === "production"
+      ? "production"
+      : env.NODE_ENV === "test"
+        ? "test"
+        : "development"
+  );
+
+  const rateLimitStoreDefault =
+    serverEnvironment === "production" ? ("postgres" as const) : ("memory" as const);
+
   const rateLimitStore = readEnumEnv(
     env,
     ["AUTH_RATE_LIMIT_STORE", "RATE_LIMIT_STORE"],
     RATE_LIMIT_STORE_VALUES,
-    "memory"
+    rateLimitStoreDefault
   );
 
   const cookieSecureFromEnv = readFirstEnv(env, ["AUTH_COOKIE_SECURE", "COOKIE_SECURE"]);
@@ -129,6 +144,11 @@ export function buildSecureAuthConfigFromEnv(
       ),
     },
     security: {
+      trustForwardedHeaders: readBooleanEnv(
+        env,
+        ["AUTH_TRUST_FORWARDED_HEADERS"],
+        false
+      ),
       sameOriginProtection: {
         enabled: readBooleanEnv(env, ["AUTH_SAME_ORIGIN_PROTECTION_ENABLED"], true),
         allowedOrigins: readCsvEnv(env, "AUTH_ALLOWED_ORIGINS"),
@@ -197,6 +217,7 @@ export function buildSecureAuthConfigFromEnv(
     },
     server: {
       cookieSecure,
+      environment: serverEnvironment,
     },
     debug: {
       authTrace: readBooleanEnv(env, ["AUTH_TRACE", "AUTH_DEBUG_TRACE"], false),

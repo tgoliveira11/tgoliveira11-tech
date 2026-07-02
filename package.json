@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@tgoliveira/outpost": "^1.2.0",
-    "@tgoliveira/secure-auth": "^0.4.1",
+    "@tgoliveira/secure-auth": "^0.5.0",
     "@vercel/blob": "^2.4.0",
     "@vercel/speed-insights": "^2.0.0",
     "cheerio": "^1.2.0",
