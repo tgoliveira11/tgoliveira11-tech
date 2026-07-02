@@ -2,7 +2,7 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-06-15  
+**Last reviewed:** 2026-06-15 (secure-auth 0.5.0 upgrade)  
 **Deployed domain (planned):** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
@@ -46,7 +46,8 @@ Living inventory of what **tgoliveira11-tech** exposes today. Update this file w
 | `/verify-email` | shipped | |
 | `/check-email` | shipped | |
 | `/login/complete` | shipped | OAuth completion |
-| `/login/2fa` | shipped | 2FA challenge |
+| `/login/2fa` | shipped | 2FA challenge (server page; `initialUsernameEmail` for password managers) |
+| `/login/2fa/complete` | shipped | OAuth + 2FA completion |
 | `/account-deleted` | shipped | Post-deletion confirmation |
 | `/settings/account` | shipped | Redirects to `/admin/account` |
 | `/settings/security` | shipped | Redirects to `/admin/security` |
@@ -105,7 +106,7 @@ Requires secure-auth session + (`ADMIN_EMAIL` match **or** `users.role = admin`)
 |----------------|--------|-------|
 | `/api/auth/[...nextauth]` | shipped | NextAuth handler |
 | `/api/auth/register` | shipped | |
-| `/api/auth/login/*` | shipped | Start, complete, 2FA, passkey, trace |
+| `/api/auth/login/*` | shipped | Start, complete, 2FA, OAuth 2FA complete, passkey, trace |
 | `/api/auth/forgot-password` | shipped | |
 | `/api/auth/reset-password` | shipped | |
 | `/api/auth/verify-email/*` | shipped | |
@@ -137,7 +138,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Integration | Status | Notes |
 |-------------|--------|-------|
 | PostgreSQL (Drizzle) | shipped | Neon in prod; Docker `5434` locally |
-| `@tgoliveira/secure-auth` | shipped | `^0.4.1` |
+| `@tgoliveira/secure-auth` | shipped | `^0.5.0` — production rate limit + forwarded headers via env |
 | `@tgoliveira/outpost` | shipped | `^1.2.0` — transactional email outbox + admin UI |
 | Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
 | Vercel Speed Insights | shipped | Optional |

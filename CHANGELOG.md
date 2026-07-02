@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `@tgoliveira/secure-auth` to `0.5.0` with production security hardening: `server.environment`, Postgres rate limiting in production, and `security.trustForwardedHeaders` for Vercel/CDN deployments.
+- OAuth 2FA completion flow: `/login/2fa/complete` page and `POST /api/auth/login/oauth-2fa-complete`.
+- `/login/2fa` server page passes `initialUsernameEmail` for password-manager compatibility during 2FA.
+
 ## [0.1.1] - 2026-06-30
 
 ### Added

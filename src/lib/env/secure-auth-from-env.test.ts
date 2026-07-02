@@ -77,3 +77,38 @@ describe("buildSecureAuthConfigFromEnv API security (0.1.21+)", () => {
     expect(config.debug?.exposeTraceRoute).toBe(true);
   });
 });
+
+describe("buildSecureAuthConfigFromEnv security hardening (0.5.0+)", () => {
+  it("defaults to memory rate limiting in development", () => {
+    const config = buildSecureAuthConfigFromEnv(defaults, {
+      ...secrets,
+      NODE_ENV: "development",
+    });
+
+    expect(config.server?.environment).toBe("development");
+    expect(config.rateLimit?.store).toBe("memory");
+    expect(config.security?.trustForwardedHeaders).toBe(false);
+  });
+
+  it("requires postgres rate limiting in production by default", () => {
+    const config = buildSecureAuthConfigFromEnv(defaults, {
+      ...secrets,
+      NODE_ENV: "production",
+    });
+
+    expect(config.server?.environment).toBe("production");
+    expect(config.rateLimit?.store).toBe("postgres");
+  });
+
+  it("maps AUTH_TRUST_FORWARDED_HEADERS and explicit rate limit store", () => {
+    const config = buildSecureAuthConfigFromEnv(defaults, {
+      ...secrets,
+      NODE_ENV: "production",
+      AUTH_TRUST_FORWARDED_HEADERS: "true",
+      AUTH_RATE_LIMIT_STORE: "postgres",
+    });
+
+    expect(config.security?.trustForwardedHeaders).toBe(true);
+    expect(config.rateLimit?.store).toBe("postgres");
+  });
+});

@@ -9,6 +9,7 @@ export const SECURE_AUTH_UI_PATHS = {
   verifyEmail: "/verify-email",
   checkEmail: "/check-email",
   loginTwoFactor: "/login/2fa",
+  loginTwoFactorOauthComplete: "/login/2fa/complete",
   loginComplete: "/login/complete",
   account: SECURE_AUTH_ADMIN_PATHS.account,
   security: SECURE_AUTH_ADMIN_PATHS.security,
