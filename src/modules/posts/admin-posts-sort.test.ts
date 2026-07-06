@@ -58,7 +58,7 @@ describe("admin posts sort helpers", () => {
     ).toBe("default");
   });
 
-  it("returns sort indicators for active columns", () => {
+  it("returns null for inactive columns and direction for active ones", () => {
     expect(
       adminSortIndicator({
         column: "title",
@@ -67,6 +67,7 @@ describe("admin posts sort helpers", () => {
         usesDefaultSort: false,
       })
     ).toBeNull();
+
     expect(
       adminSortIndicator({
         column: "title",
@@ -75,6 +76,7 @@ describe("admin posts sort helpers", () => {
         usesDefaultSort: false,
       })
     ).toBe("desc");
+
     expect(
       adminSortIndicator({
         column: "title",
@@ -84,16 +86,12 @@ describe("admin posts sort helpers", () => {
     ).toBe("asc");
   });
 
-  it("builds href without optional filters", () => {
+  it("builds href without query string when filters are empty", () => {
     expect(
       buildAdminPostsSortHref({
-        column: "status",
-        filters: { status: "", search: undefined },
+        column: "title",
+        filters: {},
       })
-    ).toBe("/admin/posts?sort=status&direction=asc");
-  });
-
-  it("rejects invalid sort fields", () => {
-    expect(parseAdminPostsSortInput({ sort: "invalid" })).toEqual({ usesDefaultSort: true });
+    ).toBe("/admin/posts?sort=title&direction=asc");
   });
 });

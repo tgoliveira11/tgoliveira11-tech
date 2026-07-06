@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
+const { findAssetByIdMock } = vi.hoisted(() => ({
+  findAssetByIdMock: vi.fn(async () => null),
+}));
+
 vi.mock("@/modules/public/public-posts.repository", () => ({
-  findAssetById: vi.fn(async () => null),
+  findAssetById: findAssetByIdMock,
 }));
 
 import type { BlogConfig } from "@/modules/public/blog-config";
@@ -108,60 +112,100 @@ describe("seo helpers", () => {
     expect(resolved.ogImageUrl).toBe("https://example.com/default.png");
   });
 
-  it("resolves absolute and relative asset image URLs", async () => {
-    const { findAssetById } = await import("@/modules/public/public-posts.repository");
-    vi.mocked(findAssetById)
-      .mockResolvedValueOnce({
-        id: "asset-1",
-        publicUrl: "https://cdn.example.com/og.png",
-      } as never)
-      .mockResolvedValueOnce({
-        id: "asset-2",
-        publicUrl: "images/cover.png",
-      } as never);
+  it("falls back to blog description when excerpt is missing", () => {
+    const resolved = resolvePostSeo({
+      bundle: makeBundle({ excerpt: null }),
+      config,
+    });
 
-    const absolute = await resolvePostSeoWithImages({
+    expect(resolved.description).toBe("A test blog");
+  });
+
+  it("builds site metadata from blog config", () => {
+    const metadata = buildSiteMetadata(config);
+
+    expect(metadata.title).toEqual({ default: "PostForge", template: "%s | PostForge" });
+    expect(metadata.description).toBe("A test blog");
+    expect(metadata.metadataBase?.toString()).toBe("https://example.com/");
+  });
+
+  it("uses asset publicUrl for og image when available", async () => {
+    findAssetByIdMock.mockResolvedValueOnce({
+      id: "asset-1",
+      publicUrl: "/uploads/cover.png",
+    });
+
+    const resolved = await resolvePostSeoWithImages({
       bundle: makeBundle({ ogAssetId: "asset-1" }),
       config,
     });
-    expect(absolute.ogImageUrl).toBe("https://cdn.example.com/og.png");
 
-    const relative = await resolvePostSeoWithImages({
-      bundle: makeBundle({ coverAssetId: "asset-2" }),
-      config,
-    });
-    expect(relative.ogImageUrl).toBe("https://example.com/images/cover.png");
+    expect(resolved.ogImageUrl).toBe("https://example.com/uploads/cover.png");
   });
 
-  it("builds site metadata and JSON-LD with category and tags", () => {
-    const bundle = makeBundle({
-      excerpt: "",
-      seoDescription: null,
-    });
-    const resolved = resolvePostSeo({ bundle, config });
-    expect(resolved.description).toBe("A test blog");
-
+  it("builds large-image metadata when ogImageUrl is present", () => {
     const metadata = buildPostMetadata({
-      ...resolved,
+      title: "Hello World",
+      description: "Short excerpt",
+      canonicalUrl: "https://example.com/blog/hello-world",
+      ogTitle: "Hello World",
+      ogDescription: "Short excerpt",
       ogImageUrl: "https://example.com/og.png",
     });
-    expect(metadata.openGraph?.images).toEqual([{ url: "https://example.com/og.png" }]);
-    expect(metadata.twitter?.card).toBe("summary_large_image");
 
-    const jsonLd = buildBlogPostingJsonLd(
-      {
-        ...bundle,
-        category: { id: "cat-1", name: "Engineering", slug: "engineering", description: null, createdAt: new Date(), updatedAt: new Date() },
-      },
-      resolved
-    );
-    expect(jsonLd.articleSection).toBe("Engineering");
+    expect(metadata.twitter?.card).toBe("summary_large_image");
+    expect(metadata.openGraph?.images).toEqual([{ url: "https://example.com/og.png" }]);
+  });
+
+  it("includes category and keywords in JSON-LD", () => {
+    const now = new Date("2026-06-14T12:00:00.000Z");
+    const bundle = makeBundle();
+    bundle.category = {
+      id: "cat-1",
+      name: "Guides",
+      slug: "guides",
+      description: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const resolved = resolvePostSeo({ bundle, config });
+    const jsonLd = buildBlogPostingJsonLd(bundle, resolved);
+
+    expect(jsonLd.articleSection).toBe("Guides");
     expect(jsonLd.keywords).toBe("News");
   });
 
-  it("builds site-level metadata", () => {
-    const metadata = buildSiteMetadata(config);
-    expect(metadata.title).toEqual({ default: "PostForge", template: "%s | PostForge" });
-    expect(metadata.metadataBase?.toString()).toBe("https://example.com/");
+  it("supports absolute asset and default image URLs", async () => {
+    findAssetByIdMock.mockResolvedValueOnce({
+      id: "asset-1",
+      publicUrl: "https://cdn.example.com/cover.png",
+    });
+
+    const withAbsoluteAsset = await resolvePostSeoWithImages({
+      bundle: makeBundle({ ogAssetId: "asset-1" }),
+      config,
+    });
+    expect(withAbsoluteAsset.ogImageUrl).toBe("https://cdn.example.com/cover.png");
+
+    findAssetByIdMock.mockResolvedValueOnce(null);
+    const withAbsoluteDefault = await resolvePostSeoWithImages({
+      bundle: makeBundle(),
+      config: { ...config, defaultSeoImage: "https://cdn.example.com/default.png" },
+    });
+    expect(withAbsoluteDefault.ogImageUrl).toBe("https://cdn.example.com/default.png");
+  });
+
+  it("builds summary card metadata when no og image exists", () => {
+    const metadata = buildPostMetadata({
+      title: "Hello World",
+      description: "Short excerpt",
+      canonicalUrl: "https://example.com/blog/hello-world",
+      ogTitle: "Hello World",
+      ogDescription: "Short excerpt",
+      ogImageUrl: null,
+    });
+
+    expect(metadata.twitter?.card).toBe("summary");
+    expect(metadata.openGraph?.images).toBeUndefined();
   });
 });

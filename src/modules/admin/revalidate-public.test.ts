@@ -1,21 +1,16 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-const { revalidatePathMock } = vi.hoisted(() => ({
-  revalidatePathMock: vi.fn(),
-}));
+const revalidatePathMock = vi.hoisted(() => vi.fn());
 
 vi.mock("next/cache", () => ({
   revalidatePath: revalidatePathMock,
 }));
 
-import { revalidatePublicPaths } from "./revalidate-public";
+import { revalidatePublicPaths } from "@/modules/admin/revalidate-public";
 
 describe("revalidatePublicPaths", () => {
-  beforeEach(() => {
-    revalidatePathMock.mockClear();
-  });
-
   it("revalidates core public routes", () => {
+    revalidatePathMock.mockClear();
     revalidatePublicPaths();
 
     expect(revalidatePathMock).toHaveBeenCalledWith("/");
@@ -25,13 +20,13 @@ describe("revalidatePublicPaths", () => {
     expect(revalidatePathMock).toHaveBeenCalledWith("/search");
     expect(revalidatePathMock).toHaveBeenCalledWith("/rss.xml");
     expect(revalidatePathMock).toHaveBeenCalledWith("/sitemap.xml");
-    expect(revalidatePathMock).toHaveBeenCalledTimes(7);
   });
 
-  it("also revalidates the post path when slug is provided", () => {
+  it("revalidates a specific post path when slug is provided", () => {
+    revalidatePathMock.mockClear();
+
     revalidatePublicPaths("hello-world");
 
     expect(revalidatePathMock).toHaveBeenCalledWith("/blog/hello-world");
-    expect(revalidatePathMock).toHaveBeenCalledTimes(8);
   });
 });

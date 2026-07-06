@@ -1,42 +1,44 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { insertReturningMock, selectLimitMock, selectMock, deleteReturningMock, orderByMock } =
-  vi.hoisted(() => {
-    const insertReturningMock = vi.fn();
-    const selectLimitMock = vi.fn();
-    const orderByMock = vi.fn();
-    const selectMock = vi.fn(() => ({
-      from: vi.fn(() => ({
-        where: vi.fn(() => ({ limit: selectLimitMock })),
-        orderBy: orderByMock,
-      })),
-    }));
-    const deleteReturningMock = vi.fn();
+const {
+  insertMock,
+  selectMock,
+  deleteMock,
+  fromMock,
+  whereMock,
+  limitMock,
+  orderByMock,
+  valuesMock,
+  returningMock,
+} = vi.hoisted(() => {
+  const returningMock = vi.fn();
+  const valuesMock = vi.fn();
+  const insertMock = vi.fn();
+  const deleteMock = vi.fn();
+  const orderByMock = vi.fn();
+  const limitMock = vi.fn();
+  const whereMock = vi.fn();
+  const fromMock = vi.fn();
+  const selectMock = vi.fn();
 
-    return {
-      insertReturningMock,
-      selectLimitMock,
-      selectMock,
-      deleteReturningMock,
-      orderByMock,
-      insertMock: vi.fn(() => ({
-        values: vi.fn(() => ({ returning: insertReturningMock })),
-      })),
-      deleteMock: vi.fn(() => ({
-        where: vi.fn(() => ({ returning: deleteReturningMock })),
-      })),
-    };
-  });
+  return {
+    insertMock,
+    selectMock,
+    deleteMock,
+    fromMock,
+    whereMock,
+    limitMock,
+    orderByMock,
+    valuesMock,
+    returningMock,
+  };
+});
 
 vi.mock("@/db/get-db", () => ({
   db: {
-    insert: vi.fn(() => ({
-      values: vi.fn(() => ({ returning: insertReturningMock })),
-    })),
+    insert: insertMock,
     select: selectMock,
-    delete: vi.fn(() => ({
-      where: vi.fn(() => ({ returning: deleteReturningMock })),
-    })),
+    delete: deleteMock,
   },
 }));
 
@@ -47,43 +49,72 @@ import {
   listRedirects,
 } from "./redirects.repository";
 
-const sampleRedirect = {
+const redirect = {
   id: "redirect-1",
   sourcePath: "/old",
   targetPath: "/new",
   statusCode: 301,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt: new Date("2026-01-01T00:00:00.000Z"),
+  updatedAt: new Date("2026-01-01T00:00:00.000Z"),
 };
 
 describe("redirects repository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    insertReturningMock.mockResolvedValue([sampleRedirect]);
-    selectLimitMock.mockResolvedValue([sampleRedirect]);
-    orderByMock.mockResolvedValue([sampleRedirect]);
-    deleteReturningMock.mockResolvedValue([{ id: "redirect-1" }]);
+
+    returningMock.mockResolvedValue([redirect]);
+    valuesMock.mockReturnValue({ returning: returningMock });
+    insertMock.mockReturnValue({ values: valuesMock });
+
+    limitMock.mockResolvedValue([]);
+    whereMock.mockReturnValue({ limit: limitMock });
+    orderByMock.mockResolvedValue([]);
+    fromMock.mockReturnValue({ where: whereMock, orderBy: orderByMock });
+    selectMock.mockReturnValue({ from: fromMock });
+
+    deleteMock.mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([{ id: redirect.id }]),
+      }),
+    });
   });
 
-  it("inserts redirects", async () => {
+  it("insertRedirect returns the inserted row", async () => {
     await expect(
       insertRedirect({ sourcePath: "/old", targetPath: "/new", statusCode: 301 })
-    ).resolves.toEqual(sampleRedirect);
+    ).resolves.toEqual(redirect);
+    expect(valuesMock).toHaveBeenCalledWith({
+      sourcePath: "/old",
+      targetPath: "/new",
+      statusCode: 301,
+    });
   });
 
-  it("finds redirect by source path", async () => {
-    await expect(findRedirectBySourcePath("/old")).resolves.toEqual(sampleRedirect);
-    selectLimitMock.mockResolvedValueOnce([]);
-    await expect(findRedirectBySourcePath("/missing")).resolves.toBeUndefined();
+  it("findRedirectBySourcePath returns the first matching row", async () => {
+    limitMock.mockResolvedValueOnce([redirect]);
+
+    await expect(findRedirectBySourcePath("/old")).resolves.toEqual(redirect);
+    expect(limitMock).toHaveBeenCalledWith(1);
   });
 
-  it("lists redirects", async () => {
-    await expect(listRedirects()).resolves.toEqual([sampleRedirect]);
+  it("listRedirects orders redirects by source path", async () => {
+    orderByMock.mockResolvedValueOnce([redirect]);
+
+    await expect(listRedirects()).resolves.toEqual([redirect]);
+    expect(orderByMock).toHaveBeenCalled();
   });
 
-  it("deletes redirects by id", async () => {
+  it("deleteRedirectById returns true when a row is deleted", async () => {
     await expect(deleteRedirectById("redirect-1")).resolves.toBe(true);
-    deleteReturningMock.mockResolvedValueOnce([]);
+  });
+
+  it("deleteRedirectById returns false when no row is deleted", async () => {
+    deleteMock.mockReturnValueOnce({
+      where: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([]),
+      }),
+    });
+
     await expect(deleteRedirectById("missing")).resolves.toBe(false);
   });
 });

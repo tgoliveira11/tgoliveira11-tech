@@ -1,66 +1,86 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const selectMock = vi.fn();
+const { selectMock, fromMock, whereMock, limitMock } = vi.hoisted(() => {
+  const limitMock = vi.fn();
+  const whereMock = vi.fn();
+  const fromMock = vi.fn();
+  const selectMock = vi.fn();
+
+  return { selectMock, fromMock, whereMock, limitMock };
+});
 
 vi.mock("@/db/get-db", () => ({
-  db: {
-    select: (...args: unknown[]) => selectMock(...args),
-  },
+  db: { select: selectMock },
 }));
 
-import { getBlogConfig, getBlogSetting } from "./blog-config";
+vi.mock("@/lib/env", () => ({
+  readEnv: vi.fn((key: string) => {
+    if (key === "APP_NAME") return "Env Blog";
+    if (key === "APP_BASE_URL") return "https://env.example.com";
+    if (key === "NEXTAUTH_URL") return "https://auth.example.com";
+    return undefined;
+  }),
+}));
+
+import { getBlogConfig, getBlogSetting } from "@/modules/public/blog-config";
 
 describe("blog config", () => {
-  const originalEnv = { ...process.env };
-
   beforeEach(() => {
     vi.clearAllMocks();
-    selectMock.mockReturnValue({
-      from: vi.fn(() => Promise.resolve([])),
+
+    limitMock.mockResolvedValue([]);
+    whereMock.mockReturnValue({ limit: limitMock });
+    fromMock.mockReturnValue({ where: whereMock });
+    selectMock.mockReturnValue({ from: fromMock });
+  });
+
+  it("getBlogConfig merges db settings with env and defaults", async () => {
+    fromMock.mockResolvedValueOnce([
+      { key: "blogTitle", value: "DB Title" },
+      { key: "blogDescription", value: "DB Description" },
+      { key: "baseUrl", value: "https://db.example.com" },
+      { key: "postsPerPage", value: "24" },
+      { key: "rssEnabled", value: "false" },
+      { key: "analyticsEnabled", value: "false" },
+      { key: "defaultSeoImage", value: "/seo.png" },
+    ]);
+
+    await expect(getBlogConfig()).resolves.toEqual({
+      title: "DB Title",
+      description: "DB Description",
+      baseUrl: "https://db.example.com",
+      postsPerPage: 24,
+      rssEnabled: false,
+      analyticsEnabled: false,
+      defaultSeoImage: "/seo.png",
     });
-    process.env = { ...originalEnv };
   });
 
-  afterEach(() => {
-    process.env = originalEnv;
-  });
+  it("getBlogConfig falls back to env and defaults when db is empty", async () => {
+    fromMock.mockResolvedValueOnce([]);
 
-  it("uses defaults when database and env are empty", async () => {
-    const config = await getBlogConfig();
-    expect(config.title).toBe("PostForge");
-    expect(config.postsPerPage).toBe(12);
-    expect(config.rssEnabled).toBe(true);
-    expect(config.analyticsEnabled).toBe(true);
-  });
-
-  it("merges database overrides and env fallbacks", async () => {
-    selectMock.mockReturnValueOnce({
-      from: vi.fn(() =>
-        Promise.resolve([
-          { key: "blogTitle", value: "Custom Blog" },
-          { key: "postsPerPage", value: "0" },
-          { key: "rssEnabled", value: "false" },
-        ])
-      ),
+    await expect(getBlogConfig()).resolves.toEqual({
+      title: "Env Blog",
+      description: "Markdown-based blog publishing platform",
+      baseUrl: "https://env.example.com",
+      postsPerPage: 12,
+      rssEnabled: true,
+      analyticsEnabled: true,
+      defaultSeoImage: null,
     });
-    process.env.APP_BASE_URL = "https://example.com";
-
-    const config = await getBlogConfig();
-    expect(config.title).toBe("Custom Blog");
-    expect(config.baseUrl).toBe("https://example.com");
-    expect(config.postsPerPage).toBe(12);
-    expect(config.rssEnabled).toBe(false);
   });
 
-  it("reads individual blog settings", async () => {
-    selectMock.mockReturnValueOnce({
-      from: vi.fn(() => ({
-        where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([{ key: "blogTitle", value: "Custom Blog" }])),
-        })),
-      })),
-    });
+  it("getBlogSetting returns a single setting value", async () => {
+    limitMock.mockResolvedValueOnce([{ key: "blogTitle", value: "Single Title" }]);
 
-    await expect(getBlogSetting("blogTitle")).resolves.toBe("Custom Blog");
+    await expect(getBlogSetting("blogTitle")).resolves.toBe("Single Title");
+    expect(whereMock).toHaveBeenCalled();
+    expect(limitMock).toHaveBeenCalledWith(1);
+  });
+
+  it("getBlogSetting returns undefined when key is missing", async () => {
+    limitMock.mockResolvedValueOnce([]);
+
+    await expect(getBlogSetting("missing")).resolves.toBeUndefined();
   });
 });

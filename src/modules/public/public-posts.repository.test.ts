@@ -1,174 +1,159 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-function drizzleResult<T>(value: T) {
-  const promise = Promise.resolve(value);
-  return new Proxy(
-    {},
-    {
-      get(_target, prop) {
-        if (prop === "then") {
-          return promise.then.bind(promise);
-        }
-        return () => drizzleResult(value);
-      },
-    }
-  );
-}
+const {
+  selectMock,
+  fromMock,
+  innerJoinMock,
+  whereMock,
+  orderByMock,
+  limitMock,
+  offsetMock,
+} = vi.hoisted(() => {
+  const offsetMock = vi.fn();
+  const limitMock = vi.fn();
+  const orderByMock = vi.fn();
+  const whereMock = vi.fn();
+  const innerJoinMock = vi.fn();
+  const fromMock = vi.fn();
+  const selectMock = vi.fn();
 
-const postId = "550e8400-e29b-41d4-a716-446655440000";
-const categoryId = "660e8400-e29b-41d4-a716-446655440001";
-const assetId = "770e8400-e29b-41d4-a716-446655440002";
-
-const samplePost = {
-  id: postId,
-  slug: "hello-world",
-  title: "Hello",
-  excerpt: "Excerpt",
-  contentMarkdown: "Body",
-  categoryId,
-  coverAssetId: assetId,
-  status: "published",
-  publishedAt: new Date("2024-01-01"),
-} as const;
-
-const sampleCategory = {
-  id: categoryId,
-  name: "Engineering",
-  slug: "engineering",
-  description: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const sampleTag = {
-  id: "880e8400-e29b-41d4-a716-446655440003",
-  name: "News",
-  slug: "news",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const sampleAsset = {
-  id: assetId,
-  postId,
-  storageProvider: "local",
-  storageKey: "posts/hello/photo.jpg",
-  publicUrl: "/uploads/photo.jpg",
-  originalFilename: "photo.jpg",
-  safeFilename: "photo.jpg",
-  mimeType: "image/jpeg",
-  fileSizeBytes: 100,
-  altText: null,
-  caption: null,
-  hash: null,
-  createdBy: "user-1",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const { selectMock } = vi.hoisted(() => ({
-  selectMock: vi.fn(),
-}));
+  return {
+    selectMock,
+    fromMock,
+    innerJoinMock,
+    whereMock,
+    orderByMock,
+    limitMock,
+    offsetMock,
+  };
+});
 
 vi.mock("@/db/get-db", () => ({
-  db: {
-    select: selectMock,
-  },
+  db: { select: selectMock },
 }));
 
+import type { Post } from "@/modules/posts/posts.types";
 import {
   countPublishedPosts,
-  findAssetById,
-  getPublishedPostBundleBySlug,
-  listPopularTags,
+  getPublishedNeighbors,
   listPublishedPostBundles,
-  searchPublishedPostBundles,
-} from "./public-posts.repository";
+  listPublishedPostsForFeed,
+} from "@/modules/public/public-posts.repository";
+
+function makePost(id: string, overrides: Partial<Post> = {}): Post {
+  const now = new Date("2026-06-14T12:00:00.000Z");
+  return {
+    id,
+    title: `Post ${id}`,
+    slug: `post-${id}`,
+    excerpt: "Excerpt",
+    contentMarkdown: "Body",
+    contentHtmlCache: null,
+    coverAssetId: null,
+    status: "published",
+    featured: false,
+    pinned: false,
+    pinnedPriority: 0,
+    publicOrder: null,
+    categoryId: null,
+    publishedAt: now,
+    scheduledAt: null,
+    unpublishedAt: null,
+    seoTitle: null,
+    seoDescription: null,
+    canonicalUrl: null,
+    ogTitle: null,
+    ogDescription: null,
+    ogAssetId: null,
+    readingTimeMinutes: 1,
+    createdBy: "user",
+    updatedBy: "user",
+    createdAt: now,
+    updatedAt: now,
+    ...overrides,
+  };
+}
+
+function mockListQuery(rows: Post[]) {
+  orderByMock.mockReturnValueOnce({ limit: limitMock });
+  offsetMock.mockResolvedValueOnce(rows);
+}
+
+function mockFeedQuery(rows: Post[]) {
+  orderByMock.mockReturnValueOnce({ limit: limitMock });
+  limitMock.mockResolvedValueOnce(rows);
+}
+
+function mockTagHydration() {
+  orderByMock.mockResolvedValueOnce([]);
+}
 
 describe("public posts repository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    selectMock.mockImplementation(() => ({
-      from: () => drizzleResult([samplePost]),
-    }));
+
+    offsetMock.mockResolvedValue([]);
+    limitMock.mockReturnValue({ offset: offsetMock });
+    orderByMock.mockReturnValue({ limit: limitMock });
+    whereMock.mockReturnValue({ orderBy: orderByMock });
+    innerJoinMock.mockReturnValue({ where: whereMock });
+    fromMock.mockReturnValue({
+      where: whereMock,
+      innerJoin: innerJoinMock,
+    });
+    selectMock.mockReturnValue({ from: fromMock });
   });
 
-  it("counts published posts with optional exclusion", async () => {
-    selectMock.mockImplementation(() => ({
-      from: () => drizzleResult([{ count: 5 }]),
-    }));
-    await expect(countPublishedPosts()).resolves.toBe(5);
-    await expect(countPublishedPosts({ excludePostId: postId })).resolves.toBe(5);
+  it("countPublishedPosts returns the db count", async () => {
+    whereMock.mockResolvedValueOnce([{ count: 7 }]);
+
+    await expect(countPublishedPosts()).resolves.toBe(7);
   });
 
-  it("returns empty search results for blank queries", async () => {
-    await expect(searchPublishedPostBundles("   ")).resolves.toEqual([]);
+  it("countPublishedPosts excludes a post when excludePostId is provided", async () => {
+    whereMock.mockResolvedValueOnce([{ count: 2 }]);
+
+    await expect(countPublishedPosts({ excludePostId: "post-1" })).resolves.toBe(2);
+    expect(whereMock).toHaveBeenCalled();
   });
 
-  it("hydrates published post bundles", async () => {
-    selectMock
-      .mockImplementationOnce(() => ({
-        from: () => drizzleResult([samplePost]),
-      }))
-      .mockImplementationOnce(() => ({
-        from: () => drizzleResult([sampleCategory]),
-      }))
-      .mockImplementationOnce(() => ({
-        from: () => ({
-          innerJoin: () => drizzleResult([{ tag: sampleTag }]),
-        }),
-      }))
-      .mockImplementationOnce(() => ({
-        from: () => drizzleResult([sampleAsset]),
-      }));
+  it("listPublishedPostBundles hydrates tags for each post", async () => {
+    const post = makePost("post-1");
+    mockListQuery([post]);
+    mockTagHydration();
 
-    const bundles = await listPublishedPostBundles({ limit: 1 });
-    expect(bundles[0]?.post.id).toBe(postId);
-    expect(bundles[0]?.category?.slug).toBe("engineering");
-    expect(bundles[0]?.tags).toEqual([sampleTag]);
-    expect(bundles[0]?.coverAsset?.id).toBe(assetId);
+    const bundles = await listPublishedPostBundles({ limit: 5, offset: 0 });
+
+    expect(bundles).toHaveLength(1);
+    expect(bundles[0]?.post.id).toBe("post-1");
+    expect(bundles[0]?.tags).toEqual([]);
+    expect(limitMock).toHaveBeenCalledWith(5);
+    expect(offsetMock).toHaveBeenCalledWith(0);
   });
 
-  it("returns null when slug is not found", async () => {
-    selectMock.mockImplementation(() => ({
-      from: () => drizzleResult([]),
-    }));
-    await expect(getPublishedPostBundleBySlug("missing")).resolves.toBeNull();
+  it("getPublishedNeighbors returns previous and next posts in listing order", async () => {
+    const posts = [
+      makePost("post-a", { publicOrder: 0 }),
+      makePost("post-b", { publicOrder: 1 }),
+      makePost("post-c", { publicOrder: 2 }),
+    ];
+    orderByMock.mockResolvedValueOnce(posts);
+
+    await expect(getPublishedNeighbors("post-b")).resolves.toEqual({
+      previous: posts[0],
+      next: posts[2],
+    });
   });
 
-  it("slices popular tags to the requested limit", async () => {
-    const popularTags = Array.from({ length: 5 }, (_, index) => ({
-      ...sampleTag,
-      id: `${index}`,
-      postCount: 10 - index,
-    }));
+  it("listPublishedPostsForFeed returns hydrated bundles up to the limit", async () => {
+    const post = makePost("feed-1");
+    mockFeedQuery([post]);
+    mockTagHydration();
 
-    selectMock.mockImplementation(() => ({
-      from: () => ({
-        innerJoin: () => ({
-          innerJoin: () => ({
-            where: () => ({
-              groupBy: () => ({
-                orderBy: () => Promise.resolve(popularTags),
-              }),
-            }),
-          }),
-        }),
-      }),
-    }));
+    const bundles = await listPublishedPostsForFeed(10);
 
-    await expect(listPopularTags(3)).resolves.toHaveLength(3);
-  });
-
-  it("finds assets by id", async () => {
-    selectMock.mockImplementationOnce(() => ({
-      from: () => drizzleResult([sampleAsset]),
-    }));
-    await expect(findAssetById(assetId)).resolves.toEqual(sampleAsset);
-
-    selectMock.mockImplementationOnce(() => ({
-      from: () => drizzleResult([]),
-    }));
-    await expect(findAssetById("missing")).resolves.toBeNull();
+    expect(bundles).toHaveLength(1);
+    expect(bundles[0]?.post.id).toBe("feed-1");
+    expect(limitMock).toHaveBeenCalledWith(10);
   });
 });

@@ -37,11 +37,39 @@ export type SecureAuthEnvSlice = Pick<
   | "debug"
   | "oauth"
   | "webauthn"
+  | "captcha"
   | "ui"
   | "admin"
   | "accountLockout"
+  | "invites"
   | "apiKeys"
+  | "profile"
 >;
+
+function resolveServerEnvironment(
+  env: NodeJS.ProcessEnv
+): (typeof SERVER_ENVIRONMENT_VALUES)[number] | undefined {
+  const explicit = readEnv(env, "AUTH_SERVER_ENVIRONMENT");
+  if (explicit) {
+    return readEnumEnv(
+      env,
+      ["AUTH_SERVER_ENVIRONMENT"],
+      SERVER_ENVIRONMENT_VALUES,
+      "development"
+    );
+  }
+
+  const nodeEnv = env.NODE_ENV;
+  if (
+    nodeEnv === "production" ||
+    nodeEnv === "development" ||
+    nodeEnv === "test"
+  ) {
+    return nodeEnv;
+  }
+
+  return undefined;
+}
 
 /** Maps PostForge environment variables to `createSecureAuth(config)` fields. */
 export function buildSecureAuthConfigFromEnv(
@@ -73,16 +101,7 @@ export function buildSecureAuthConfigFromEnv(
     "above"
   );
 
-  const serverEnvironment = readEnumEnv(
-    env,
-    ["AUTH_SERVER_ENVIRONMENT", "NODE_ENV"],
-    SERVER_ENVIRONMENT_VALUES,
-    env.NODE_ENV === "production"
-      ? "production"
-      : env.NODE_ENV === "test"
-        ? "test"
-        : "development"
-  );
+  const serverEnvironment = resolveServerEnvironment(env);
 
   const rateLimitStoreDefault =
     serverEnvironment === "production" ? ("postgres" as const) : ("memory" as const);
@@ -129,6 +148,43 @@ export function buildSecureAuthConfigFromEnv(
       requireEmailVerificationBeforeSignIn: requireEmailVerification,
       nextAuthSecret: readEnv(env, "NEXTAUTH_SECRET") ?? "",
       twoFactorEncryptionKey: readEnv(env, "TWO_FACTOR_SECRET_ENCRYPTION_KEY") ?? "",
+      magicLink: {
+        enabled: readBooleanEnv(env, ["AUTH_MAGIC_LINK_ENABLED"], false),
+      },
+      securityNotifications: {
+        enabled: readBooleanEnv(env, ["AUTH_SECURITY_NOTIFICATIONS_ENABLED"], true),
+      },
+    },
+    admin: {
+      enabled: readBooleanEnv(env, ["AUTH_ADMIN_ENABLED"], true),
+      path: readEnv(env, "AUTH_ADMIN_PATH") ?? "/admin/core",
+      bootstrapEmail: readEnv(env, "ADMIN_EMAIL")?.toLowerCase(),
+      configCacheTtlSeconds: readNumberEnv(
+        env,
+        ["AUTH_ADMIN_CONFIG_CACHE_TTL_SECONDS"],
+        60,
+        { min: 0 }
+      ),
+    },
+    accountLockout: {
+      enabled: readBooleanEnv(env, ["AUTH_ACCOUNT_LOCKOUT_ENABLED"], true),
+    },
+    invites: {
+      enabled: readBooleanEnv(env, ["AUTH_INVITES_ENABLED"], false),
+      requireApproval: readBooleanEnv(env, ["AUTH_INVITES_REQUIRE_APPROVAL"], false),
+      requireInviteCode: readBooleanEnv(env, ["AUTH_INVITES_REQUIRE_CODE"], false),
+      defaultQuotaPerUser: readNumberEnv(env, ["AUTH_INVITES_DEFAULT_QUOTA"], 0, { min: 0 }),
+      codeExpiryDays: readNumberEnv(env, ["AUTH_INVITES_CODE_EXPIRY_DAYS"], 30, { min: 1 }),
+    },
+    apiKeys: {
+      enabled: readBooleanEnv(env, ["AUTH_API_KEYS_ENABLED"], true),
+      defaultExpiryDays: readNumberEnv(env, ["AUTH_API_KEYS_DEFAULT_EXPIRY_DAYS"], 365, {
+        min: 0,
+      }),
+    },
+    profile: {
+      enabled: readBooleanEnv(env, ["AUTH_PROFILE_ENABLED"], false),
+      allowAvatarUpload: readBooleanEnv(env, ["AUTH_PROFILE_ALLOW_AVATAR_UPLOAD"], false),
     },
     accountPolicy: {
       sendVerificationOnRegister: readBooleanEnv(
@@ -185,6 +241,11 @@ export function buildSecureAuthConfigFromEnv(
         ["AUTH_PASSWORD_BLOCK_COMMON_PASSWORDS", "PASSWORD_BLOCK_COMMON_PASSWORDS"],
         true
       ),
+      checkBreachedPasswords: readBooleanEnv(
+        env,
+        ["AUTH_PASSWORD_HIBP_ENABLED", "AUTH_PASSWORD_CHECK_BREACHED"],
+        false
+      ),
       minScore: readNumberEnv(env, ["AUTH_PASSWORD_MIN_SCORE", "PASSWORD_MIN_SCORE"], 2, {
         min: 0,
         max: 4,
@@ -234,6 +295,11 @@ export function buildSecureAuthConfigFromEnv(
         ["AUTH_APPLE_CLIENT_ID", "APPLE_CLIENT_ID"],
         ["AUTH_APPLE_CLIENT_SECRET", "APPLE_CLIENT_SECRET"]
       ),
+      github: readOAuthPair(
+        env,
+        ["AUTH_GITHUB_CLIENT_ID", "GITHUB_CLIENT_ID"],
+        ["AUTH_GITHUB_CLIENT_SECRET", "GITHUB_CLIENT_SECRET"]
+      ),
       microsoft: microsoftOAuth
         ? {
             ...microsoftOAuth,
@@ -248,22 +314,21 @@ export function buildSecureAuthConfigFromEnv(
       rpName: readEnv(env, "WEBAUTHN_RP_NAME") ?? appName,
       origin: readFirstEnv(env, ["WEBAUTHN_ORIGIN", "APP_BASE_URL", "NEXTAUTH_URL"]) ?? baseUrl,
     },
+    captcha: {
+      enabled: readBooleanEnv(env, ["AUTH_CAPTCHA_ENABLED"], false),
+      provider: "turnstile",
+      siteKey: readEnv(env, "AUTH_CAPTCHA_TURNSTILE_SITE_KEY"),
+      secretKey: readEnv(env, "AUTH_CAPTCHA_TURNSTILE_SECRET_KEY"),
+      pages: {
+        register: readBooleanEnv(env, ["AUTH_CAPTCHA_REGISTER_ENABLED"], false),
+        login: readBooleanEnv(env, ["AUTH_CAPTCHA_LOGIN_ENABLED"], false),
+      },
+    },
     ui: {
       brand: { name: appName },
       passwordStrength: {
         position: passwordStrengthPosition,
       },
-    },
-    admin: {
-      enabled: readBooleanEnv(env, ["AUTH_ADMIN_ENABLED"], true),
-      path: readEnv(env, "AUTH_ADMIN_PATH") ?? "/admin/core",
-      bootstrapEmail: readEnv(env, "ADMIN_EMAIL")?.toLowerCase(),
-    },
-    accountLockout: {
-      enabled: readBooleanEnv(env, ["AUTH_ACCOUNT_LOCKOUT_ENABLED"], true),
-    },
-    apiKeys: {
-      enabled: readBooleanEnv(env, ["AUTH_API_KEYS_ENABLED"], true),
     },
   };
 }

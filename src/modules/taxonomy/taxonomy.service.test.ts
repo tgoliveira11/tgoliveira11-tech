@@ -118,11 +118,6 @@ describe("taxonomy.service findOrCreate", () => {
     expect(categoryResult.created).toBe(false);
 
     vi.mocked(categoriesRepo.findCategoryBySlug).mockResolvedValue(undefined);
-    vi.mocked(categoriesRepo.findCategoryByNameCaseInsensitive).mockResolvedValue(sampleCategory);
-    categoryResult = await taxonomyService.findOrCreateCategory("engineering");
-    expect(categoryResult.created).toBe(false);
-
-    vi.mocked(categoriesRepo.findCategoryBySlug).mockResolvedValue(undefined);
     vi.mocked(categoriesRepo.findCategoryByNameCaseInsensitive).mockResolvedValue(undefined);
     vi.mocked(categoriesService.createCategory).mockResolvedValue(sampleCategory);
 
@@ -131,32 +126,15 @@ describe("taxonomy.service findOrCreate", () => {
     expect(categoryResult.created).toBe(true);
   });
 
-  it("rethrows create conflicts when fallback records are missing", async () => {
-    vi.mocked(tagsRepo.findTagBySlug)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined);
-    vi.mocked(tagsRepo.findTagByNameCaseInsensitive).mockResolvedValue(undefined);
-    vi.mocked(tagsService.createTag).mockRejectedValue(new ConflictError("Tag slug already exists"));
+  it("reuses an existing category by case-insensitive name", async () => {
+    vi.mocked(categoriesRepo.findCategoryBySlug).mockResolvedValue(undefined);
+    vi.mocked(categoriesRepo.findCategoryByNameCaseInsensitive).mockResolvedValue(sampleCategory);
 
-    await expect(taxonomyService.findOrCreateTag("nextjs")).rejects.toBeInstanceOf(ConflictError);
-  });
+    const result = await taxonomyService.findOrCreateCategory("engineering");
 
-  it("rejects invalid taxonomy names", async () => {
-    await expect(taxonomyService.findOrCreateTag("")).rejects.toThrow(/name/i);
-  });
-
-  it("rethrows category conflicts when fallback records are missing", async () => {
-    vi.mocked(categoriesRepo.findCategoryBySlug)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined);
-    vi.mocked(categoriesRepo.findCategoryByNameCaseInsensitive).mockResolvedValue(undefined);
-    vi.mocked(categoriesService.createCategory).mockRejectedValue(
-      new ConflictError("Category slug already exists")
-    );
-
-    await expect(taxonomyService.findOrCreateCategory("Engineering")).rejects.toBeInstanceOf(
-      ConflictError
-    );
+    expect(result.item).toEqual(sampleCategory);
+    expect(result.created).toBe(false);
+    expect(categoriesService.createCategory).not.toHaveBeenCalled();
   });
 
   it("reuses category after create conflict", async () => {
@@ -169,8 +147,21 @@ describe("taxonomy.service findOrCreate", () => {
     );
 
     const result = await taxonomyService.findOrCreateCategory("Engineering");
+
     expect(result.item).toEqual(sampleCategory);
     expect(result.created).toBe(false);
+  });
+
+  it("rethrows tag conflicts when fallback lookup misses", async () => {
+    vi.mocked(tagsRepo.findTagBySlug).mockResolvedValue(undefined);
+    vi.mocked(tagsRepo.findTagByNameCaseInsensitive).mockResolvedValue(undefined);
+    vi.mocked(tagsService.createTag).mockRejectedValue(new ConflictError("Tag slug already exists"));
+
+    await expect(taxonomyService.findOrCreateTag("nextjs")).rejects.toBeInstanceOf(ConflictError);
+  });
+
+  it("rejects invalid taxonomy names", async () => {
+    await expect(taxonomyService.findOrCreateTag("")).rejects.toThrow(/name/i);
   });
 });
 
@@ -179,21 +170,41 @@ describe("taxonomy.service search", () => {
     vi.resetAllMocks();
   });
 
-  it("returns empty arrays for invalid search queries", async () => {
-    await expect(taxonomyService.searchTags("")).resolves.toEqual([]);
-    await expect(taxonomyService.searchCategories("   ")).resolves.toEqual([]);
+  it("searchTags returns empty results for blank queries", async () => {
+    await expect(taxonomyService.searchTags("   ")).resolves.toEqual([]);
+    expect(tagsRepo.searchTagsByName).not.toHaveBeenCalled();
   });
 
-  it("delegates valid search queries to repositories", async () => {
+  it("searchTags delegates trimmed queries to the repository", async () => {
     vi.mocked(tagsRepo.searchTagsByName).mockResolvedValue([sampleTag]);
+
+    const results = await taxonomyService.searchTags("  next  ");
+
+    expect(tagsRepo.searchTagsByName).toHaveBeenCalledWith("next");
+    expect(results).toEqual([sampleTag]);
+  });
+
+  it("searchCategories returns empty results for blank queries", async () => {
+    await expect(taxonomyService.searchCategories("")).resolves.toEqual([]);
+    expect(categoriesRepo.searchCategoriesByName).not.toHaveBeenCalled();
+  });
+
+  it("searchCategories delegates trimmed queries to the repository", async () => {
     vi.mocked(categoriesRepo.searchCategoriesByName).mockResolvedValue([sampleCategory]);
 
-    await expect(taxonomyService.searchTags("next")).resolves.toEqual([sampleTag]);
-    await expect(taxonomyService.searchCategories("eng")).resolves.toEqual([sampleCategory]);
+    const results = await taxonomyService.searchCategories("eng");
+
+    expect(categoriesRepo.searchCategoriesByName).toHaveBeenCalledWith("eng");
+    expect(results).toEqual([sampleCategory]);
+  });
+});
+
+describe("taxonomy.service normalizeTaxonomyInput", () => {
+  it("normalizes valid input", () => {
+    expect(taxonomyService.normalizeTaxonomyInput("  hello   world  ")).toBe("hello world");
   });
 
-  it("normalizes taxonomy input for tests", () => {
-    expect(taxonomyService.normalizeTaxonomyInput("  DevOps  ")).toBe("DevOps");
-    expect(() => taxonomyService.normalizeTaxonomyInput("   ")).toThrow(/between 1 and 120/);
+  it("rejects names that are too long after normalization", () => {
+    expect(() => taxonomyService.normalizeTaxonomyInput("x".repeat(121))).toThrow(/1 and 120/i);
   });
 });

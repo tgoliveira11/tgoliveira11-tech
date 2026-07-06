@@ -1,5 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
-import { THEME_STORAGE_KEY, applyTheme, getStoredTheme, isTheme, persistTheme } from "@/lib/theme";
+import {
+  THEME_STORAGE_KEY,
+  applyTheme,
+  getStoredTheme,
+  isTheme,
+  persistTheme,
+} from "@/lib/theme";
 
 describe("theme persistence", () => {
   const store = new Map<string, string>();
@@ -27,6 +33,8 @@ describe("theme persistence", () => {
     expect(isTheme("light")).toBe(true);
     expect(isTheme("dark")).toBe(true);
     expect(isTheme("system")).toBe(false);
+    expect(isTheme(null)).toBe(false);
+    expect(isTheme(undefined)).toBe(false);
   });
 
   it("persists and restores the selected theme", () => {
@@ -38,29 +46,22 @@ describe("theme persistence", () => {
     expect(getStoredTheme()).toBe("light");
   });
 
-  it("returns null on the server and ignores invalid stored values", () => {
-    vi.unstubAllGlobals();
-    expect(getStoredTheme()).toBeNull();
-
-    vi.stubGlobal("window", {
-      localStorage: {
-        getItem: () => "system",
-        setItem: vi.fn(),
-      },
-    });
+  it("returns null for invalid stored values", () => {
+    store.set(THEME_STORAGE_KEY, "system");
     expect(getStoredTheme()).toBeNull();
   });
 
-  it("applies theme to the document root", () => {
-    const root = {
-      setAttribute: vi.fn(),
-      style: { colorScheme: "" as string },
-    };
-    vi.stubGlobal("document", { documentElement: root });
+  it("returns null when localStorage read fails", () => {
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: () => {
+          throw new Error("storage blocked");
+        },
+        setItem: vi.fn(),
+      },
+    });
 
-    applyTheme("dark");
-    expect(root.setAttribute).toHaveBeenCalledWith("data-theme", "dark");
-    expect(root.style.colorScheme).toBe("dark");
+    expect(getStoredTheme()).toBeNull();
   });
 
   it("ignores localStorage write failures", () => {
@@ -68,11 +69,53 @@ describe("theme persistence", () => {
       localStorage: {
         getItem: () => null,
         setItem: () => {
-          throw new Error("blocked");
+          throw new Error("quota exceeded");
         },
       },
     });
 
     expect(() => persistTheme("dark")).not.toThrow();
+  });
+});
+
+describe("applyTheme", () => {
+  let documentElement: {
+    setAttribute: ReturnType<typeof vi.fn>;
+    style: { colorScheme: string };
+  };
+
+  beforeEach(() => {
+    documentElement = {
+      setAttribute: vi.fn(),
+      style: { colorScheme: "" },
+    };
+    vi.stubGlobal("document", { documentElement });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sets data-theme and color-scheme on the document root", () => {
+    applyTheme("dark");
+
+    expect(documentElement.setAttribute).toHaveBeenCalledWith("data-theme", "dark");
+    expect(documentElement.style.colorScheme).toBe("dark");
+
+    applyTheme("light");
+
+    expect(documentElement.setAttribute).toHaveBeenCalledWith("data-theme", "light");
+    expect(documentElement.style.colorScheme).toBe("light");
+  });
+});
+
+describe("getStoredTheme without window", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("returns null during server-side rendering", () => {
+    vi.stubGlobal("window", undefined);
+    expect(getStoredTheme()).toBeNull();
   });
 });

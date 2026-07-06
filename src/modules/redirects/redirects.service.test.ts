@@ -27,58 +27,69 @@ import {
   listRedirects,
 } from "./redirects.service";
 
+const redirect = {
+  id: "redirect-1",
+  sourcePath: "/old",
+  targetPath: "/new",
+  statusCode: 301,
+  createdAt: new Date("2026-01-01T00:00:00.000Z"),
+  updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+};
+
 describe("redirects service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     findRedirectBySourcePathMock.mockResolvedValue(undefined);
-    insertRedirectMock.mockResolvedValue({
-      id: "r1",
+    insertRedirectMock.mockResolvedValue(redirect);
+    listRedirectsMock.mockResolvedValue([redirect]);
+    deleteRedirectByIdMock.mockResolvedValue(true);
+  });
+
+  it("createRedirect inserts a validated redirect", async () => {
+    const created = await createRedirect({
+      sourcePath: "/old",
+      targetPath: "/new",
+      statusCode: 301,
+    });
+
+    expect(created).toEqual(redirect);
+    expect(insertRedirectMock).toHaveBeenCalledWith({
       sourcePath: "/old",
       targetPath: "/new",
       statusCode: 301,
     });
   });
 
-  it("creates redirect when source path is free", async () => {
-    const redirect = await createRedirect({ sourcePath: "/old", targetPath: "/new" });
-    expect(redirect.sourcePath).toBe("/old");
-    expect(insertRedirectMock).toHaveBeenCalled();
-  });
+  it("createRedirect rejects duplicate source paths", async () => {
+    findRedirectBySourcePathMock.mockResolvedValue(redirect);
 
-  it("rejects duplicate source path", async () => {
-    findRedirectBySourcePathMock.mockResolvedValue({ id: "existing" });
     await expect(
-      createRedirect({ sourcePath: "/old", targetPath: "/new" })
+      createRedirect({ sourcePath: "/old", targetPath: "/other", statusCode: 302 })
     ).rejects.toBeInstanceOf(ConflictError);
+    expect(insertRedirectMock).not.toHaveBeenCalled();
   });
 
-  it("gets redirect by source path", async () => {
-    findRedirectBySourcePathMock.mockResolvedValue({
-      id: "r1",
-      sourcePath: "/old",
-      targetPath: "/new",
-      statusCode: 301,
-    });
-    await expect(getRedirectBySourcePath("/old")).resolves.toMatchObject({ id: "r1" });
-  });
+  it("getRedirectBySourcePath returns a redirect or throws NotFoundError", async () => {
+    findRedirectBySourcePathMock.mockResolvedValue(redirect);
+    await expect(getRedirectBySourcePath("/old")).resolves.toEqual(redirect);
 
-  it("throws when redirect is missing", async () => {
+    findRedirectBySourcePathMock.mockResolvedValue(undefined);
     await expect(getRedirectBySourcePath("/missing")).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it("lists redirects", async () => {
-    listRedirectsMock.mockResolvedValue([]);
-    await expect(listRedirects()).resolves.toEqual([]);
+  it("listRedirects delegates to the repository", async () => {
+    await expect(listRedirects()).resolves.toEqual([redirect]);
+    expect(listRedirectsMock).toHaveBeenCalled();
   });
 
-  it("deletes redirect", async () => {
-    deleteRedirectByIdMock.mockResolvedValue(true);
-    await deleteRedirect("r1");
-    expect(deleteRedirectByIdMock).toHaveBeenCalledWith("r1");
+  it("deleteRedirect removes an existing redirect", async () => {
+    await expect(deleteRedirect("redirect-1")).resolves.toBeUndefined();
+    expect(deleteRedirectByIdMock).toHaveBeenCalledWith("redirect-1");
   });
 
-  it("throws when delete misses redirect", async () => {
+  it("deleteRedirect throws when id is missing", async () => {
     deleteRedirectByIdMock.mockResolvedValue(false);
+
     await expect(deleteRedirect("missing")).rejects.toBeInstanceOf(NotFoundError);
   });
 });
