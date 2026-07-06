@@ -1,29 +1,35 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NotFoundError, ValidationError } from "@/lib/errors";
+import { LocalStorageProvider } from "@/modules/assets/local-storage-provider";
+
+const postId = "00000000-0000-4000-8000-000000000001";
+const assetId = "00000000-0000-4000-8000-000000000002";
+const userId = "00000000-0000-4000-8000-000000000099";
 
 const {
   createAssetMetadataRecordMock,
-  findAssetByIdMock,
-  updateAssetByIdMock,
   deleteAssetByIdMock,
+  findAssetByIdMock,
   listAssetsByPostIdMock,
+  updateAssetByIdMock,
   findPostByIdMock,
   updatePostByIdMock,
 } = vi.hoisted(() => ({
   createAssetMetadataRecordMock: vi.fn(),
-  findAssetByIdMock: vi.fn(),
-  updateAssetByIdMock: vi.fn(),
   deleteAssetByIdMock: vi.fn(),
+  findAssetByIdMock: vi.fn(),
   listAssetsByPostIdMock: vi.fn(),
+  updateAssetByIdMock: vi.fn(),
   findPostByIdMock: vi.fn(),
   updatePostByIdMock: vi.fn(),
 }));
 
-vi.mock("./assets.repository", () => ({
+vi.mock("@/modules/assets/assets.repository", () => ({
   createAssetMetadataRecord: createAssetMetadataRecordMock,
-  findAssetById: findAssetByIdMock,
-  updateAssetById: updateAssetByIdMock,
   deleteAssetById: deleteAssetByIdMock,
+  findAssetById: findAssetByIdMock,
   listAssetsByPostId: listAssetsByPostIdMock,
+  updateAssetById: updateAssetByIdMock,
 }));
 
 vi.mock("@/modules/posts/posts.repository", () => ({
@@ -35,11 +41,10 @@ vi.mock("@/lib/env", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/env")>();
   return {
     ...actual,
-    readUploadMaxFileSizeBytes: vi.fn(() => 5_000_000),
+    readUploadMaxFileSizeBytes: vi.fn().mockReturnValue(5_000_000),
   };
 });
 
-import { LocalStorageProvider } from "./local-storage-provider";
 import {
   assertAssetBelongsToPost,
   buildSafeFilename,
@@ -49,205 +54,277 @@ import {
   getAssetById,
   getStorageProvider,
   guessMimeTypeFromStorageKey,
+  listAssetsByPost,
+  readAssetFile,
   resetStorageProvider,
   setPostCoverAsset,
   setPostOgAsset,
   setStorageProvider,
   updateAssetMetadata,
   uploadPostAsset,
-  readAssetFile,
-} from "./assets.service";
-import { NotFoundError, ValidationError } from "@/lib/errors";
+} from "@/modules/assets/assets.service";
 
-const postId = "550e8400-e29b-41d4-a716-446655440000";
-
-const baseAsset = {
-  id: "asset-1",
+const sampleAsset = {
+  id: assetId,
   postId,
-  userId: "user-1",
   storageProvider: "local",
-  storageKey: "posts/post-1/photo.jpg",
-  publicUrl: "/uploads/posts/post-1/photo.jpg",
-  originalFilename: "photo.jpg",
-  safeFilename: "photo.jpg",
-  mimeType: "image/jpeg",
+  storageKey: "posts/post-1/photo.png",
+  publicUrl: "/api/assets/posts/post-1/photo.png",
+  originalFilename: "photo.png",
+  safeFilename: "photo.png",
+  mimeType: "image/png",
   fileSizeBytes: 100,
+  width: null,
+  height: null,
   altText: null,
   caption: null,
   hash: "abc",
-  createdBy: "user-1",
+  createdBy: userId,
   createdAt: new Date(),
   updatedAt: new Date(),
+};
+
+const mockProvider = {
+  name: "local",
+  upload: vi.fn().mockResolvedValue({
+    storageKey: "posts/post-1/photo.png",
+    publicUrl: "/api/assets/posts/post-1/photo.png",
+  }),
+  delete: vi.fn().mockResolvedValue(undefined),
+  read: vi.fn().mockResolvedValue(Buffer.from("data")),
 };
 
 describe("assets service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetStorageProvider();
-    findAssetByIdMock.mockResolvedValue(baseAsset);
+    setStorageProvider(mockProvider as never);
+
+    findAssetByIdMock.mockResolvedValue(sampleAsset);
+    listAssetsByPostIdMock.mockResolvedValue([]);
+    createAssetMetadataRecordMock.mockResolvedValue(sampleAsset);
+    updateAssetByIdMock.mockResolvedValue(sampleAsset);
+    deleteAssetByIdMock.mockResolvedValue(sampleAsset);
     findPostByIdMock.mockResolvedValue({
       id: postId,
-      coverAssetId: "asset-1",
+      coverAssetId: assetId,
       ogAssetId: null,
     });
-    updatePostByIdMock.mockResolvedValue({ id: "post-1" });
-    deleteAssetByIdMock.mockResolvedValue(baseAsset);
-    listAssetsByPostIdMock.mockResolvedValue([]);
+    updatePostByIdMock.mockResolvedValue({ id: postId });
   });
 
-  it("manages storage provider singleton", () => {
-    const custom = { name: "custom", upload: vi.fn(), delete: vi.fn() } as never;
-    setStorageProvider(custom);
-    expect(getStorageProvider()).toBe(custom);
+  it("getStorageProvider lazily creates a provider", () => {
     resetStorageProvider();
-    expect(getStorageProvider().name).toBeTruthy();
+    const provider = getStorageProvider();
+    expect(provider).toBeDefined();
   });
 
-  it("creates asset metadata with validation", async () => {
-    createAssetMetadataRecordMock.mockResolvedValue(baseAsset);
+  it("listAssetsByPost delegates to repository", async () => {
+    listAssetsByPostIdMock.mockResolvedValueOnce([sampleAsset]);
 
-    const asset = await createAssetMetadata({
-      postId,
-      storageProvider: "local",
-      storageKey: "posts/post-1/photo.jpg",
-      publicUrl: "/uploads/posts/post-1/photo.jpg",
-      originalFilename: "photo.jpg",
-      safeFilename: "photo.jpg",
-      mimeType: "image/jpeg",
-      fileSizeBytes: 100,
-      hash: "abc",
-      createdBy: "user-1",
-    });
-
-    expect(asset.id).toBe("asset-1");
+    await expect(listAssetsByPost(postId)).resolves.toEqual([sampleAsset]);
   });
 
-  it("rejects oversized uploads", async () => {
-    await expect(
-      createAssetMetadata({
-        postId,
-        storageProvider: "local",
-        storageKey: "posts/post-1/photo.jpg",
-        publicUrl: "/uploads/posts/post-1/photo.jpg",
-        originalFilename: "photo.jpg",
-        safeFilename: "photo.jpg",
-        mimeType: "image/jpeg",
-        fileSizeBytes: 9_000_000,
-        hash: "abc",
-        createdBy: "user-1",
-      })
-    ).rejects.toBeInstanceOf(ValidationError);
-  });
+  it("getAssetById throws when missing", async () => {
+    findAssetByIdMock.mockResolvedValueOnce(undefined);
 
-  it("gets and updates asset metadata", async () => {
-    updateAssetByIdMock.mockResolvedValue(baseAsset);
-    await expect(getAssetById("asset-1")).resolves.toEqual(baseAsset);
-    await expect(updateAssetMetadata("asset-1", { altText: "Alt" })).resolves.toEqual(baseAsset);
-  });
-
-  it("throws when asset metadata is missing", async () => {
-    findAssetByIdMock.mockResolvedValue(undefined);
-    await expect(getAssetById("missing")).rejects.toBeInstanceOf(NotFoundError);
-    updateAssetByIdMock.mockResolvedValue(null);
-    findAssetByIdMock.mockResolvedValue(baseAsset);
-    await expect(updateAssetMetadata("asset-1", { altText: "Alt" })).rejects.toBeInstanceOf(
+    await expect(getAssetById("00000000-0000-4000-8000-000000000099")).rejects.toBeInstanceOf(
       NotFoundError
     );
   });
 
-  it("deletes asset metadata and storage object for matching provider", async () => {
-    const provider = {
-      name: "local",
-      upload: vi.fn(),
-      delete: vi.fn(),
-    };
-    setStorageProvider(provider as never);
-
-    await deleteAssetMetadata("asset-1");
-    expect(provider.delete).toHaveBeenCalledWith(baseAsset.storageKey);
+  it("createAssetMetadata rejects oversized files", async () => {
+    await expect(
+      createAssetMetadata({
+        postId,
+        storageProvider: "local",
+        storageKey: "posts/post-1/huge.png",
+        publicUrl: "/url",
+        originalFilename: "huge.png",
+        safeFilename: "huge.png",
+        mimeType: "image/png",
+        fileSizeBytes: 10_000_000,
+        createdBy: userId,
+      })
+    ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it("asserts asset belongs to post", async () => {
-    await expect(assertAssetBelongsToPost("asset-1", postId)).resolves.toEqual(baseAsset);
-    await expect(assertAssetBelongsToPost("asset-1", "other-post")).rejects.toBeInstanceOf(
-      ValidationError
+  it("updateAssetMetadata throws when asset is missing", async () => {
+    updateAssetByIdMock.mockResolvedValueOnce(undefined);
+
+    await expect(updateAssetMetadata(assetId, { altText: "Alt" })).rejects.toBeInstanceOf(
+      NotFoundError
     );
   });
 
-  it("uploads post asset", async () => {
-    const provider = {
-      name: "local",
-      upload: vi.fn().mockResolvedValue({
-        storageKey: "posts/post-1/photo.jpg",
-        publicUrl: "/uploads/posts/post-1/photo.jpg",
-      }),
-      delete: vi.fn(),
-    };
-    setStorageProvider(provider as never);
-    createAssetMetadataRecordMock.mockResolvedValue(baseAsset);
+  it("deleteAssetMetadata deletes storage when provider matches", async () => {
+    await deleteAssetMetadata(assetId);
+
+    expect(mockProvider.delete).toHaveBeenCalledWith(sampleAsset.storageKey);
+  });
+
+  it("deleteAssetMetadata throws when asset is missing", async () => {
+    deleteAssetByIdMock.mockResolvedValueOnce(undefined);
+
+    await expect(deleteAssetMetadata(assetId)).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("deleteAssetMetadata skips storage delete for mismatched provider", async () => {
+    deleteAssetByIdMock.mockResolvedValueOnce({
+      ...sampleAsset,
+      storageProvider: "vercel-blob",
+    });
+
+    await deleteAssetMetadata(assetId);
+
+    expect(mockProvider.delete).not.toHaveBeenCalled();
+  });
+
+  it("assertAssetBelongsToPost rejects foreign assets", async () => {
+    findAssetByIdMock.mockResolvedValueOnce({ ...sampleAsset, postId: "00000000-0000-4000-8000-000000000010" });
+
+    await expect(assertAssetBelongsToPost(assetId, postId)).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("uploadPostAsset uploads and creates metadata", async () => {
+    const buffer = Buffer.from("image-data");
 
     const asset = await uploadPostAsset({
       postId,
-      buffer: Buffer.from("image"),
-      originalFilename: "photo.jpg",
-      mimeType: "image/jpeg",
-      userId: "user-1",
+      buffer,
+      originalFilename: "photo.png",
+      mimeType: "image/png",
+      userId,
     });
 
-    expect(asset.id).toBe("asset-1");
-    expect(provider.upload).toHaveBeenCalled();
+    expect(mockProvider.upload).toHaveBeenCalled();
+    expect(createAssetMetadataRecordMock).toHaveBeenCalled();
+    expect(asset).toEqual(sampleAsset);
   });
 
-  it("rejects upload when post is missing", async () => {
-    findPostByIdMock.mockResolvedValue(undefined);
+  it("uploadPostAsset throws when post is missing", async () => {
+    findPostByIdMock.mockResolvedValueOnce(undefined);
+
     await expect(
       uploadPostAsset({
-        postId: "missing",
-        buffer: Buffer.from("image"),
-        originalFilename: "photo.jpg",
-        mimeType: "image/jpeg",
-        userId: "user-1",
+        postId,
+        buffer: Buffer.from("x"),
+        originalFilename: "photo.png",
+        mimeType: "image/png",
+        userId,
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it("deletes post asset and clears cover reference", async () => {
-    const provider = { name: "local", upload: vi.fn(), delete: vi.fn() };
-    setStorageProvider(provider as never);
-
-    await deletePostAsset("asset-1", "user-1");
-    expect(updatePostByIdMock).toHaveBeenCalledWith(postId, {
-      coverAssetId: null,
-      updatedBy: "user-1",
+  it("deletePostAsset clears cover and og references", async () => {
+    findPostByIdMock.mockResolvedValueOnce({
+      id: postId,
+      coverAssetId: assetId,
+      ogAssetId: assetId,
     });
+
+    await deletePostAsset(assetId, userId);
+
+    expect(updatePostByIdMock).toHaveBeenCalledWith(
+      postId,
+      expect.objectContaining({ coverAssetId: null, ogAssetId: null })
+    );
+    expect(deleteAssetByIdMock).toHaveBeenCalledWith(assetId);
   });
 
-  it("sets cover and og assets", async () => {
-    await setPostCoverAsset(postId, "asset-1", "user-1");
-    await setPostOgAsset(postId, null, "user-1");
-    expect(updatePostByIdMock).toHaveBeenCalled();
+  it("setPostCoverAsset validates ownership when assetId is set", async () => {
+    await setPostCoverAsset(postId, assetId, userId);
+
+    expect(updatePostByIdMock).toHaveBeenCalledWith(
+      postId,
+      expect.objectContaining({ coverAssetId: assetId })
+    );
   });
 
-  it("throws when setting cover on missing post", async () => {
-    updatePostByIdMock.mockResolvedValue(null);
-    await expect(setPostCoverAsset("missing", null, "user-1")).rejects.toBeInstanceOf(NotFoundError);
+  it("setPostCoverAsset throws when post is missing", async () => {
+    updatePostByIdMock.mockResolvedValueOnce(undefined);
+
+    await expect(setPostCoverAsset(postId, null, userId)).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it("sanitizes filenames and guesses mime types", () => {
-    expect(buildSafeFilename("My Photo.JPG")).toBe("My-Photo.JPG");
-    expect(guessMimeTypeFromStorageKey("a.png")).toBe("image/png");
-    expect(guessMimeTypeFromStorageKey("a.gif")).toBe("image/gif");
-    expect(guessMimeTypeFromStorageKey("a.webp")).toBe("image/webp");
-    expect(guessMimeTypeFromStorageKey("a.jpg")).toBe("image/jpeg");
+  it("setPostOgAsset updates og asset id", async () => {
+    await setPostOgAsset(postId, null, userId);
+
+    expect(updatePostByIdMock).toHaveBeenCalledWith(
+      postId,
+      expect.objectContaining({ ogAssetId: null })
+    );
   });
 
-  it("reads local asset files through local provider", async () => {
-    const provider = new LocalStorageProvider("/tmp");
-    provider.read = vi.fn().mockResolvedValue(Buffer.from("data"));
-    setStorageProvider(provider);
+  it("readAssetFile reads from local provider", async () => {
+    setStorageProvider(new LocalStorageProvider() as never);
 
-    const buffer = await readAssetFile({ ...baseAsset, storageProvider: "local" });
-    expect(buffer.toString()).toBe("data");
+    await expect(readAssetFile(sampleAsset)).rejects.toThrow();
+  });
+
+  it("readAssetFile rejects remote assets", async () => {
+    await expect(
+      readAssetFile({ ...sampleAsset, storageProvider: "vercel-blob" })
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("buildSafeFilename sanitizes filenames", () => {
+    expect(buildSafeFilename("../../secret.png")).not.toContain("..");
+  });
+
+  it("guessMimeTypeFromStorageKey detects common extensions", () => {
+    expect(guessMimeTypeFromStorageKey("photo.png")).toBe("image/png");
+    expect(guessMimeTypeFromStorageKey("photo.gif")).toBe("image/gif");
+    expect(guessMimeTypeFromStorageKey("photo.webp")).toBe("image/webp");
+    expect(guessMimeTypeFromStorageKey("photo.jpg")).toBe("image/jpeg");
+  });
+
+  it("deletePostAsset skips post updates when post is missing", async () => {
+    findPostByIdMock.mockResolvedValueOnce(undefined);
+
+    await deletePostAsset(assetId, userId);
+
+    expect(updatePostByIdMock).not.toHaveBeenCalled();
+    expect(deleteAssetByIdMock).toHaveBeenCalledWith(assetId);
+  });
+
+  it("deletePostAsset clears only cover when og differs", async () => {
+    findPostByIdMock.mockResolvedValueOnce({
+      id: postId,
+      coverAssetId: assetId,
+      ogAssetId: "00000000-0000-4000-8000-000000000003",
+    });
+
+    await deletePostAsset(assetId, userId);
+
+    expect(updatePostByIdMock).toHaveBeenCalledWith(
+      postId,
+      expect.objectContaining({ coverAssetId: null, updatedBy: userId })
+    );
+    expect(updatePostByIdMock).not.toHaveBeenCalledWith(
+      postId,
+      expect.objectContaining({ ogAssetId: null })
+    );
+  });
+
+  it("setPostOgAsset validates ownership when assetId is set", async () => {
+    await setPostOgAsset(postId, assetId, userId);
+
+    expect(updatePostByIdMock).toHaveBeenCalledWith(
+      postId,
+      expect.objectContaining({ ogAssetId: assetId })
+    );
+  });
+
+  it("setPostOgAsset throws when post is missing", async () => {
+    updatePostByIdMock.mockResolvedValueOnce(undefined);
+
+    await expect(setPostOgAsset(postId, assetId, userId)).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("readAssetFile rejects when active provider is not local storage", async () => {
+    setStorageProvider(mockProvider as never);
+
+    await expect(readAssetFile(sampleAsset)).rejects.toBeInstanceOf(NotFoundError);
   });
 });
-

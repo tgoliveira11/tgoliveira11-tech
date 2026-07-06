@@ -30,79 +30,86 @@ import {
   createOrFindTagAction,
   searchCategoriesAction,
   searchTagsAction,
-} from "./admin-taxonomy.actions";
+} from "@/modules/taxonomy/admin-taxonomy.actions";
 
-describe("admin-taxonomy actions", () => {
+const sampleTag = {
+  id: "tag-1",
+  name: "TypeScript",
+  slug: "typescript",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const sampleCategory = {
+  id: "cat-1",
+  name: "Engineering",
+  slug: "engineering",
+  description: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+describe("admin taxonomy actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     requireAdminSessionMock.mockResolvedValue({ user: { id: "admin-1" } });
-    searchTagsMock.mockResolvedValue([{ id: "tag-1", name: "News", slug: "news" }]);
-    findOrCreateTagMock.mockResolvedValue({
-      item: { id: "tag-1", name: "News", slug: "news" },
-      created: true,
-    });
-    searchCategoriesMock.mockResolvedValue([
-      { id: "category-1", name: "Engineering", slug: "engineering", description: null },
-    ]);
-    findOrCreateCategoryMock.mockResolvedValue({
-      item: { id: "category-1", name: "Engineering", slug: "engineering", description: null },
-      created: false,
-    });
+    searchTagsMock.mockResolvedValue([sampleTag]);
+    searchCategoriesMock.mockResolvedValue([sampleCategory]);
+    findOrCreateTagMock.mockResolvedValue({ item: sampleTag, created: true });
+    findOrCreateCategoryMock.mockResolvedValue({ item: sampleCategory, created: false });
   });
 
-  it("searches tags for admin", async () => {
-    const result = await searchTagsAction("new");
-    expect(result).toEqual({
-      ok: true,
-      data: { tags: [{ id: "tag-1", name: "News", slug: "news" }] },
-    });
+  it("searchTagsAction returns tags", async () => {
+    const result = await searchTagsAction("type");
+
+    expect(result).toEqual({ ok: true, data: { tags: [sampleTag] } });
   });
 
-  it("creates or finds tag", async () => {
-    const result = await createOrFindTagAction("News");
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        tag: { id: "tag-1", name: "News", slug: "news" },
-        created: true,
-      },
-    });
+  it("createOrFindTagAction returns created flag", async () => {
+    const result = await createOrFindTagAction("TypeScript");
+
+    expect(result).toEqual({ ok: true, data: { tag: sampleTag, created: true } });
   });
 
-  it("searches categories for admin", async () => {
+  it("searchCategoriesAction returns categories", async () => {
     const result = await searchCategoriesAction("eng");
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.data.categories).toHaveLength(1);
-    }
+
+    expect(result).toEqual({ ok: true, data: { categories: [sampleCategory] } });
   });
 
-  it("creates or finds category", async () => {
+  it("createOrFindCategoryAction returns existing category", async () => {
     const result = await createOrFindCategoryAction("Engineering");
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.data.created).toBe(false);
-    }
+
+    expect(result).toEqual({ ok: true, data: { category: sampleCategory, created: false } });
   });
 
-  it("returns error when admin session is missing", async () => {
-    requireAdminSessionMock.mockRejectedValue(new Error("Forbidden"));
-    const result = await searchTagsAction("new");
+  it("maps errors to action failures", async () => {
+    searchTagsMock.mockRejectedValueOnce(new Error("Forbidden"));
+
+    const result = await searchTagsAction("type");
+
     expect(result).toEqual({ ok: false, error: "Forbidden" });
   });
 
-  it("maps AppError and unknown failures", async () => {
+  it("maps AppError and unknown failures across actions", async () => {
     const { AppError } = await import("@/lib/errors");
-    searchCategoriesMock.mockRejectedValue(new AppError("Invalid category"));
+
+    searchCategoriesMock.mockRejectedValueOnce(new AppError("Denied"));
     await expect(searchCategoriesAction("eng")).resolves.toEqual({
       ok: false,
-      error: "Invalid category",
+      error: "Denied",
     });
 
-    findOrCreateTagMock.mockRejectedValue("broken");
-    await expect(createOrFindTagAction("News")).resolves.toEqual({
+    findOrCreateTagMock.mockRejectedValueOnce("boom");
+    await expect(createOrFindTagAction("TS")).resolves.toEqual({
       ok: false,
       error: "Something went wrong",
+    });
+
+    requireAdminSessionMock.mockRejectedValueOnce(new Error("Forbidden"));
+    await expect(createOrFindCategoryAction("Engineering")).resolves.toEqual({
+      ok: false,
+      error: "Forbidden",
     });
   });
 });

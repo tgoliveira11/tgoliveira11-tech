@@ -140,18 +140,31 @@ describe("posts repository admin helpers", () => {
     expect(selectDistinctMock).not.toHaveBeenCalled();
   });
 
-  it("listAdminPosts joins categories when sorting by category", async () => {
-    offsetMock.mockResolvedValueOnce([{ post: { id: "post-1", title: "Category sorted" } }]);
+  it("listAdminPostsWithTotal joins categories when sorting by category", async () => {
     whereMock.mockReturnValueOnce({ orderBy: orderByMock });
     whereMock.mockResolvedValueOnce([{ count: 1 }]);
-    fromMock.mockReturnValueOnce({
-      leftJoin: leftJoinMock,
-      where: whereMock,
-    });
-    selectMock.mockReturnValueOnce({ from: fromMock });
+    offsetMock.mockResolvedValueOnce([{ post: { id: "post-1", title: "Post" } }]);
 
-    const rows = await listAdminPosts({ sort: "category", direction: "asc" });
+    const result = await listAdminPostsWithTotal({ sort: "category", direction: "asc" });
+
     expect(leftJoinMock).toHaveBeenCalled();
-    expect(rows).toEqual([{ id: "post-1", title: "Category sorted" }]);
+    expect(result.posts).toEqual([{ id: "post-1", title: "Post" }]);
+  });
+
+  it("countAdminPosts without tag filter uses plain count query", async () => {
+    whereMock.mockResolvedValueOnce([{ count: 5 }]);
+
+    await expect(countAdminPosts({ status: "published" })).resolves.toBe(5);
+    expect(innerJoinMock).not.toHaveBeenCalled();
+  });
+
+  it("listAdminPostsWithTotal returns empty posts when tag filter matches nothing", async () => {
+    whereMock
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ count: 0 }]);
+
+    const result = await listAdminPostsWithTotal({ tagId: "tag-1", status: "published" });
+
+    expect(result).toEqual({ posts: [], totalItems: 0 });
   });
 });

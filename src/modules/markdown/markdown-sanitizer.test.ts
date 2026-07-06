@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { defaultSchema } from "rehype-sanitize";
 import { getMarkdownSanitizeSchema, sanitizeSchema } from "./markdown-sanitizer";
 
 describe("markdown sanitizer", () => {
-  it("exposes the default rehype sanitize schema", () => {
+  it("exports the default rehype-sanitize schema", () => {
+    expect(sanitizeSchema).toBe(defaultSchema);
+  });
+
+  it("returns the shared sanitize schema", () => {
     expect(getMarkdownSanitizeSchema()).toBe(sanitizeSchema);
-    expect(sanitizeSchema.tagNames).toBeTruthy();
+    expect(getMarkdownSanitizeSchema().tagNames).toBeDefined();
   });
 });

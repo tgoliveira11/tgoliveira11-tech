@@ -1,53 +1,51 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-function drizzleResult<T>(value: T) {
-  const promise = Promise.resolve(value);
-  return new Proxy(
-    {},
-    {
-      get(_target, prop) {
-        if (prop === "then") {
-          return promise.then.bind(promise);
-        }
-        return () => drizzleResult(value);
-      },
-    }
-  );
-}
+const {
+  deleteMock,
+  insertMock,
+  selectMock,
+  updateMock,
+  fromMock,
+  whereMock,
+  limitMock,
+  orderByMock,
+  valuesMock,
+  setMock,
+  returningMock,
+} = vi.hoisted(() => {
+  const returningMock = vi.fn();
+  const setMock = vi.fn();
+  const valuesMock = vi.fn();
+  const orderByMock = vi.fn();
+  const limitMock = vi.fn();
+  const whereMock = vi.fn();
+  const fromMock = vi.fn();
+  const selectMock = vi.fn();
+  const updateMock = vi.fn();
+  const insertMock = vi.fn();
+  const deleteMock = vi.fn();
 
-const postId = "550e8400-e29b-41d4-a716-446655440000";
-
-const sampleAsset = {
-  id: "asset-1",
-  postId,
-  storageProvider: "local",
-  storageKey: "posts/hello/photo.jpg",
-  publicUrl: "/uploads/photo.jpg",
-  originalFilename: "photo.jpg",
-  safeFilename: "photo.jpg",
-  mimeType: "image/jpeg",
-  fileSizeBytes: 100,
-  altText: null,
-  caption: null,
-  hash: null,
-  createdBy: "user-1",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const { insertMock, selectMock, updateMock, deleteMock } = vi.hoisted(() => ({
-  insertMock: vi.fn(),
-  selectMock: vi.fn(),
-  updateMock: vi.fn(),
-  deleteMock: vi.fn(),
-}));
+  return {
+    deleteMock,
+    insertMock,
+    selectMock,
+    updateMock,
+    fromMock,
+    whereMock,
+    limitMock,
+    orderByMock,
+    valuesMock,
+    setMock,
+    returningMock,
+  };
+});
 
 vi.mock("@/db/get-db", () => ({
   db: {
+    delete: deleteMock,
     insert: insertMock,
     select: selectMock,
     update: updateMock,
-    delete: deleteMock,
   },
 }));
 
@@ -58,64 +56,83 @@ import {
   insertAsset,
   listAssetsByPostId,
   updateAssetById,
-} from "./assets.repository";
+} from "@/modules/assets/assets.repository";
+
+const sampleAsset = {
+  id: "asset-1",
+  postId: "post-1",
+  storageProvider: "local",
+  storageKey: "posts/post-1/photo.png",
+  publicUrl: "/api/assets/posts/post-1/photo.png",
+  originalFilename: "photo.png",
+  safeFilename: "photo.png",
+  mimeType: "image/png",
+  fileSizeBytes: 100,
+  width: null,
+  height: null,
+  altText: null,
+  caption: null,
+  hash: null,
+  createdBy: "user-1",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 describe("assets repository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    insertMock.mockImplementation(() => ({
-      values: () => ({
-        returning: () => Promise.resolve([sampleAsset]),
-      }),
-    }));
-    updateMock.mockImplementation(() => ({
-      set: () => ({
-        where: () => ({
-          returning: () => Promise.resolve([sampleAsset]),
-        }),
-      }),
-    }));
-    deleteMock.mockImplementation(() => ({
-      where: () => ({
-        returning: () => Promise.resolve([sampleAsset]),
-      }),
-    }));
-    selectMock.mockImplementation(() => ({
-      from: () => drizzleResult([sampleAsset]),
-    }));
+
+    returningMock.mockResolvedValue([sampleAsset]);
+    setMock.mockReturnValue({ where: whereMock });
+    whereMock.mockReturnValue({ returning: returningMock, limit: limitMock, orderBy: orderByMock });
+    valuesMock.mockReturnValue({ returning: returningMock });
+    insertMock.mockReturnValue({ values: valuesMock });
+    updateMock.mockReturnValue({ set: setMock });
+    deleteMock.mockReturnValue({ where: whereMock });
+
+    limitMock.mockResolvedValue([sampleAsset]);
+    orderByMock.mockReturnValue({ limit: limitMock });
+    orderByMock.mockResolvedValue([sampleAsset]);
+    fromMock.mockReturnValue({ where: whereMock, orderBy: orderByMock });
+    selectMock.mockReturnValue({ from: fromMock });
   });
 
-  it("inserts and updates assets", async () => {
+  it("insertAsset returns inserted row", async () => {
     await expect(insertAsset(sampleAsset)).resolves.toEqual(sampleAsset);
+  });
+
+  it("updateAssetById returns updated row", async () => {
     await expect(updateAssetById("asset-1", { altText: "Alt" })).resolves.toEqual(sampleAsset);
   });
 
-  it("finds and lists assets", async () => {
-    await expect(findAssetById("asset-1")).resolves.toEqual(sampleAsset);
-    await expect(listAssetsByPostId(postId)).resolves.toEqual([sampleAsset]);
+  it("findAssetById returns undefined when missing", async () => {
+    limitMock.mockResolvedValueOnce([]);
+
+    await expect(findAssetById("missing")).resolves.toBeUndefined();
   });
 
-  it("creates metadata records and deletes assets", async () => {
+  it("listAssetsByPostId orders by createdAt desc", async () => {
+    await expect(listAssetsByPostId("post-1")).resolves.toEqual([sampleAsset]);
+    expect(orderByMock).toHaveBeenCalled();
+  });
+
+  it("deleteAssetById returns deleted row", async () => {
+    await expect(deleteAssetById("asset-1")).resolves.toEqual(sampleAsset);
+  });
+
+  it("createAssetMetadataRecord inserts with defaults", async () => {
     await expect(
       createAssetMetadataRecord({
-        postId,
+        postId: "post-1",
         storageProvider: "local",
-        storageKey: sampleAsset.storageKey,
-        publicUrl: sampleAsset.publicUrl,
-        originalFilename: sampleAsset.originalFilename,
-        safeFilename: sampleAsset.safeFilename,
-        mimeType: "image/jpeg",
+        storageKey: "key",
+        publicUrl: "/url",
+        originalFilename: "photo.png",
+        safeFilename: "photo.png",
+        mimeType: "image/png",
         fileSizeBytes: 100,
         createdBy: "user-1",
       })
     ).resolves.toEqual(sampleAsset);
-
-    await expect(deleteAssetById("asset-1")).resolves.toEqual(sampleAsset);
-    deleteMock.mockImplementationOnce(() => ({
-      where: () => ({
-        returning: () => Promise.resolve([]),
-      }),
-    }));
-    await expect(deleteAssetById("missing")).resolves.toBeUndefined();
   });
 });

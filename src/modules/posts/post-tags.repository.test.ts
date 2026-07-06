@@ -1,43 +1,43 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-function drizzleResult<T>(value: T) {
-  const promise = Promise.resolve(value);
-  return new Proxy(
-    {},
-    {
-      get(_target, prop) {
-        if (prop === "then") {
-          return promise.then.bind(promise);
-        }
-        return () => drizzleResult(value);
-      },
-    }
-  );
-}
+const {
+  deleteMock,
+  insertMock,
+  selectMock,
+  fromMock,
+  innerJoinMock,
+  whereMock,
+  valuesMock,
+} = vi.hoisted(() => {
+  const valuesMock = vi.fn();
+  const whereMock = vi.fn();
+  const innerJoinMock = vi.fn();
+  const fromMock = vi.fn();
+  const selectMock = vi.fn();
+  const insertMock = vi.fn();
+  const deleteMock = vi.fn();
 
-const { insertMock, selectMock, deleteMock } = vi.hoisted(() => ({
-  insertMock: vi.fn(),
-  selectMock: vi.fn(),
-  deleteMock: vi.fn(),
-}));
+  return { deleteMock, insertMock, selectMock, fromMock, innerJoinMock, whereMock, valuesMock };
+});
 
 vi.mock("@/db/get-db", () => ({
   db: {
+    delete: deleteMock,
     insert: insertMock,
     select: selectMock,
-    delete: deleteMock,
   },
 }));
 
-import { getTagIdsForPost, getTagsForPost, syncPostTags } from "./post-tags.repository";
-
-const postId = "550e8400-e29b-41d4-a716-446655440000";
-const tagId = "660e8400-e29b-41d4-a716-446655440001";
+import {
+  getTagIdsForPost,
+  getTagsForPost,
+  syncPostTags,
+} from "@/modules/posts/post-tags.repository";
 
 const sampleTag = {
-  id: tagId,
-  name: "News",
-  slug: "news",
+  id: "tag-1",
+  name: "TypeScript",
+  slug: "typescript",
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -45,49 +45,48 @@ const sampleTag = {
 describe("post-tags repository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    deleteMock.mockImplementation(() => ({
-      where: () => Promise.resolve(undefined),
-    }));
-    insertMock.mockImplementation(() => ({
-      values: () => Promise.resolve(undefined),
-    }));
+
+    valuesMock.mockResolvedValue(undefined);
+    insertMock.mockReturnValue({ values: valuesMock });
+    deleteMock.mockReturnValue({ where: whereMock });
+    whereMock.mockResolvedValue(undefined);
+
+    innerJoinMock.mockReturnValue({ where: whereMock });
+    fromMock.mockReturnValue({ where: whereMock, innerJoin: innerJoinMock });
+    selectMock.mockReturnValue({ from: fromMock });
   });
 
-  it("loads tags and tag ids for a post", async () => {
-    selectMock.mockImplementationOnce(() => ({
-      from: () => ({
-        innerJoin: () => drizzleResult([{ tag: sampleTag }]),
-      }),
-    }));
-    await expect(getTagsForPost(postId)).resolves.toEqual([sampleTag]);
+  it("getTagsForPost returns tag rows", async () => {
+    whereMock.mockResolvedValueOnce([{ tag: sampleTag }]);
 
-    selectMock.mockImplementationOnce(() => ({
-      from: () => drizzleResult([{ tagId }]),
-    }));
-    await expect(getTagIdsForPost(postId)).resolves.toEqual([tagId]);
+    await expect(getTagsForPost("post-1")).resolves.toEqual([sampleTag]);
   });
 
-  it("syncs post tags after validating ids", async () => {
-    selectMock.mockImplementationOnce(() => ({
-      from: () => drizzleResult([{ id: tagId }]),
-    }));
+  it("getTagIdsForPost returns tag ids", async () => {
+    whereMock.mockResolvedValueOnce([{ tagId: "tag-1" }, { tagId: "tag-2" }]);
 
-    await syncPostTags(postId, [tagId, tagId]);
-    expect(deleteMock).toHaveBeenCalled();
-    expect(insertMock).toHaveBeenCalled();
+    await expect(getTagIdsForPost("post-1")).resolves.toEqual(["tag-1", "tag-2"]);
   });
 
-  it("clears tags when empty list is provided", async () => {
-    await syncPostTags(postId, []);
+  it("syncPostTags clears tags when empty", async () => {
+    await syncPostTags("post-1", []);
+
     expect(deleteMock).toHaveBeenCalled();
     expect(insertMock).not.toHaveBeenCalled();
   });
 
-  it("rejects invalid tag ids", async () => {
-    selectMock.mockImplementationOnce(() => ({
-      from: () => drizzleResult([]),
-    }));
+  it("syncPostTags validates tag ids before insert", async () => {
+    whereMock.mockResolvedValueOnce([{ id: "tag-1" }]);
 
-    await expect(syncPostTags(postId, [tagId])).rejects.toThrow(/One or more tag IDs are invalid/);
+    await syncPostTags("post-1", ["tag-1", "tag-1"]);
+
+    expect(deleteMock).toHaveBeenCalled();
+    expect(valuesMock).toHaveBeenCalledWith([{ postId: "post-1", tagId: "tag-1" }]);
+  });
+
+  it("syncPostTags throws when tag ids are invalid", async () => {
+    whereMock.mockResolvedValueOnce([{ id: "tag-1" }]);
+
+    await expect(syncPostTags("post-1", ["tag-1", "missing"])).rejects.toThrow(/invalid/i);
   });
 });

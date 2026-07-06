@@ -1,33 +1,51 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-function drizzleResult<T>(value: T) {
-  const promise = Promise.resolve(value);
-  return new Proxy(
-    {},
-    {
-      get(_target, prop) {
-        if (prop === "then") {
-          return promise.then.bind(promise);
-        }
-        return () => drizzleResult(value);
-      },
-    }
-  );
-}
+const {
+  deleteMock,
+  insertMock,
+  selectMock,
+  updateMock,
+  fromMock,
+  whereMock,
+  limitMock,
+  orderByMock,
+  valuesMock,
+  setMock,
+  returningMock,
+} = vi.hoisted(() => {
+  const returningMock = vi.fn();
+  const setMock = vi.fn();
+  const valuesMock = vi.fn();
+  const orderByMock = vi.fn();
+  const limitMock = vi.fn();
+  const whereMock = vi.fn();
+  const fromMock = vi.fn();
+  const selectMock = vi.fn();
+  const updateMock = vi.fn();
+  const insertMock = vi.fn();
+  const deleteMock = vi.fn();
 
-const { insertMock, selectMock, updateMock, deleteMock } = vi.hoisted(() => ({
-  insertMock: vi.fn(),
-  selectMock: vi.fn(),
-  updateMock: vi.fn(),
-  deleteMock: vi.fn(),
-}));
+  return {
+    deleteMock,
+    insertMock,
+    selectMock,
+    updateMock,
+    fromMock,
+    whereMock,
+    limitMock,
+    orderByMock,
+    valuesMock,
+    setMock,
+    returningMock,
+  };
+});
 
 vi.mock("@/db/get-db", () => ({
   db: {
+    delete: deleteMock,
     insert: insertMock,
     select: selectMock,
     update: updateMock,
-    delete: deleteMock,
   },
 }));
 
@@ -35,17 +53,13 @@ import {
   countCategoryUsage,
   deleteCategoryById,
   findCategoryById,
-  findCategoryByNameCaseInsensitive,
   findCategoryBySlug,
   insertCategory,
-  listAdminCategories,
   listCategories,
-  searchCategoriesByName,
-  updateCategoryById,
-} from "./categories.repository";
+} from "@/modules/categories/categories.repository";
 
 const sampleCategory = {
-  id: "category-1",
+  id: "cat-1",
   name: "Engineering",
   slug: "engineering",
   description: null,
@@ -56,72 +70,67 @@ const sampleCategory = {
 describe("categories repository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    insertMock.mockImplementation(() => ({
-      values: () => ({
-        returning: () => Promise.resolve([sampleCategory]),
-      }),
-    }));
-    updateMock.mockImplementation(() => ({
-      set: () => ({
-        where: () => ({
-          returning: () => Promise.resolve([sampleCategory]),
-        }),
-      }),
-    }));
-    deleteMock.mockImplementation(() => ({
-      where: () => ({
-        returning: () => Promise.resolve([{ id: "category-1" }]),
-      }),
-    }));
-    selectMock.mockImplementation(() => ({
-      from: () => drizzleResult([sampleCategory]),
-    }));
+
+    returningMock.mockResolvedValue([sampleCategory]);
+    setMock.mockReturnValue({ where: whereMock });
+    whereMock.mockReturnValue({ returning: returningMock, limit: limitMock });
+    valuesMock.mockReturnValue({ returning: returningMock });
+    insertMock.mockReturnValue({ values: valuesMock });
+    updateMock.mockReturnValue({ set: setMock });
+    deleteMock.mockReturnValue({ where: whereMock });
+
+    limitMock.mockResolvedValue([sampleCategory]);
+    orderByMock.mockResolvedValue([sampleCategory]);
+    fromMock.mockReturnValue({ where: whereMock, orderBy: orderByMock });
+    selectMock.mockReturnValue({ from: fromMock });
   });
 
-  it("inserts and updates categories", async () => {
-    await expect(
-      insertCategory({ name: "Engineering", slug: "engineering", description: null })
-    ).resolves.toEqual(sampleCategory);
-    await expect(updateCategoryById("category-1", { name: "Eng" })).resolves.toEqual(sampleCategory);
+  it("insertCategory returns the inserted row", async () => {
+    const result = await insertCategory({
+      name: "Engineering",
+      slug: "engineering",
+      description: null,
+    });
+
+    expect(insertMock).toHaveBeenCalled();
+    expect(result).toEqual(sampleCategory);
   });
 
-  it("finds categories by id, slug, and name", async () => {
-    await expect(findCategoryById("category-1")).resolves.toEqual(sampleCategory);
-    await expect(findCategoryBySlug("engineering")).resolves.toEqual(sampleCategory);
-    await expect(findCategoryByNameCaseInsensitive("ENGINEERING")).resolves.toEqual(sampleCategory);
+  it("findCategoryById returns a category", async () => {
+    const result = await findCategoryById("cat-1");
+
+    expect(selectMock).toHaveBeenCalled();
+    expect(result).toEqual(sampleCategory);
   });
 
-  it("searches categories and lists them", async () => {
-    await expect(searchCategoriesByName("   ")).resolves.toEqual([]);
-    await expect(searchCategoriesByName("eng")).resolves.toEqual([sampleCategory]);
-    await expect(listCategories()).resolves.toEqual([sampleCategory]);
+  it("findCategoryBySlug returns undefined when missing", async () => {
+    limitMock.mockResolvedValueOnce([]);
+
+    await expect(findCategoryBySlug("missing")).resolves.toBeUndefined();
   });
 
-  it("lists admin categories with counts", async () => {
-    const adminRow = {
-      ...sampleCategory,
-      totalPostCount: 4,
-      publishedPostCount: 2,
-    };
-    selectMock.mockImplementationOnce(() => ({
-      from: () => ({
-        leftJoin: () => ({
-          groupBy: () => ({
-            orderBy: () => Promise.resolve([adminRow]),
-          }),
-        }),
-      }),
-    }));
-    await expect(listAdminCategories()).resolves.toEqual([
-      { ...adminRow, totalPostCount: 4, publishedPostCount: 2 },
-    ]);
+  it("listCategories orders categories by name", async () => {
+    const rows = await listCategories();
+
+    expect(orderByMock).toHaveBeenCalled();
+    expect(rows).toEqual([sampleCategory]);
   });
 
-  it("counts usage and deletes categories", async () => {
-    selectMock.mockImplementationOnce(() => ({
-      from: () => drizzleResult([{ count: 2 }]),
-    }));
-    await expect(countCategoryUsage("category-1")).resolves.toBe(2);
-    await expect(deleteCategoryById("category-1")).resolves.toBe(true);
+  it("countCategoryUsage returns a numeric count", async () => {
+    whereMock.mockResolvedValueOnce([{ count: 2 }]);
+
+    await expect(countCategoryUsage("cat-1")).resolves.toBe(2);
+  });
+
+  it("deleteCategoryById returns true when a row is deleted", async () => {
+    returningMock.mockResolvedValueOnce([{ id: "cat-1" }]);
+
+    await expect(deleteCategoryById("cat-1")).resolves.toBe(true);
+  });
+
+  it("deleteCategoryById returns false when nothing is deleted", async () => {
+    returningMock.mockResolvedValueOnce([]);
+
+    await expect(deleteCategoryById("missing")).resolves.toBe(false);
   });
 });

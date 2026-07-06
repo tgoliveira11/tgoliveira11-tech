@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { requireAdminSessionMock, createTagMock, updateTagMock, deleteTagMock } = vi.hoisted(() => ({
-  requireAdminSessionMock: vi.fn(),
-  createTagMock: vi.fn(),
-  updateTagMock: vi.fn(),
-  deleteTagMock: vi.fn(),
-}));
+const { requireAdminSessionMock, createTagMock, updateTagMock, deleteTagMock } = vi.hoisted(
+  () => ({
+    requireAdminSessionMock: vi.fn(),
+    createTagMock: vi.fn(),
+    updateTagMock: vi.fn(),
+    deleteTagMock: vi.fn(),
+  })
+);
 
 vi.mock("@/modules/admin/authorization", () => ({
   requireAdminSession: requireAdminSessionMock,
@@ -22,64 +24,76 @@ vi.mock("next/cache", () => ({
 }));
 
 import { AppError } from "@/lib/errors";
-import { createTagAction, deleteTagAction, updateTagAction } from "./admin-tags.actions";
+import {
+  createTagAction,
+  deleteTagAction,
+  updateTagAction,
+} from "@/modules/tags/admin-tags.actions";
 
-describe("admin-tags actions", () => {
+describe("admin tags actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     requireAdminSessionMock.mockResolvedValue({ user: { id: "admin-1" } });
-    createTagMock.mockResolvedValue({ id: "tag-1", name: "News", slug: "news" });
-    updateTagMock.mockResolvedValue({ id: "tag-1", name: "News", slug: "news" });
+    createTagMock.mockResolvedValue(undefined);
+    updateTagMock.mockResolvedValue(undefined);
     deleteTagMock.mockResolvedValue(undefined);
   });
 
-  it("creates tag on valid form data", async () => {
+  it("createTagAction creates a tag", async () => {
     const formData = new FormData();
-    formData.set("name", "News");
-    formData.set("slug", "news");
+    formData.set("name", "TypeScript");
+    formData.set("slug", "typescript");
 
-    const result = await createTagAction({ ok: false }, formData);
+    const result = await createTagAction({ ok: true }, formData);
+
     expect(result).toEqual({ ok: true, message: "Tag created" });
+    expect(createTagMock).toHaveBeenCalledWith({ name: "TypeScript", slug: "typescript" });
   });
 
-  it("returns mapped AppError message on failure", async () => {
-    createTagMock.mockRejectedValue(new AppError("Duplicate", 409));
+  it("updateTagAction updates a tag", async () => {
     const formData = new FormData();
-    formData.set("name", "News");
+    formData.set("name", "TS");
 
-    const result = await createTagAction({ ok: false }, formData);
-    expect(result).toEqual({ ok: false, error: "Duplicate" });
+    const result = await updateTagAction("tag-1", { ok: true }, formData);
+
+    expect(result).toEqual({ ok: true, message: "Tag updated" });
+    expect(updateTagMock).toHaveBeenCalledWith("tag-1", { name: "TS" });
   });
 
-  it("returns generic message for unknown errors", async () => {
-    createTagMock.mockRejectedValue("boom");
-    const formData = new FormData();
-    formData.set("name", "News");
+  it("deleteTagAction deletes a tag", async () => {
+    const result = await deleteTagAction("tag-1");
 
-    const result = await createTagAction({ ok: false }, formData);
-    expect(result).toEqual({ ok: false, error: "Something went wrong" });
+    expect(result).toEqual({ ok: true, message: "Tag deleted" });
+    expect(deleteTagMock).toHaveBeenCalledWith("tag-1");
   });
 
-  it("updates and deletes tags", async () => {
+  it("maps AppError messages on failure", async () => {
+    createTagMock.mockRejectedValueOnce(new AppError("Duplicate slug"));
+
     const formData = new FormData();
-    formData.set("name", "News");
+    formData.set("name", "TypeScript");
 
-    await expect(updateTagAction("tag-1", { ok: false }, formData)).resolves.toEqual({
-      ok: true,
-      message: "Tag updated",
-    });
-    await expect(deleteTagAction("tag-1")).resolves.toEqual({
-      ok: true,
-      message: "Tag deleted",
-    });
-  });
+    const result = await createTagAction({ ok: true }, formData);
 
-  it("rejects unauthenticated actions", async () => {
-    requireAdminSessionMock.mockRejectedValue(new Error("Forbidden"));
-    const formData = new FormData();
-    formData.set("name", "News");
-
-    const result = await createTagAction({ ok: false }, formData);
     expect(result.ok).toBe(false);
+    expect(result.error).toBe("Duplicate slug");
+  });
+
+  it("maps auth failures from requireAdminSession", async () => {
+    requireAdminSessionMock.mockRejectedValueOnce(new Error("Forbidden"));
+
+    const result = await deleteTagAction("tag-1");
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe("Forbidden");
+  });
+
+  it("maps unknown errors to a generic message", async () => {
+    deleteTagMock.mockRejectedValueOnce("boom");
+
+    const result = await deleteTagAction("tag-1");
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe("Something went wrong");
   });
 });
