@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { GoogleAnalytics } from "@/components/public/google-analytics";
 import { getBlogConfig } from "@/modules/public/blog-config";
+import { GOOGLE_ANALYTICS_MEASUREMENT_ID } from "@/modules/public/google-analytics";
 import { buildSiteMetadata, buildWebsiteJsonLd, stringifyJsonLd } from "@/modules/public/seo";
 
 export async function generateMetadata() {
@@ -13,6 +15,10 @@ export default async function PublicGroupLayout({ children }: { children: ReactN
 
   return (
     <>
+      <GoogleAnalytics
+        measurementId={GOOGLE_ANALYTICS_MEASUREMENT_ID}
+        enabled={config.analyticsEnabled}
+      />
       {children}
       <script
         type="application/ld+json"

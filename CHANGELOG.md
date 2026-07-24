@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Canonical editorial taxonomy for AI Engineering, Software & Solution Architecture, Engineering Leadership, Technology Strategy, and Career & Reflections.
 - DB-backed content validation and dry-run taxonomy migration scripts.
 - Default branded Open Graph image route for social previews.
+- Google Analytics 4 measurement on public pages with SPA page views, site-search events, and Web Vitals forwarding.
+- AI-readable public content maps at `/llms.txt` and `/llms-full.txt`.
 
 ### Changed
 
@@ -19,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rework homepage, navigation, article metadata, RSS, sitemap taxonomy output, author CTA, and related-article logic around the new editorial IA.
 - Normalize public tag display/archive behavior to lowercase kebab-case with migration documentation.
 - Use the approved square profile photo on About surfaces and apply circular presentation in CSS.
+- Preserve RSS and AI-readable alternate links, canonical metadata, and advanced Googlebot indexing directives across public pages.
+- Complete article metadata with canonical URLs, author profile links, Open Graph Article tags, fallback social images, Twitter cards, and BlogPosting JSON-LD.
 - Sync PostForge upstream (`7359a65`): secure-auth v0.2/v0.3 env mappings (magic link, captcha, GitHub OAuth, invites, profile, HIBP), additional test coverage from template.
 
 ### Fixed

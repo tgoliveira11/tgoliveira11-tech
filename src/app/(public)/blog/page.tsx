@@ -7,19 +7,16 @@ import { PublicPagination } from "@/components/public/public-pagination";
 import { normalizePage } from "@/lib/pagination";
 import { getBlogListingPage } from "@/modules/public/public-posts.service";
 import { getBlogConfig } from "@/modules/public/blog-config";
-import { buildSiteMetadata } from "@/modules/public/seo";
+import { buildPublicPageMetadata } from "@/modules/public/seo";
 
 export async function generateMetadata() {
   const config = await getBlogConfig();
-  return {
-    ...buildSiteMetadata(config),
+  return buildPublicPageMetadata(config, {
     title: "Articles",
     description:
       "All published articles on AI engineering, architecture, engineering leadership, technology strategy, and career reflections.",
-    alternates: {
-      canonical: "/blog",
-    },
-  };
+    canonicalPath: "/blog",
+  });
 }
 
 export default async function BlogListingPage({

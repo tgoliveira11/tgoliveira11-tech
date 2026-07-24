@@ -16,18 +16,15 @@ import {
   hasSearchQuery,
   normalizeSearchQuery,
 } from "@/modules/public/search";
-import { buildSiteMetadata } from "@/modules/public/seo";
+import { buildPublicPageMetadata } from "@/modules/public/seo";
 
 export async function generateMetadata() {
   const config = await getBlogConfig();
-  return {
-    ...buildSiteMetadata(config),
+  return buildPublicPageMetadata(config, {
     title: "Search",
     description: "Search published articles.",
-    alternates: {
-      canonical: "/search",
-    },
-  };
+    canonicalPath: "/search",
+  });
 }
 
 export default async function SearchPage({

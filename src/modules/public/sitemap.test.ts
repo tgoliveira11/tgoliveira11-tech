@@ -32,8 +32,13 @@ describe("sitemap and robots helpers", () => {
 
   it("disallows admin routes in robots.txt", () => {
     const robots = buildRobotsTxt(config);
+    expect(robots).toContain("Allow: /");
     expect(robots).toContain("Disallow: /admin");
     expect(robots).toContain("Disallow: /api/admin");
+    expect(robots).toContain("Disallow: /api/auth");
+    expect(robots).toContain("Disallow: /api/account");
+    expect(robots).toContain("https://example.com/llms.txt");
+    expect(robots).toContain("https://example.com/llms-full.txt");
     expect(robots).toContain("Sitemap: https://example.com/sitemap.xml");
   });
 });
