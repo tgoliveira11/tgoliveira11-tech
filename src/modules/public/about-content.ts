@@ -9,10 +9,10 @@ import {
 export const ABOUT_PAGE_PATH = "/about" as const;
 
 export const ABOUT_PROFILE_IMAGE = {
-  src: "/images/about/thiago-oliveira.jpg",
-  alt: "Thiago Goulart de Oliveira, engineering director and technology leader",
-  width: 720,
-  height: 720,
+  src: "/images/about/thiago-oliveira.png",
+  alt: "Portrait of Thiago Goulart de Oliveira, Engineering Director.",
+  width: 1254,
+  height: 1254,
 } as const;
 
 export const ABOUT_PAGE_CONTENT = {
