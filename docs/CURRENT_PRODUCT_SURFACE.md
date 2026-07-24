@@ -2,7 +2,7 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-07-24 (site rework follow-up, conversion analytics, redirects, public discovery, and production content cleanup)
+**Last reviewed:** 2026-07-24 (static editorial covers, PostForge 0.1.2 upstream audit, site rework follow-up, conversion analytics, redirects, public discovery, and production content cleanup)
 **Canonical deployed domain:** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
@@ -149,6 +149,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | `@tgoliveira/secure-auth` | shipped | `^0.5.0` — production rate limit + forwarded headers via env |
 | `@tgoliveira/outpost` | shipped | `^1.2.0` — transactional email outbox + admin UI |
 | Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
+| Static public cover assets | shipped | Selected editorial covers are stored under `/public/images/covers` and referenced from production asset metadata. |
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |
 | Google Analytics 4 | shipped | Public route group only; measurement ID `G-XJ5W80DYKL`; tracks page views, search terms, Web Vitals, CTA clicks, Featured Insight clicks, related-article clicks, article entry, scroll depth, completion, and UTM fields |
@@ -156,7 +157,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Content validation CLI | shipped | `npm run content:validate` |
 | Taxonomy migration CLI | shipped | `npm run content:migrate-taxonomy` (dry-run by default; `-- --apply` updates DB) |
 | Approved content site-rework CLI | shipped | `npm run content:apply-site-rework -- --content-dir .codex-site-rework/approved-content` (dry-run by default; `-- --apply` updates DB) |
-| Upstream PostForge sync | shipped | Weekly workflow + `npm run sync:upstream:merge` |
+| Upstream PostForge sync | shipped | Weekly workflow + `npm run sync:upstream:merge`; current upstream audit: PostForge `0.1.2` at `af7ebc1`, with local version aligned and direct merge requiring manual conflict review. |
 
 ---
 
@@ -182,6 +183,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Footer priority links | LinkedIn, GitHub, résumé when configured, email, RSS |
 | Legacy URL redirects | `src/proxy.ts` + `src/lib/legacy-post-redirect.ts` |
 | Site rework reference project plan | `docs/github-reference-project-plan.md` |
+| Editorial cover assets | Static public images for selected high-priority posts in `/public/images/covers` |
 
 ---
 
