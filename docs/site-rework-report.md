@@ -233,7 +233,7 @@ Executed:
 - Taxonomy migration dry run on empty local DB: passed.
 - Production build: passed.
 - Full validation: passed (`typecheck`, `lint`, `test:coverage`, `content:validate`, `build`).
-- Security audit: passed (`npm run audit:security`, 0 vulnerabilities).
+- Production dependency security audit: passed (`npm run audit:security`, 0 vulnerabilities).
 - Local smoke: homepage returned 200, `/opengraph-image` returned `image/png`, and old post/tag/category aliases returned 308 to canonical paths.
 - Non-failing lint warning remains in existing generated coverage output: `coverage/lcov-report/block-navigation.js`.
 

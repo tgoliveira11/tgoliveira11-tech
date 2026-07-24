@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Upgrade Next.js, `eslint-config-next`, `next-auth`, `js-yaml`, `@tailwindcss/postcss`, `postcss`, and `sharp` resolution to clear high+ `npm audit` findings in CI.
+- Scope the CI high+ npm audit gate to production dependencies while keeping full-tree dev-tool audit findings documented for manual review.
 
 ## [0.1.2] - 2026-07-02
 

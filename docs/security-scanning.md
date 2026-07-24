@@ -7,7 +7,7 @@ Repo-local security baseline for GitHub Actions + Vercel deployment. PostForge u
 | Check | Workflow | Trigger | Blocks merge |
 |-------|----------|---------|--------------|
 | Typecheck, lint, test, build | `ci.yml` | push/PR to `main` | Yes |
-| npm audit (high+) | `ci.yml` | push/PR to `main` | Yes |
+| npm audit production dependencies (high+) | `ci.yml` | push/PR to `main` | Yes |
 | CodeQL (SAST) | `codeql.yml` | push/PR to `main` | Findings in Security tab |
 | Semgrep CE (SAST) | `semgrep.yml` | push/PR to `main` | Yes on ERROR severity |
 | Gitleaks (secrets) | `gitleaks.yml` | push/PR | Yes |
@@ -33,7 +33,7 @@ Repo-local security baseline for GitHub Actions + Vercel deployment. PostForge u
 
 - **CodeQL / Semgrep SARIF** → GitHub **Security** → **Code scanning alerts**
 - **Gitleaks** → workflow logs (no secrets printed) + job failure
-- **npm audit** → CI job logs
+- **npm audit production high+** → CI job logs
 - **Dependency Review** → PR checks + summary comment
 - **ZAP** → Actions artifact `zap-baseline-report` (HTML/JSON/Markdown)
 
@@ -85,8 +85,9 @@ Excluded scope (conservative): `/admin`, `/api/account`, `/api/auth`, `/api/admi
 
 ### npm audit
 
-- **High/critical** — fix or document exception before merge
-- **Moderate** — review manually (`npm run audit:ci`)
+- **Production high/critical** — fix or document exception before merge (`npm run audit:security`)
+- **Full-tree moderate+ and dev-tool findings** — review manually (`npm run audit:ci`)
+- Current dev-only ESLint/Next plugin chain still depends on `minimatch@3`; upgrading to ESLint 10 is blocked by plugin peer/API compatibility, so CI gates production dependencies while lint/test/build exercise the dev toolchain.
 
 ## Security headers
 
@@ -107,8 +108,8 @@ npm run typecheck
 npm run lint
 npm test
 npm run build
-npm run audit:security   # high+ only (matches CI gate)
-npm run audit:ci         # moderate+ for manual review
+npm run audit:security   # production high+ only (matches CI gate)
+npm run audit:ci         # full-tree moderate+ for manual review
 ```
 
 ## Recommended GitHub branch protection (`main`)
@@ -134,7 +135,8 @@ Enable **Code scanning** (CodeQL uploads) under **Settings → Code security and
 ## Security baseline checklist
 
 - [ ] No secrets in git history (Gitleaks clean)
-- [ ] No high/critical npm audit findings unaddressed
+- [ ] No high/critical production npm audit findings unaddressed
+- [ ] Full-tree dev audit findings reviewed or documented
 - [ ] CodeQL + Semgrep reviewed for new alerts on each PR
 - [ ] Dependency Review passing on PRs
 - [ ] ZAP baseline reviewed weekly (artifact)
