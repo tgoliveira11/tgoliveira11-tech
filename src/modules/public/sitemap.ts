@@ -51,6 +51,12 @@ export function buildRobotsTxt(config: BlogConfig): string {
 Allow: /
 Disallow: /admin
 Disallow: /api/admin
+Disallow: /api/auth
+Disallow: /api/account
+
+# AI-readable public content maps
+# ${baseUrl}/llms.txt
+# ${baseUrl}/llms-full.txt
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;

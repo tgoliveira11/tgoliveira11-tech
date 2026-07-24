@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { BlogConfig } from "./blog-config";
+import { LLMS_FULL_TXT_PATH, LLMS_TXT_PATH } from "./ai-discovery";
 import { PUBLIC_AUTHOR_PROFILE } from "./author-profile";
 import {
   PROFESSIONAL_AUTHOR_TITLE,
@@ -13,6 +14,8 @@ import {
 } from "./public-site-config";
 import { publicPostPath } from "@/modules/posts/slug";
 
+const DEFAULT_SEO_IMAGE_PATH = "/opengraph-image";
+
 export type PostSeoInput = {
   bundle: PublicPostBundle;
   config: BlogConfig;
@@ -22,6 +25,7 @@ export type ResolvedPostSeo = {
   title: string;
   description: string;
   canonicalUrl: string;
+  siteBaseUrl?: string;
   ogTitle: string;
   ogDescription: string;
   ogImageUrl: string | null;
@@ -44,6 +48,7 @@ export function resolvePostSeo(input: PostSeoInput): ResolvedPostSeo {
     title,
     description,
     canonicalUrl,
+    siteBaseUrl: baseUrl,
     ogTitle,
     ogDescription,
     ogImageUrl: null,
@@ -66,27 +71,127 @@ export async function resolvePostSeoWithImages(input: PostSeoInput): Promise<Res
     }
   }
 
-  if (!ogImageUrl && input.config.defaultSeoImage) {
-    ogImageUrl = input.config.defaultSeoImage.startsWith("http")
-      ? input.config.defaultSeoImage
-      : `${baseUrl}${input.config.defaultSeoImage.startsWith("/") ? "" : "/"}${input.config.defaultSeoImage}`;
+  const fallbackSeoImage = input.config.defaultSeoImage?.trim() || DEFAULT_SEO_IMAGE_PATH;
+
+  if (!ogImageUrl) {
+    ogImageUrl = fallbackSeoImage.startsWith("http")
+      ? fallbackSeoImage
+      : `${baseUrl}${fallbackSeoImage.startsWith("/") ? "" : "/"}${fallbackSeoImage}`;
   }
 
   return { ...resolved, ogImageUrl };
+}
+
+function resolvePostSiteBaseUrl(resolved: ResolvedPostSeo): string {
+  return (
+    resolved.siteBaseUrl ??
+    inferBaseUrlFromCanonical(resolved.canonicalUrl) ??
+    PUBLIC_AUTHOR_PROFILE.website.replace(/\/$/, "")
+  );
+}
+
+function buildAuthorUrl(baseUrl: string): string {
+  return `${baseUrl}/about`;
+}
+
+function buildPublicRobots(): Metadata["robots"] {
+  return {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  };
+}
+
+function buildPublicAlternateTypes(baseUrl: string): NonNullable<Metadata["alternates"]>["types"] {
+  return {
+    "application/rss+xml": `${baseUrl}/rss.xml`,
+    "text/plain": [
+      { title: "LLMs.txt", url: `${baseUrl}${LLMS_TXT_PATH}` },
+      { title: "LLMs-full.txt", url: `${baseUrl}${LLMS_FULL_TXT_PATH}` },
+    ],
+  };
+}
+
+function inferBaseUrlFromCanonical(canonicalUrl: string): string | null {
+  try {
+    return new URL(canonicalUrl).origin;
+  } catch {
+    return null;
+  }
+}
+
+export function buildPublicAlternates(
+  config: BlogConfig,
+  canonical: string
+): Metadata["alternates"] {
+  const baseUrl = config.baseUrl.replace(/\/$/, "");
+
+  return {
+    canonical,
+    types: buildPublicAlternateTypes(baseUrl),
+  };
+}
+
+export function buildPublicPageMetadata(
+  config: BlogConfig,
+  input: { title: string; description: string; canonicalPath: string }
+): Metadata {
+  const title = input.title;
+  const description = input.description;
+  const baseUrl = config.baseUrl.replace(/\/$/, "");
+  const defaultImage = config.defaultSeoImage ?? DEFAULT_SEO_IMAGE_PATH;
+  const siteTitle = getPublicSiteTitle(config);
+  const canonicalUrl = `${baseUrl}${input.canonicalPath}`;
+
+  return {
+    title,
+    description,
+    metadataBase: new URL(config.baseUrl),
+    alternates: buildPublicAlternates(config, input.canonicalPath),
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: canonicalUrl,
+      siteName: siteTitle,
+      images: [{ url: defaultImage }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [defaultImage],
+    },
+    robots: buildPublicRobots(),
+  };
 }
 
 export function buildPostMetadata(
   resolved: ResolvedPostSeo,
   bundle?: PublicPostBundle
 ): Metadata {
+  const siteBaseUrl = resolvePostSiteBaseUrl(resolved);
+  const authorUrl = buildAuthorUrl(siteBaseUrl);
+
   return {
     title: resolved.title,
     description: resolved.description,
-    authors: [{ name: PUBLIC_AUTHOR_PROFILE.fullName, url: PUBLIC_AUTHOR_PROFILE.website }],
+    metadataBase: new URL(siteBaseUrl),
+    authors: [{ name: PUBLIC_AUTHOR_PROFILE.fullName, url: authorUrl }],
+    creator: PUBLIC_AUTHOR_PROFILE.fullName,
+    publisher: SITE_NAME,
     category: bundle?.category?.name,
     keywords: bundle?.tags.map((tag) => tag.name),
     alternates: {
       canonical: resolved.canonicalUrl,
+      types: buildPublicAlternateTypes(siteBaseUrl),
     },
     openGraph: {
       title: resolved.ogTitle,
@@ -94,11 +199,13 @@ export function buildPostMetadata(
       type: "article",
       url: resolved.canonicalUrl,
       siteName: SITE_NAME,
+      locale: "en_US",
       publishedTime: bundle?.post.publishedAt?.toISOString(),
       modifiedTime: bundle?.post.updatedAt.toISOString(),
-      authors: [PUBLIC_AUTHOR_PROFILE.website],
+      authors: [authorUrl],
+      section: bundle?.category?.name,
       tags: bundle?.tags.map((tag) => tag.name),
-      images: resolved.ogImageUrl ? [{ url: resolved.ogImageUrl }] : undefined,
+      images: resolved.ogImageUrl ? [{ url: resolved.ogImageUrl, alt: resolved.ogTitle }] : undefined,
     },
     twitter: {
       card: resolved.ogImageUrl ? "summary_large_image" : "summary",
@@ -106,10 +213,7 @@ export function buildPostMetadata(
       description: resolved.ogDescription,
       images: resolved.ogImageUrl ? [resolved.ogImageUrl] : undefined,
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: buildPublicRobots(),
   };
 }
 
@@ -120,7 +224,7 @@ export function buildPersonJsonLd(config: BlogConfig): Record<string, unknown> {
     "@type": "Person",
     "@id": `${baseUrl}/#person`,
     name: PUBLIC_AUTHOR_PROFILE.fullName,
-    url: baseUrl,
+    url: buildAuthorUrl(baseUrl),
     jobTitle: PROFESSIONAL_AUTHOR_TITLE,
     sameAs: [PUBLIC_AUTHOR_PROFILE.linkedIn, PUBLIC_AUTHOR_PROFILE.github],
   };
@@ -145,7 +249,15 @@ export function buildBlogPostingJsonLd(
   bundle: PublicPostBundle,
   resolved: ResolvedPostSeo
 ): Record<string, unknown> {
-  const baseUrl = resolved.canonicalUrl.replace(publicPostPath(bundle.post.slug), "");
+  const baseUrl = resolvePostSiteBaseUrl(resolved);
+  const author = {
+    "@type": "Person",
+    "@id": `${baseUrl}/#person`,
+    name: PUBLIC_AUTHOR_PROFILE.fullName,
+    url: buildAuthorUrl(baseUrl),
+    jobTitle: PROFESSIONAL_AUTHOR_TITLE,
+    sameAs: [PUBLIC_AUTHOR_PROFILE.linkedIn, PUBLIC_AUTHOR_PROFILE.github],
+  };
 
   return {
     "@context": "https://schema.org",
@@ -155,19 +267,17 @@ export function buildBlogPostingJsonLd(
     description: resolved.description,
     datePublished: bundle.post.publishedAt?.toISOString(),
     dateModified: bundle.post.updatedAt.toISOString(),
-    mainEntityOfPage: resolved.canonicalUrl,
-    image: resolved.ogImageUrl ?? undefined,
-    url: resolved.canonicalUrl,
-    author: {
-      "@type": "Person",
-      "@id": `${baseUrl}/#person`,
-      name: PUBLIC_AUTHOR_PROFILE.fullName,
-      url: baseUrl,
-      jobTitle: PROFESSIONAL_AUTHOR_TITLE,
-      sameAs: [PUBLIC_AUTHOR_PROFILE.linkedIn, PUBLIC_AUTHOR_PROFILE.github],
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": resolved.canonicalUrl,
     },
+    image: resolved.ogImageUrl ? [resolved.ogImageUrl] : undefined,
+    url: resolved.canonicalUrl,
+    author,
+    publisher: author,
     keywords: bundle.tags.map((tag) => tag.name).join(", ") || undefined,
     articleSection: bundle.category?.name,
+    timeRequired: bundle.post.readingTimeMinutes ? `PT${bundle.post.readingTimeMinutes}M` : undefined,
     inLanguage: "en",
   };
 }
@@ -176,7 +286,7 @@ export function buildArticleBreadcrumbJsonLd(
   bundle: PublicPostBundle,
   resolved: ResolvedPostSeo
 ): Record<string, unknown> {
-  const baseUrl = resolved.canonicalUrl.replace(publicPostPath(bundle.post.slug), "");
+  const baseUrl = resolvePostSiteBaseUrl(resolved);
 
   return {
     "@context": "https://schema.org",
@@ -212,7 +322,7 @@ export function buildSiteMetadata(config: BlogConfig): Metadata {
   const title = getPublicSiteTitle(config);
   const description = getPublicSiteDescription(config);
   const baseUrl = config.baseUrl.replace(/\/$/, "");
-  const defaultImage = config.defaultSeoImage ?? "/opengraph-image";
+  const defaultImage = config.defaultSeoImage ?? DEFAULT_SEO_IMAGE_PATH;
 
   return {
     title: {
@@ -221,9 +331,7 @@ export function buildSiteMetadata(config: BlogConfig): Metadata {
     },
     description,
     metadataBase: new URL(config.baseUrl),
-    alternates: {
-      canonical: "/",
-    },
+    alternates: buildPublicAlternates(config, "/"),
     openGraph: {
       title,
       description,
@@ -238,9 +346,6 @@ export function buildSiteMetadata(config: BlogConfig): Metadata {
       description,
       images: [defaultImage],
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: buildPublicRobots(),
   };
 }

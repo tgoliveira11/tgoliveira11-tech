@@ -12,8 +12,11 @@ import type { BlogConfig } from "@/modules/public/blog-config";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import {
   buildBlogPostingJsonLd,
+  buildArticleBreadcrumbJsonLd,
   buildPostMetadata,
+  buildPublicPageMetadata,
   buildSiteMetadata,
+  buildWebsiteJsonLd,
   resolvePostSeo,
   resolvePostSeoWithImages,
 } from "@/modules/public/seo";
@@ -93,13 +96,74 @@ describe("seo helpers", () => {
   });
 
   it("builds metadata and JSON-LD", () => {
-    const resolved = resolvePostSeo({ bundle: makeBundle(), config });
-    const metadata = buildPostMetadata(resolved);
-    const jsonLd = buildBlogPostingJsonLd(makeBundle(), resolved);
+    const bundle = makeBundle();
+    const resolved = {
+      ...resolvePostSeo({ bundle, config }),
+      ogImageUrl: "https://example.com/default.png",
+    };
+    const metadata = buildPostMetadata(resolved, bundle);
+    const jsonLd = buildBlogPostingJsonLd(bundle, resolved);
 
     expect(metadata.title).toBe("Hello World");
+    expect(metadata.description).toBe("Short excerpt");
+    expect(metadata.metadataBase?.toString()).toBe("https://example.com/");
+    expect(metadata.authors).toEqual([
+      {
+        name: "Thiago Goulart de Oliveira",
+        url: "https://example.com/about",
+      },
+    ]);
+    expect(metadata.creator).toBe("Thiago Goulart de Oliveira");
+    expect(metadata.publisher).toBe("Thiago Goulart de Oliveira");
+    expect(metadata.alternates).toMatchObject({
+      canonical: "https://example.com/blog/hello-world",
+      types: {
+        "application/rss+xml": "https://example.com/rss.xml",
+      },
+    });
+    expect(metadata.openGraph).toMatchObject({
+      type: "article",
+      title: "Hello World",
+      description: "Short excerpt",
+      url: "https://example.com/blog/hello-world",
+      locale: "en_US",
+      siteName: "Thiago Goulart de Oliveira",
+      publishedTime: "2026-06-14T12:00:00.000Z",
+      modifiedTime: "2026-06-14T12:00:00.000Z",
+      authors: ["https://example.com/about"],
+      tags: ["News"],
+      images: [{ url: "https://example.com/default.png", alt: "Hello World" }],
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      title: "Hello World",
+      description: "Short excerpt",
+      images: ["https://example.com/default.png"],
+    });
+    expect(metadata.robots).toMatchObject({
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+      },
+    });
     expect(jsonLd["@type"]).toBe("BlogPosting");
     expect(jsonLd.headline).toBe("Hello World");
+    expect(jsonLd.mainEntityOfPage).toEqual({
+      "@type": "WebPage",
+      "@id": "https://example.com/blog/hello-world",
+    });
+    expect(jsonLd.image).toEqual(["https://example.com/default.png"]);
+    expect(jsonLd.author).toMatchObject({
+      "@type": "Person",
+      "@id": "https://example.com/#person",
+      name: "Thiago Goulart de Oliveira",
+      url: "https://example.com/about",
+    });
+    expect(jsonLd.publisher).toEqual(jsonLd.author);
+    expect(jsonLd.timeRequired).toBe("PT3M");
   });
 
   it("falls back to defaultSeoImage when asset records are unavailable", async () => {
@@ -110,6 +174,15 @@ describe("seo helpers", () => {
 
     const resolved = await resolvePostSeoWithImages({ bundle, config });
     expect(resolved.ogImageUrl).toBe("https://example.com/default.png");
+  });
+
+  it("uses the branded Open Graph image route when no article image is configured", async () => {
+    const resolved = await resolvePostSeoWithImages({
+      bundle: makeBundle(),
+      config: { ...config, defaultSeoImage: null },
+    });
+
+    expect(resolved.ogImageUrl).toBe("https://example.com/opengraph-image");
   });
 
   it("falls back to blog description when excerpt is missing", () => {
@@ -123,6 +196,7 @@ describe("seo helpers", () => {
 
   it("builds site metadata from blog config", () => {
     const metadata = buildSiteMetadata(config);
+    const websiteJsonLd = buildWebsiteJsonLd(config);
 
     expect(metadata.title).toEqual({
       default: "Thiago Goulart de Oliveira",
@@ -130,6 +204,51 @@ describe("seo helpers", () => {
     });
     expect(metadata.description).toContain("production AI systems");
     expect(metadata.metadataBase?.toString()).toBe("https://example.com/");
+    expect(metadata.alternates).toMatchObject({
+      canonical: "/",
+      types: {
+        "application/rss+xml": "https://example.com/rss.xml",
+        "text/plain": [
+          { title: "LLMs.txt", url: "https://example.com/llms.txt" },
+          { title: "LLMs-full.txt", url: "https://example.com/llms-full.txt" },
+        ],
+      },
+    });
+    expect(metadata.robots).toMatchObject({
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+      },
+    });
+    expect(websiteJsonLd.publisher).toMatchObject({
+      "@id": "https://example.com/#person",
+      url: "https://example.com/about",
+    });
+  });
+
+  it("builds public page metadata without dropping discovery alternates", () => {
+    const metadata = buildPublicPageMetadata(config, {
+      title: "Articles",
+      description: "All public articles.",
+      canonicalPath: "/blog",
+    });
+
+    expect(metadata.title).toBe("Articles");
+    expect(metadata.description).toBe("All public articles.");
+    expect(metadata.alternates).toMatchObject({
+      canonical: "/blog",
+      types: {
+        "application/rss+xml": "https://example.com/rss.xml",
+      },
+    });
+    expect(metadata.openGraph).toMatchObject({
+      title: "Articles",
+      description: "All public articles.",
+      url: "https://example.com/blog",
+    });
   });
 
   it("uses asset publicUrl for og image when available", async () => {
@@ -157,7 +276,9 @@ describe("seo helpers", () => {
     });
 
     expect(metadata.twitter?.card).toBe("summary_large_image");
-    expect(metadata.openGraph?.images).toEqual([{ url: "https://example.com/og.png" }]);
+    expect(metadata.openGraph?.images).toEqual([
+      { url: "https://example.com/og.png", alt: "Hello World" },
+    ]);
   });
 
   it("includes category and keywords in JSON-LD", () => {
@@ -176,6 +297,24 @@ describe("seo helpers", () => {
 
     expect(jsonLd.articleSection).toBe("Guides");
     expect(jsonLd.keywords).toBe("News");
+  });
+
+  it("uses the site base URL for article structured data when canonical URL is custom", () => {
+    const bundle = makeBundle({ canonicalUrl: "https://canonical.example.com/custom" });
+    const resolved = resolvePostSeo({ bundle, config });
+    const articleJsonLd = buildBlogPostingJsonLd(bundle, resolved);
+    const breadcrumbJsonLd = buildArticleBreadcrumbJsonLd(bundle, resolved);
+
+    expect(articleJsonLd["@id"]).toBe("https://canonical.example.com/custom#article");
+    expect(articleJsonLd.author).toMatchObject({
+      "@id": "https://example.com/#person",
+      url: "https://example.com/about",
+    });
+    expect(breadcrumbJsonLd.itemListElement).toMatchObject([
+      { item: "https://example.com/" },
+      { item: "https://example.com/blog" },
+      { item: "https://canonical.example.com/custom" },
+    ]);
   });
 
   it("supports absolute asset and default image URLs", async () => {

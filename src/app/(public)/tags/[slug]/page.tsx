@@ -7,7 +7,7 @@ import { PostList } from "@/components/public/post-list";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { canonicalizeTagSlug } from "@/modules/public/editorial-taxonomy";
 import { listPublishedPostBundlesByTagSlug } from "@/modules/public/public-posts.service";
-import { buildSiteMetadata } from "@/modules/public/seo";
+import { buildPublicPageMetadata } from "@/modules/public/seo";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -17,14 +17,11 @@ export async function generateMetadata({ params }: PageProps) {
   const result = await listPublishedPostBundlesByTagSlug(canonicalSlug, { limit: 1 });
   if (!result) return { title: "Tag not found" };
   const config = await getBlogConfig();
-  return {
-    ...buildSiteMetadata(config),
+  return buildPublicPageMetadata(config, {
     title: `#${result.tag.name}`,
     description: `Posts tagged with #${result.tag.name}.`,
-    alternates: {
-      canonical: `/tags/${result.tag.slug}`,
-    },
-  };
+    canonicalPath: `/tags/${result.tag.slug}`,
+  });
 }
 
 export default async function TagDetailPage({ params }: PageProps) {

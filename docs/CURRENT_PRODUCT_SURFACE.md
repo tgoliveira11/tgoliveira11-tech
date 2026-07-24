@@ -2,7 +2,7 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-07-24 (site repositioning and taxonomy canonicalization)
+**Last reviewed:** 2026-07-24 (GA4, public discovery, and AI-readable content maps)
 **Deployed domain (planned):** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
@@ -23,7 +23,7 @@ Living inventory of what **tgoliveira11-tech** exposes today. Update this file w
 |-------|--------|-------|
 | `/` | shipped | Home — featured/recent posts |
 | `/blog` | shipped | Paginated post index (`PUBLIC_POSTS_PAGE_SIZE`, default 5) |
-| `/blog/[slug]` | shipped | Published post detail |
+| `/blog/[slug]` | shipped | Published post detail with canonical metadata, Open Graph Article tags, Twitter card, and BlogPosting JSON-LD |
 | `/tags`, `/tags/[slug]` | shipped | Tag index and filtered posts |
 | `/categories`, `/categories/[slug]` | shipped | Canonical editorial category index and filtered posts |
 | `/search` | shipped | Full-text search |
@@ -32,6 +32,8 @@ Living inventory of what **tgoliveira11-tech** exposes today. Update this file w
 | `/rss.xml` | shipped | RSS feed (dynamic) |
 | `/sitemap.xml` | shipped | Sitemap (dynamic) |
 | `/robots.txt` | shipped | Robots (dynamic) |
+| `/llms.txt` | shipped | Concise AI-readable public content map |
+| `/llms-full.txt` | shipped | AI-readable public content export with published article markdown |
 | `/:YYYY-MM-DD-slug` | shipped | 308 redirect → `/blog/[slug]` via `src/proxy.ts` (legacy GitHub Pages URLs) |
 
 Canonical editorial categories: AI Engineering, Software & Solution Architecture, Engineering Leadership, Technology Strategy, Career & Reflections.
@@ -146,6 +148,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |
+| Google Analytics 4 | shipped | Public route group only; measurement ID `G-XJ5W80DYKL`; tracks page views, search terms, and Web Vitals while relying on GA4 Enhanced Measurement for automatic interactions |
 | GitHub Pages import CLI | shipped | `npm run import:github-pages` |
 | Content validation CLI | shipped | `npm run content:validate` |
 | Taxonomy migration CLI | shipped | `npm run content:migrate-taxonomy` (dry-run by default; `-- --apply` updates DB) |
