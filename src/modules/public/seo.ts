@@ -15,6 +15,17 @@ import {
 import { publicPostPath } from "@/modules/posts/slug";
 
 const DEFAULT_SEO_IMAGE_PATH = "/opengraph-image";
+const PERSON_IMAGE_PATH = "/images/about/thiago-oliveira.png";
+const PERSON_KNOWS_ABOUT = [
+  "Engineering Management",
+  "Generative AI",
+  "Agentic Systems",
+  "Solution Architecture",
+  "Cloud Architecture",
+  "Distributed Systems",
+  "Product Engineering",
+  "Technology Strategy",
+] as const;
 
 export type PostSeoInput = {
   bundle: PublicPostBundle;
@@ -141,10 +152,18 @@ export function buildPublicAlternates(
 
 export function buildPublicPageMetadata(
   config: BlogConfig,
-  input: { title: string; description: string; canonicalPath: string }
+  input: {
+    title: string;
+    description: string;
+    canonicalPath: string;
+    ogTitle?: string;
+    ogDescription?: string;
+  }
 ): Metadata {
   const title = input.title;
   const description = input.description;
+  const ogTitle = input.ogTitle ?? title;
+  const ogDescription = input.ogDescription ?? description;
   const baseUrl = config.baseUrl.replace(/\/$/, "");
   const defaultImage = config.defaultSeoImage ?? DEFAULT_SEO_IMAGE_PATH;
   const siteTitle = getPublicSiteTitle(config);
@@ -156,8 +175,8 @@ export function buildPublicPageMetadata(
     metadataBase: new URL(config.baseUrl),
     alternates: buildPublicAlternates(config, input.canonicalPath),
     openGraph: {
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       type: "website",
       url: canonicalUrl,
       siteName: siteTitle,
@@ -165,8 +184,8 @@ export function buildPublicPageMetadata(
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       images: [defaultImage],
     },
     robots: buildPublicRobots(),
@@ -225,8 +244,10 @@ export function buildPersonJsonLd(config: BlogConfig): Record<string, unknown> {
     "@id": `${baseUrl}/#person`,
     name: PUBLIC_AUTHOR_PROFILE.fullName,
     url: buildAuthorUrl(baseUrl),
+    image: `${baseUrl}${PERSON_IMAGE_PATH}`,
     jobTitle: PROFESSIONAL_AUTHOR_TITLE,
     sameAs: [PUBLIC_AUTHOR_PROFILE.linkedIn, PUBLIC_AUTHOR_PROFILE.github],
+    knowsAbout: [...PERSON_KNOWS_ABOUT],
   };
 }
 
@@ -255,8 +276,10 @@ export function buildBlogPostingJsonLd(
     "@id": `${baseUrl}/#person`,
     name: PUBLIC_AUTHOR_PROFILE.fullName,
     url: buildAuthorUrl(baseUrl),
+    image: `${baseUrl}${PERSON_IMAGE_PATH}`,
     jobTitle: PROFESSIONAL_AUTHOR_TITLE,
     sameAs: [PUBLIC_AUTHOR_PROFILE.linkedIn, PUBLIC_AUTHOR_PROFILE.github],
+    knowsAbout: [...PERSON_KNOWS_ABOUT],
   };
 
   return {

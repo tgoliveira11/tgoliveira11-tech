@@ -14,24 +14,24 @@ describe("site footer links", () => {
     expect(source).toContain('rel="noopener noreferrer"');
   });
 
-  it("renders SK external link after RSS", () => {
+  it("prioritizes professional links before editorial navigation", () => {
     const footerSource = readFileSync(
       resolve(process.cwd(), "src/components/public/site-footer.tsx"),
       "utf8"
     );
-    const configSource = readFileSync(
-      resolve(process.cwd(), "src/modules/public/public-site-config.ts"),
-      "utf8"
-    );
 
+    const linkedInIndex = footerSource.indexOf("LinkedIn");
+    const githubIndex = footerSource.indexOf("GitHub");
     const rssIndex = footerSource.indexOf("RSS");
-    const skIndex = footerSource.indexOf("SK");
+    const aiEngineeringIndex = footerSource.indexOf("AI Engineering");
 
-    expect(configSource).toContain("https://selahkeep.com");
-    expect(footerSource).toContain("PUBLIC_SITE_CONFIG.footer.skUrl");
+    expect(footerSource).toContain("resume_download_click");
+    expect(footerSource).toContain("email_contact_click");
     expect(footerSource).toContain('target="_blank"');
     expect(footerSource).toContain('rel="noopener noreferrer"');
+    expect(linkedInIndex).toBeGreaterThan(-1);
+    expect(githubIndex).toBeGreaterThan(linkedInIndex);
     expect(rssIndex).toBeGreaterThan(-1);
-    expect(skIndex).toBeGreaterThan(rssIndex);
+    expect(aiEngineeringIndex).toBeGreaterThan(rssIndex);
   });
 });

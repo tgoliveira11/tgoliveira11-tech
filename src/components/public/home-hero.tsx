@@ -7,11 +7,8 @@ const primaryButtonClass =
 const secondaryButtonClass =
   "inline-flex items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] px-5 py-2.5 text-sm font-medium transition hover:border-[var(--primary)] hover:text-[var(--primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]";
 
-const textLinkClass =
-  "text-sm font-medium text-[var(--primary)] underline-offset-4 transition hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]";
-
 export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
-  const [linkedInLink, githubLink] = PUBLIC_PROFILE_LINKS;
+  const linkedInLink = PUBLIC_PROFILE_LINKS.find((link) => link.label === "LinkedIn");
 
   return (
     <section
@@ -37,8 +34,21 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
           </p>
 
           <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-start">
-            <Link href={primaryPostsHref} className={primaryButtonClass}>
-              Read featured insights
+            <Link
+              href={primaryPostsHref}
+              className={primaryButtonClass}
+              data-analytics-event="home_explore_work_click"
+              data-analytics-component="home_hero"
+            >
+              Explore my work
+            </Link>
+            <Link
+              href="/about"
+              className={secondaryButtonClass}
+              data-analytics-event="about_cta_click"
+              data-analytics-component="home_hero"
+            >
+              About me
             </Link>
             {linkedInLink ? (
               <a
@@ -46,18 +56,10 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={secondaryButtonClass}
+                data-analytics-event="linkedin_cta_click"
+                data-analytics-component="home_hero"
               >
-                {linkedInLink.label}
-              </a>
-            ) : null}
-            {githubLink ? (
-              <a
-                href={githubLink.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${textLinkClass} px-1 py-2.5 sm:ml-1`}
-              >
-                {githubLink.label}
+                Connect on LinkedIn
               </a>
             ) : null}
           </div>

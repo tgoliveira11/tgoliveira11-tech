@@ -9,6 +9,8 @@ export function PostList({
   variant = "default",
   maxTags,
   showPromotionBadges,
+  analyticsEvent,
+  analyticsComponent,
 }: {
   posts: PublicPostBundle[];
   emptyMessage?: string;
@@ -16,6 +18,8 @@ export function PostList({
   variant?: "default" | "compact";
   maxTags?: number;
   showPromotionBadges?: boolean;
+  analyticsEvent?: string;
+  analyticsComponent?: string;
 }) {
   if (posts.length === 0) {
     return (
@@ -42,6 +46,8 @@ export function PostList({
             variant={variant}
             maxTags={maxTags}
             showPromotionBadges={showPromotionBadges ?? variant === "default"}
+            analyticsEvent={analyticsEvent}
+            analyticsComponent={analyticsComponent}
           />
         </li>
       ))}

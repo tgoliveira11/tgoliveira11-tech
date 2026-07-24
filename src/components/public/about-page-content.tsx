@@ -1,10 +1,27 @@
 import { PUBLIC_AUTHOR_PROFILE } from "@/modules/public/author-profile";
 import { ABOUT_PAGE_CONTENT } from "@/modules/public/about-content";
+import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import { AboutCtaLinks } from "./about-cta-links";
 import { AboutProfileImage } from "./about-profile-image";
+import { PostList } from "./post-list";
 
-export function AboutPageContent() {
-  const { hero, intro, audienceNote, sections } = ABOUT_PAGE_CONTENT;
+export function AboutPageContent({
+  selectedInsights = [],
+}: {
+  selectedInsights?: PublicPostBundle[];
+}) {
+  const {
+    hero,
+    intro,
+    audienceNote,
+    professionalSummary,
+    coreAreas,
+    careerProgression,
+    sections,
+    leadershipPrinciples,
+    selectedWork,
+    finalCta,
+  } = ABOUT_PAGE_CONTENT;
 
   return (
     <div className="space-y-12">
@@ -56,22 +73,131 @@ export function AboutPageContent() {
       </section>
 
       <section
-        aria-labelledby="about-audience-heading"
-        className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 px-6 py-5 sm:px-8 sm:py-6"
+        aria-labelledby="about-summary-heading"
+        className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start"
       >
-        <h2 id="about-audience-heading" className="sr-only">
-          How I can contribute
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-[var(--primary)]">
+            Professional summary
+          </p>
+          <h2
+            id="about-summary-heading"
+            className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl"
+          >
+            {professionalSummary.heading}
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-[var(--muted)] text-pretty">
+            {audienceNote}
+          </p>
+        </div>
+        <div className="space-y-4 text-base leading-relaxed text-[var(--muted)]">
+          {professionalSummary.paragraphs.map((paragraph) => (
+            <p key={paragraph} className="text-pretty">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="about-core-areas-heading">
+        <h2
+          id="about-core-areas-heading"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+        >
+          Core areas
         </h2>
-        <p className="text-base leading-relaxed text-[var(--muted)] text-pretty sm:text-lg">
-          {audienceNote}
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+          {coreAreas.map((area) => (
+            <li
+              key={area.title}
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[var(--shadow-sm)] sm:p-6"
+            >
+              <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
+                {area.title}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+                {area.description}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section
+        aria-labelledby="about-career-heading"
+        className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-6 sm:p-8"
+      >
+        <h2
+          id="about-career-heading"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+        >
+          {careerProgression.heading}
+        </h2>
+        <p className="mt-5 text-base font-medium leading-relaxed text-[var(--foreground)]">
+          {careerProgression.sequence}
+        </p>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--muted)] text-pretty">
+          {careerProgression.description}
         </p>
       </section>
 
-      <section aria-labelledby="about-sections-heading">
-        <h2 id="about-sections-heading" className="sr-only">
-          Background and focus areas
+      {selectedInsights.length > 0 ? (
+        <section aria-labelledby="about-selected-work-heading">
+          <div className="mb-6">
+            <h2
+              id="about-selected-work-heading"
+              className="text-2xl font-semibold tracking-tight sm:text-3xl"
+            >
+              {selectedWork.heading}
+            </h2>
+            <p className="mt-3 max-w-3xl text-base leading-relaxed text-[var(--muted)]">
+              {selectedWork.description}
+            </p>
+          </div>
+          <PostList
+            posts={selectedInsights}
+            layout="grid"
+            variant="compact"
+            maxTags={3}
+            showPromotionBadges={false}
+            analyticsEvent="about_selected_work_click"
+            analyticsComponent="about_selected_work"
+          />
+        </section>
+      ) : null}
+
+      <section aria-labelledby="about-principles-heading">
+        <h2
+          id="about-principles-heading"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+        >
+          Leadership principles
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ol className="mt-6 grid gap-4 sm:grid-cols-2">
+          {leadershipPrinciples.map((principle) => (
+            <li
+              key={principle.title}
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[var(--shadow-sm)] sm:p-6"
+            >
+              <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
+                {principle.title}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+                {principle.description}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="about-experience-heading">
+        <h2
+          id="about-experience-heading"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+        >
+          Areas of technical experience
+        </h2>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
           {sections.map((section) => (
             <li
               key={section.id}
@@ -97,6 +223,28 @@ export function AboutPageContent() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section
+        aria-labelledby="about-final-cta-heading"
+        className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-sm)] sm:p-8"
+      >
+        <h2
+          id="about-final-cta-heading"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+        >
+          {finalCta.heading}
+        </h2>
+        <div className="mt-4 max-w-3xl space-y-3 text-base leading-relaxed text-[var(--muted)]">
+          {finalCta.paragraphs.map((paragraph) => (
+            <p key={paragraph} className="text-pretty">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        <div className="mt-6">
+          <AboutCtaLinks showBlogLink={false} />
+        </div>
       </section>
     </div>
   );

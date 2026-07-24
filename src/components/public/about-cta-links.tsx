@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PUBLIC_AUTHOR_PROFILE } from "@/modules/public/author-profile";
 import { ABOUT_PAGE_CONTENT } from "@/modules/public/about-content";
 
 const primaryButtonClass =
@@ -15,7 +16,8 @@ export function AboutCtaLinks({
   layout?: "row" | "stack";
 }) {
   const { blog, profileLinks } = ABOUT_PAGE_CONTENT.ctas;
-  const [linkedInLink, githubLink] = profileLinks;
+  const linkedInLink = profileLinks.find((link) => link.label === "LinkedIn");
+  const githubLink = profileLinks.find((link) => link.label === "GitHub");
   const containerClass =
     layout === "stack"
       ? "flex flex-col items-stretch gap-3"
@@ -24,18 +26,25 @@ export function AboutCtaLinks({
   return (
     <div className={containerClass}>
       {showBlogLink ? (
-        <Link href={blog.href} className={primaryButtonClass}>
+        <Link
+          href={blog.href}
+          className={primaryButtonClass}
+          data-analytics-event="about_work_cta_click"
+          data-analytics-component="about_cta"
+        >
           {blog.label}
         </Link>
       ) : null}
-      {githubLink ? (
+      {PUBLIC_AUTHOR_PROFILE.resumeUrl ? (
         <a
-          href={githubLink.href}
+          href={PUBLIC_AUTHOR_PROFILE.resumeUrl}
           target="_blank"
           rel="noopener noreferrer"
           className={secondaryButtonClass}
+          data-analytics-event="resume_download_click"
+          data-analytics-component="about_cta"
         >
-          {githubLink.label}
+          Download résumé
         </a>
       ) : null}
       {linkedInLink ? (
@@ -44,8 +53,22 @@ export function AboutCtaLinks({
           target="_blank"
           rel="noopener noreferrer"
           className={secondaryButtonClass}
+          data-analytics-event="linkedin_cta_click"
+          data-analytics-component="about_cta"
         >
-          {linkedInLink.label}
+          Connect on LinkedIn
+        </a>
+      ) : null}
+      {githubLink ? (
+        <a
+          href={githubLink.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={secondaryButtonClass}
+          data-analytics-event="github_cta_click"
+          data-analytics-component="about_cta"
+        >
+          View GitHub
         </a>
       ) : null}
     </div>

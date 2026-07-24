@@ -30,8 +30,8 @@ This repo therefore:
 
 ## Brand
 
-- Site name: **tgoliveira11 tech**
-- Tagline: Software architecture · Engineering leadership · AI
+- Site name: **Thiago Goulart de Oliveira**
+- Tagline: Engineering Director · AI Platforms · Cloud & Solution Architecture
 - Footer links: blog (`APP_BASE_URL`), GitHub, LinkedIn
 
 Template source lives in `src/lib/email/templates/`.
@@ -41,7 +41,7 @@ Template source lives in `src/lib/email/templates/`.
 ```env
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=<from Resend dashboard>
-EMAIL_FROM="tgoliveira11 tech <noreply@mail.tgoliveira11.tech>"
+EMAIL_FROM="Thiago Goulart de Oliveira <noreply@mail.tgoliveira11.tech>"
 EMAIL_REPLY_TO="thiago@tgoliveira11.tech"
 APP_BASE_URL=https://tgoliveira11-tech.vercel.app
 ```
@@ -54,7 +54,7 @@ APP_BASE_URL=https://tgoliveira11-tech.vercel.app
 
    ```env
    EMAIL_PROVIDER=console
-   EMAIL_FROM="tgoliveira11 tech <noreply@localhost>"
+   EMAIL_FROM="Thiago Goulart de Oliveira <noreply@localhost>"
    ```
 
 2. Run `npm run dev`.

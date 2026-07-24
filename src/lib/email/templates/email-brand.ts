@@ -1,7 +1,7 @@
 /** Repo-local transactional email brand for tgoliveira11-tech. */
 export const EMAIL_BRAND = {
-  siteName: "tgoliveira11 tech",
-  tagline: "Software architecture · Engineering leadership · AI",
+  siteName: "Thiago Goulart de Oliveira",
+  tagline: "Engineering Director · AI Platforms · Cloud & Solution Architecture",
   githubUrl: "https://github.com/tgoliveira11",
   linkedInUrl: "https://www.linkedin.com/in/tgoliveira/",
   colors: {

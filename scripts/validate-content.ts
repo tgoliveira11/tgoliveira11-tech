@@ -25,6 +25,9 @@ const STATIC_PUBLIC_PATHS = new Set([
   "/about",
   "/blog",
   "/categories",
+  "/llms-full.txt",
+  "/llms.txt",
+  "/robots.txt",
   "/rss.xml",
   "/search",
   "/sitemap.xml",
@@ -141,6 +144,24 @@ async function main() {
           postLabel
         );
       }
+
+      if (post.updatedAt < post.publishedAt) {
+        addIssue(
+          issues,
+          "error",
+          `updatedAt ${post.updatedAt.toISOString()} is before publishedAt ${post.publishedAt.toISOString()}.`,
+          postLabel
+        );
+      }
+    }
+
+    if (/^#\s+\S+/m.test(post.contentMarkdown)) {
+      addIssue(
+        issues,
+        "error",
+        "Article body contains a top-level H1; the public template renders the article title.",
+        postLabel
+      );
     }
 
     const sourceCategory = post.categoryId ? categoriesById.get(post.categoryId) ?? null : null;

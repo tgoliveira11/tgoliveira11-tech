@@ -2,8 +2,8 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-07-24 (GA4, public discovery, and AI-readable content maps)
-**Deployed domain (planned):** `www.tgoliveira11.tech` (Vercel + Neon)
+**Last reviewed:** 2026-07-24 (site rework follow-up, conversion analytics, redirects, public discovery, and production content cleanup)
+**Canonical deployed domain:** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
 
@@ -35,8 +35,11 @@ Living inventory of what **tgoliveira11-tech** exposes today. Update this file w
 | `/llms.txt` | shipped | Concise AI-readable public content map |
 | `/llms-full.txt` | shipped | AI-readable public content export with published article markdown |
 | `/:YYYY-MM-DD-slug` | shipped | 308 redirect → `/blog/[slug]` via `src/proxy.ts` (legacy GitHub Pages URLs) |
+| Apex host `tgoliveira11.tech` | shipped | 308 redirect → `https://www.tgoliveira11.tech/:path*` via `next.config.ts` |
 
 Canonical editorial categories: AI Engineering, Software & Solution Architecture, Engineering Leadership, Technology Strategy, Career & Reflections.
+
+Priority article aliases redirect to date-aligned canonical slugs; the B2B mobility article canonical is `/blog/2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform`, with the former `2026-07-25` slug retained as a permanent redirect.
 
 ---
 
@@ -148,10 +151,11 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |
-| Google Analytics 4 | shipped | Public route group only; measurement ID `G-XJ5W80DYKL`; tracks page views, search terms, and Web Vitals while relying on GA4 Enhanced Measurement for automatic interactions |
+| Google Analytics 4 | shipped | Public route group only; measurement ID `G-XJ5W80DYKL`; tracks page views, search terms, Web Vitals, CTA clicks, Featured Insight clicks, related-article clicks, article entry, scroll depth, completion, and UTM fields |
 | GitHub Pages import CLI | shipped | `npm run import:github-pages` |
 | Content validation CLI | shipped | `npm run content:validate` |
 | Taxonomy migration CLI | shipped | `npm run content:migrate-taxonomy` (dry-run by default; `-- --apply` updates DB) |
+| Approved content site-rework CLI | shipped | `npm run content:apply-site-rework -- --content-dir .codex-site-rework/approved-content` (dry-run by default; `-- --apply` updates DB) |
 | Upstream PostForge sync | shipped | Weekly workflow + `npm run sync:upstream:merge` |
 
 ---
@@ -175,8 +179,9 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Dev port | `3011` |
 | `AUTH_COOKIE_PREFIX` | `tgoliveira11-tech` |
 | Docker Postgres container | `tgoliveira11-tech-postgres` |
-| Footer SK link | `https://selahkeep.com` |
+| Footer priority links | LinkedIn, GitHub, résumé when configured, email, RSS |
 | Legacy URL redirects | `src/proxy.ts` + `src/lib/legacy-post-redirect.ts` |
+| Site rework reference project plan | `docs/github-reference-project-plan.md` |
 
 ---
 

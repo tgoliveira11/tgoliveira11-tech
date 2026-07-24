@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PUBLIC_AUTHOR_PROFILE } from "@/modules/public/author-profile";
 import {
   LINKEDIN_CTA_LABEL,
@@ -17,14 +18,26 @@ export function ArticleAuthorBox() {
         <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
           {PROFESSIONAL_AUTHOR_SUMMARY}
         </p>
-        <a
-          href={PUBLIC_AUTHOR_PROFILE.linkedIn}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex text-sm font-medium text-[var(--primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
-        >
-          {LINKEDIN_CTA_LABEL}
-        </a>
+        <div className="mt-4 flex flex-wrap gap-4">
+          <Link
+            href="/about"
+            className="inline-flex text-sm font-medium text-[var(--primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+            data-analytics-event="article_author_about_click"
+            data-analytics-component="article_author_box"
+          >
+            About the author
+          </Link>
+          <a
+            href={PUBLIC_AUTHOR_PROFILE.linkedIn}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex text-sm font-medium text-[var(--primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+            data-analytics-event="article_cta_click"
+            data-analytics-component="article_author_box"
+          >
+            {LINKEDIN_CTA_LABEL}
+          </a>
+        </div>
       </div>
     </aside>
   );

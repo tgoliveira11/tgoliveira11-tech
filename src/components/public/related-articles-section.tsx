@@ -23,6 +23,8 @@ export function RelatedArticlesSection({ posts }: { posts: PublicPostBundle[] })
         variant="compact"
         maxTags={3}
         showPromotionBadges={false}
+        analyticsEvent="related_article_click"
+        analyticsComponent="related_articles"
       />
     </section>
   );

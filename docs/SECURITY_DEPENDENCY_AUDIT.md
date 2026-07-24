@@ -7,7 +7,8 @@ How PostForge manages `npm audit` findings without risky bulk fixes.
 ```bash
 npm run audit          # full tree (dev + prod)
 npm run audit:prod     # production dependencies only
-npm run audit:ci     # fail CI on moderate+ (full tree)
+npm run audit:security # production high+ (CI gate)
+npm run audit:ci       # moderate+ full tree for manual review
 ```
 
 Before committing dependency changes, always run:
@@ -16,6 +17,7 @@ Before committing dependency changes, always run:
 npm ls @tgoliveira/secure-auth drizzle-orm drizzle-kit next next-auth esbuild postcss uuid
 npm audit
 npm audit --omit=dev
+npm run audit:security
 npm run typecheck
 npm test
 npm run lint
@@ -26,6 +28,8 @@ npm run build
 ## Do not use `npm audit fix --force`
 
 `npm audit fix --force` often proposes **breaking downgrades** (for example Next.js 9, next-auth 3.x, old drizzle-kit). Treat audit output as a signal, then fix the **root cause** with targeted upgrades or `overrides`.
+
+CI gates high/critical production dependency vulnerabilities through `npm run audit:security`. Full-tree audit output is still reviewed manually because current Next.js ESLint plugins depend on `minimatch@3`, and the compatible ESLint 9 plugin stack has no published non-breaking fix for the dev-only `brace-expansion` advisory yet.
 
 ## Current overrides (PostForge)
 

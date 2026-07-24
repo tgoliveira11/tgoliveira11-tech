@@ -148,7 +148,7 @@ Actionable phase-by-phase plan for building the blog publishing platform on top 
 - [x] `public-layout.tsx`, `site-header.tsx`, `site-footer.tsx`
 - [x] Public `Admin` convenience link for authenticated sessions (route protection unchanged)
 - [x] Admin `View site` link back to `/`
-- [x] Footer SK external link after RSS
+- [x] Footer professional links prioritized before editorial navigation
 - [x] `post-card.tsx`, `post-list.tsx`, `tag-list.tsx`, `category-list.tsx`
 - [x] `search-form.tsx`, `empty-state.tsx`, `pagination.tsx`
 - [x] `home-hero.tsx`, `featured-post-card.tsx`, `recent-posts-section.tsx`, `topics-section.tsx`
@@ -576,4 +576,3 @@ Phase 1 ──► Phase 2 ──► Phase 3
 - [DEPLOYMENT.md](./DEPLOYMENT.md) — production deployment
 - [UPGRADING_FROM_POSTFORGE.md](./UPGRADING_FROM_POSTFORGE.md) — upstream updates
 - [FAQ.md](./FAQ.md) — common questions
-

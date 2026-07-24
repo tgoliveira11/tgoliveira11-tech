@@ -103,6 +103,7 @@ export const CATEGORY_SLUG_ALIASES: Record<string, EditorialCategorySlug> = {
   artificialintelligence: "ai-engineering",
   technologyarchitecture: "software-solution-architecture",
   architecture: "software-solution-architecture",
+  softwaresolutionarchitecture: "software-solution-architecture",
   softwarearchitecture: "software-solution-architecture",
   solutionarchitecture: "software-solution-architecture",
   systemarchitecture: "software-solution-architecture",
@@ -114,6 +115,7 @@ export const CATEGORY_SLUG_ALIASES: Record<string, EditorialCategorySlug> = {
   professionalgrowth: "career-reflections",
   personaldevelopment: "career-reflections",
   reflectionssociety: "career-reflections",
+  careerreflections: "career-reflections",
   reflections: "career-reflections",
   career: "career-reflections",
   technologystrategy: "technology-strategy",
@@ -140,9 +142,15 @@ export const TAG_SLUG_ALIASES: Record<string, string> = {
   apis: "apis",
   restapis: "rest-apis",
   sastdast: "sast-dast",
+  oauth2: "oauth-2",
+  openidconnect: "openid-connect",
+  zerotrust: "zero-trust",
+  abuseprevention: "abuse-prevention",
   texttosql: "text-to-sql",
   llmops: "llmops",
   aiobservability: "ai-observability",
+  aievaluation: "ai-evaluation",
+  aiquality: "ai-quality",
   responsibleai: "responsible-ai",
   enterpriseai: "enterprise-ai",
   generativeai: "generative-ai",
@@ -351,6 +359,11 @@ const POST_CATEGORY_OVERRIDES: Record<string, EditorialCategorySlug> = {
   "event-driven-microservices": "software-solution-architecture",
   "architecture-design-patterns": "software-solution-architecture",
   "api-security": "software-solution-architecture",
+  "safeguarding-your-rest-apis": "software-solution-architecture",
+  "choosing-a-distributed-cache-consistency-availability-cost-and-operational-trade-offs":
+    "software-solution-architecture",
+  "evaluating-enterprise-ai-operational-trust": "ai-engineering",
+  "observability-agentic-systems": "ai-engineering",
   "remote-work": "engineering-leadership",
   "become-to-achieve": "engineering-leadership",
   "building-scaling-b2b-mobility-platform": "technology-strategy",
@@ -473,11 +486,13 @@ export const PRIORITY_POST_ALIASES: Record<string, string> = {
   "software-solution-system-architecture": "2023-06-16-software-solution-system-architecture",
   "a-letter-to-my-past-self": "2024-10-08-a-letter-to-my-past-self",
   "building-scaling-b2b-mobility-platform":
-    "2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
+    "2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
   "building-and-scaling-a-b2b-mobility-platform":
-    "2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
+    "2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
   "from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform":
-    "2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
+    "2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
+  "2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform":
+    "2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
 };
 
 export function getCanonicalPostAliasTarget(slug: string): string | null {
@@ -489,6 +504,18 @@ export function getCanonicalPostAliasTarget(slug: string): string | null {
 }
 
 export const POST_IMAGE_ALT_OVERRIDES: Record<string, string> = {
+  "software-solution-system-architecture":
+    "A layered comparison of software, solution, and system architecture across code, business capabilities, and operational systems.",
+  "a-letter-to-my-past-self":
+    "A visual career path from software engineering through architecture, entrepreneurship, and engineering leadership.",
+  "api-security":
+    "An enterprise API request passing through identity, authorization, abuse prevention, gateway, service, and observability controls.",
+  "safeguarding-your-rest-apis":
+    "An enterprise API request passing through identity, authorization, abuse prevention, gateway, service, and observability controls.",
+  "in-memory-cache":
+    "A distributed-cache decision map comparing consistency, availability, latency, cost, and operational complexity.",
+  "choosing-a-distributed-cache-consistency-availability-cost-and-operational-trade-offs":
+    "A distributed-cache decision map comparing consistency, availability, latency, cost, and operational complexity.",
   "what-breaks-first-when-text-to-sql-moves-from-demo-to-production":
     "An enterprise operator using a conversational Text-to-SQL system protected by semantic, authorization, validation, and data-governance layers.",
   "text-to-sql-from-demo-to-production":

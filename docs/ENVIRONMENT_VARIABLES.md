@@ -22,7 +22,7 @@ Reference for PostForge configuration. Copy `.env.example` to `.env.local` for l
 
 | Variable | Purpose | Default | Notes |
 |----------|---------|---------|-------|
-| `APP_BASE_URL` | Canonical public URL | `http://localhost:3000` | Used for SEO, RSS, links |
+| `APP_BASE_URL` | Canonical public URL | `https://www.tgoliveira11.tech` in repo defaults; local `.env.example` uses `http://localhost:3011` | Used for SEO, RSS, links |
 | `APP_NAME` | Site / blog title fallback | `PostForge` | Overridden by `blog_settings` when set |
 | `APP_SLUG` | Internal app slug | `postforge` | Rarely changed |
 | `NODE_ENV` | Node environment | `development` | Set by host in production |
@@ -105,7 +105,7 @@ Never prefix `RESEND_API_KEY` with `NEXT_PUBLIC_`.
 ```env
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=<from Resend>
-EMAIL_FROM="tgoliveira11 tech <noreply@mail.tgoliveira11.tech>"
+EMAIL_FROM="Thiago Goulart de Oliveira <noreply@mail.tgoliveira11.tech>"
 EMAIL_REPLY_TO="thiago@tgoliveira11.tech"
 ```
 
@@ -143,6 +143,7 @@ See `.env.example` for:
 | `PUBLIC_POSTS_PAGE_SIZE` | Posts per page on `/blog` | `5` | Positive integer, max `50`; invalid values fall back to `5` |
 | `HOME_RECENT_POSTS_LIMIT` | Recent posts shown on home (below featured) | `12` | Positive integer, max `48`; invalid values fall back to `12` |
 | `HOME_POPULAR_CATEGORIES_LIMIT` | Top categories on home “Explore by category” | `6` | Positive integer, max `24`; invalid values fall back to `6` |
+| `NEXT_PUBLIC_RESUME_URL` / `RESUME_URL` | Enables the public résumé CTA | unset | Optional; do not invent this URL |
 
 ### Public appearance
 
@@ -226,6 +227,16 @@ See [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md) and [deployment-vercel-neon.md](d
 Post view API: `POST /api/analytics/post-view` (rate-limited, published posts only).
 
 Captured request data includes referrer host, UTM params, coarse browser/OS, geo headers when available, device type, accept language, and a JSON `request_metadata` blob for additional fields. Enable raw IP storage only if your privacy policy covers it.
+
+Public GA4 events include SPA page views, site search, Web Vitals, CTA clicks, Featured Insight clicks, related-article clicks, article entry, scroll depth, completion, and UTM fields. See [analytics-events.md](analytics-events.md).
+
+Approved site-rework manuscript import can be dry-run with:
+
+```bash
+npm run content:apply-site-rework -- --content-dir .codex-site-rework/approved-content
+```
+
+Run `npm run content:apply-site-rework -- --apply --content-dir .codex-site-rework/approved-content` only after confirming the target `DATABASE_URL` and admin author user.
 
 ---
 
