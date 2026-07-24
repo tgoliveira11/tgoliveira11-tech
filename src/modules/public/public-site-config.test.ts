@@ -8,7 +8,7 @@ import {
 describe("public site config", () => {
   it("exposes repo-specific header and footer settings", () => {
     expect(PUBLIC_SITE_CONFIG.siteTitle).toBe("Thiago Goulart de Oliveira");
-    expect(PUBLIC_SITE_CONFIG.footer.skUrl).toBe("https://selahkeep.com");
+    expect(PUBLIC_SITE_CONFIG.footer.compact).toBe(true);
   });
 
   it("returns configured site title override", () => {

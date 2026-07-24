@@ -1,3 +1,5 @@
+import { readEnv } from "@/lib/env";
+
 export type PublicProfileLink = {
   label: string;
   href: string;
@@ -12,7 +14,8 @@ export const PUBLIC_AUTHOR_PROFILE = {
   email: "thiago@tgoliveira11.tech",
   github: "https://github.com/tgoliveira11",
   linkedIn: "https://www.linkedin.com/in/tgoliveira",
-  website: "https://tgoliveira11.tech",
+  resumeUrl: readEnv("NEXT_PUBLIC_RESUME_URL") ?? readEnv("RESUME_URL") ?? null,
+  website: "https://www.tgoliveira11.tech",
 } as const;
 
 export type HomeHeroHighlight = {

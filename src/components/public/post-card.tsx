@@ -11,11 +11,15 @@ export function PostCard({
   variant = "default",
   maxTags = DEFAULT_VISIBLE_TAGS,
   showPromotionBadges = true,
+  analyticsEvent = "article_card_click",
+  analyticsComponent = "post_card",
 }: {
   bundle: PublicPostBundle;
   variant?: "default" | "compact";
   maxTags?: number;
   showPromotionBadges?: boolean;
+  analyticsEvent?: string;
+  analyticsComponent?: string;
 }) {
   const { post, category, tags, coverAsset } = bundle;
   const { visible: visibleTags, hiddenCount } = limitTagsForDisplay(tags, maxTags);
@@ -35,6 +39,9 @@ export function PostCard({
             isCompact ? "aspect-[16/9]" : "mb-4 aspect-[16/9] rounded-lg"
           }`}
           aria-label={`View cover image for ${post.title}`}
+          data-analytics-event={analyticsEvent}
+          data-analytics-component={analyticsComponent}
+          data-analytics-article-slug={post.slug}
         >
           <PostImage
             src={coverAsset.publicUrl}
@@ -73,13 +80,20 @@ export function PostCard({
             isCompact ? "mt-1.5 text-base leading-snug" : "mt-2 text-2xl"
           }`}
         >
-          <Link href={postHref} className="hover:text-[var(--primary)]">
+          <Link
+            href={postHref}
+            className="hover:text-[var(--primary)]"
+            data-analytics-event={analyticsEvent}
+            data-analytics-component={analyticsComponent}
+            data-analytics-article-slug={post.slug}
+          >
             {post.title}
           </Link>
         </h2>
 
         <PostMeta
           publishedAt={post.publishedAt}
+          updatedAt={post.updatedAt}
           readingTimeMinutes={post.readingTimeMinutes}
           className={isCompact ? "mt-1.5 text-xs" : "mt-2"}
         />
@@ -123,6 +137,9 @@ export function PostCard({
             className={`font-medium text-[var(--primary)] hover:underline ${
               isCompact ? "text-xs" : "text-sm"
             }`}
+            data-analytics-event={analyticsEvent}
+            data-analytics-component={analyticsComponent}
+            data-analytics-article-slug={post.slug}
           >
             Read post
           </Link>

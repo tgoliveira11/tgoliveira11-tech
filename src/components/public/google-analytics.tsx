@@ -11,6 +11,7 @@ type GtagArguments =
   | ["event", string, Record<string, unknown>?];
 
 type WebVitalsMetric = Parameters<Parameters<typeof useReportWebVitals>[0]>[0];
+type SearchParamsLike = Pick<URLSearchParams, "get">;
 
 declare global {
   interface Window {
@@ -18,6 +19,10 @@ declare global {
     gtag?: (...args: GtagArguments) => void;
     __googleAnalyticsInitialized?: Record<string, boolean>;
     __googleAnalyticsPreviousLocation?: string;
+    tgoTrackPublicEvent?: (
+      eventName: string,
+      parameters?: Record<string, unknown>
+    ) => void;
   }
 }
 
@@ -65,6 +70,64 @@ function ensureGoogleAnalytics(measurementId: string): void {
   window.__googleAnalyticsInitialized[measurementId] = true;
 }
 
+function getUtmParameters(searchParams: SearchParamsLike): Record<string, string> {
+  const entries = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+  ] as const;
+  const output: Record<string, string> = {};
+
+  for (const key of entries) {
+    const value = searchParams.get(key)?.trim();
+    if (value) {
+      output[key] = value;
+    }
+  }
+
+  return output;
+}
+
+function trackPublicEvent(
+  measurementId: string,
+  eventName: string,
+  parameters: Record<string, unknown> = {}
+): void {
+  ensureGoogleAnalytics(measurementId);
+
+  window.gtag?.("event", eventName, {
+    send_to: measurementId,
+    transport_type: "beacon",
+    page_location: window.location.href,
+    page_path: `${window.location.pathname}${window.location.search}`,
+    page_title: document.title,
+    ...getUtmParameters(new URLSearchParams(window.location.search)),
+    ...parameters,
+  });
+}
+
+function shouldTrackEntryArticle(pathname: string, pageReferrer?: string): boolean {
+  if (!/^\/blog\/[^/]+/.test(pathname)) {
+    return false;
+  }
+
+  try {
+    if (window.sessionStorage.getItem("tgo_entry_article_tracked")) {
+      return false;
+    }
+
+    const referrerUrl = pageReferrer ? new URL(pageReferrer) : null;
+    const isInternalReferrer = referrerUrl?.origin === window.location.origin;
+    window.sessionStorage.setItem("tgo_entry_article_tracked", "true");
+
+    return !isInternalReferrer;
+  } catch {
+    return !pageReferrer;
+  }
+}
+
 function GoogleAnalyticsRouteEvents({ measurementId }: { measurementId: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -80,6 +143,7 @@ function GoogleAnalyticsRouteEvents({ measurementId }: { measurementId: string }
     const pagePath = queryString ? `${pathname}?${queryString}` : pathname;
     const pageLocation = `${window.location.origin}${pagePath}`;
     const pageReferrer = window.__googleAnalyticsPreviousLocation || document.referrer || undefined;
+    const utmParameters = getUtmParameters(searchParams);
 
     window.gtag?.("event", "page_view", {
       page_location: pageLocation,
@@ -87,6 +151,7 @@ function GoogleAnalyticsRouteEvents({ measurementId }: { measurementId: string }
       page_referrer: pageReferrer,
       page_title: document.title,
       send_to: measurementId,
+      ...utmParameters,
     });
     window.__googleAnalyticsPreviousLocation = pageLocation;
 
@@ -96,9 +161,69 @@ function GoogleAnalyticsRouteEvents({ measurementId }: { measurementId: string }
         page_location: pageLocation,
         search_term: searchTerm,
         send_to: measurementId,
+        ...utmParameters,
+      });
+    }
+
+    if (pathname === "/about") {
+      trackPublicEvent(measurementId, "about_page_visit", {
+        page_location: pageLocation,
+        ...utmParameters,
+      });
+    }
+
+    if (shouldTrackEntryArticle(pathname, pageReferrer)) {
+      trackPublicEvent(measurementId, "entry_article", {
+        article_path: pathname,
+        page_location: pageLocation,
+        page_referrer: pageReferrer,
+        ...utmParameters,
       });
     }
   }, [measurementId, pathname, searchParams]);
+
+  return null;
+}
+
+function GoogleAnalyticsConversionEvents({ measurementId }: { measurementId: string }) {
+  useEffect(() => {
+    window.tgoTrackPublicEvent = (eventName, parameters) => {
+      trackPublicEvent(measurementId, eventName, parameters);
+    };
+
+    function handleTrackedClick(event: MouseEvent) {
+      const target =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>("[data-analytics-event]")
+          : null;
+      const eventName = target?.dataset.analyticsEvent?.trim();
+      if (!target || !eventName) {
+        return;
+      }
+
+      const href =
+        target instanceof HTMLAnchorElement
+          ? target.href
+          : target.getAttribute("href") ?? undefined;
+
+      trackPublicEvent(measurementId, eventName, {
+        event_label: target.dataset.analyticsLabel || target.textContent?.trim(),
+        link_url: href,
+        link_text: target.textContent?.trim(),
+        component: target.dataset.analyticsComponent,
+        article_slug: target.dataset.analyticsArticleSlug,
+      });
+    }
+
+    document.addEventListener("click", handleTrackedClick, { capture: true });
+
+    return () => {
+      document.removeEventListener("click", handleTrackedClick, { capture: true });
+      if (window.tgoTrackPublicEvent) {
+        delete window.tgoTrackPublicEvent;
+      }
+    };
+  }, [measurementId]);
 
   return null;
 }
@@ -152,8 +277,8 @@ export function GoogleAnalytics({
       <Suspense fallback={null}>
         <GoogleAnalyticsRouteEvents measurementId={measurementId} />
       </Suspense>
+      <GoogleAnalyticsConversionEvents measurementId={measurementId} />
       <GoogleAnalyticsWebVitals measurementId={measurementId} />
     </>
   );
 }
-

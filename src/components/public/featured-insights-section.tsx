@@ -27,6 +27,8 @@ export function FeaturedInsightsSection({ posts }: { posts: PublicPostBundle[] }
             variant="compact"
             maxTags={3}
             showPromotionBadges={false}
+            analyticsEvent="home_featured_insight_click"
+            analyticsComponent="featured_insights"
           />
         ) : null}
       </div>

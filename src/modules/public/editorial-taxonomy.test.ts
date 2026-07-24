@@ -83,6 +83,9 @@ describe("editorial taxonomy", () => {
     expect(getCanonicalPostAliasTarget("2026-07-24-text-to-sql-from-demo-to-production")).toBe(
       "2026-07-24-what-breaks-first-when-text-to-sql-moves-from-demo-to-production"
     );
+    expect(getCanonicalPostAliasTarget("2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform")).toBe(
+      "2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform"
+    );
     expect(getCanonicalPostAliasTarget("unknown")).toBeNull();
   });
 

@@ -1,6 +1,6 @@
 # Site rework report
 
-Date: 2026-07-24  
+Date: 2026-07-24
 Branch: `chore/site-repositioning-2026`
 
 ## 1. Framework and Architecture Discovered
@@ -139,7 +139,7 @@ Added/standardized:
   - `/software-solution-system-architecture` → `/blog/2023-06-16-software-solution-system-architecture`
   - `/a-letter-to-my-past-self` → `/blog/2024-10-08-a-letter-to-my-past-self`
   - `/text-to-sql-from-demo-to-production` → `/blog/2026-07-24-what-breaks-first-when-text-to-sql-moves-from-demo-to-production`
-  - `/building-scaling-b2b-mobility-platform` → `/blog/2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform`
+  - `/building-scaling-b2b-mobility-platform` → `/blog/2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform`
 - Blog priority aliases through `/blog/[slug]`.
 - Blog alias handling skips self-redirects for already canonical dated slugs.
 - Category alias pages redirect to canonical category slugs.
@@ -245,6 +245,15 @@ Production database update on 2026-07-24:
 - Production content validation result: 0 errors, 25 warnings.
 - Remaining production warnings are content-quality items: imported `publishedAt` dates differ from dated slugs for legacy posts, two posts have no cover image, and two cover assets are missing descriptive alt text.
 
+Production content cleanup on 2026-07-24:
+
+- Demoted duplicate top-level article body H1 headings in two legacy posts.
+- Restored legacy `publishedAt` dates from date-prefixed slugs.
+- Canonicalized the B2B mobility article to the `2026-07-24` date-based slug and redirected the former `2026-07-25` slug.
+- Associated cover assets and descriptive alt text with posts that were missing cover metadata.
+- Production content validation after cleanup checked 25 posts, 11 categories, 454 tags, and 27 assets.
+- Production content validation result: 0 errors, 0 warnings.
+
 ## 18. Missing Article Bodies
 
 - No repository article bodies exist to edit.
@@ -267,9 +276,9 @@ Live production content uses Vercel Blob cover assets for the Text-to-SQL and B2
 
 ## 20. Remaining Manual Actions
 
-- Review live production post dates and restore original publication dates where imports overwrote them.
-- Confirm whether the B2B mobility slug should keep `2026-07-25` or be redirected to a `2026-07-24` canonical slug.
-- Add or update production article cover asset alt text where database assets still have empty alt fields.
+- Production post dates have been restored from date-prefixed slugs.
+- The B2B mobility article now uses the `2026-07-24` canonical slug; the `2026-07-25` slug redirects.
+- Production article cover asset metadata now validates without warnings.
 - Confirm production `APP_BASE_URL`/blog setting should use `https://www.tgoliveira11.tech` or apex `https://tgoliveira11.tech`, then keep sitemap/robots/canonicals consistent.
 
 ## 21. Risks or Assumptions
@@ -278,3 +287,202 @@ Live production content uses Vercel Blob cover assets for the Text-to-SQL and B2
 - Live RSS/sitemap were treated as the current public content inventory.
 - Canonical article URLs preserve current live `/blog/YYYY-MM-DD-slug` routes rather than changing stable slugs.
 - The taxonomy migration script is intentionally dry-run by default to avoid accidental production database edits.
+
+---
+
+## 22. Follow-up implementation from attached rework bundle
+
+Date: 2026-07-24
+
+Branch: `feature/codex-site-rework`
+
+### Framework and repository architecture
+
+- Confirmed Next.js `16.2.11`, React `19.2.4`, npm with `package-lock.json`, App Router in `src/app`, and DB-backed content.
+- Read local Next docs for metadata/OG, redirects, headers/cache, and JSON-LD before code changes.
+
+### Deployment and caching findings
+
+- Added repository-level canonical host redirect from `tgoliveira11.tech` to `https://www.tgoliveira11.tech`.
+- Added no-store headers for public HTML routes because the public layout can display an authenticated admin convenience link.
+- Added short shared caching for metadata endpoints: `/rss.xml`, `/sitemap.xml`, `/robots.txt`, `/llms.txt`, and `/llms-full.txt`.
+- Static fingerprinted Next assets remain under Next's immutable caching behavior.
+
+### Canonical-host decision
+
+- Canonical origin is `https://www.tgoliveira11.tech`.
+- `src/modules/public/blog-config.ts` now defaults to the canonical production origin when env/blog settings are absent.
+- `PUBLIC_AUTHOR_PROFILE.website` now uses the canonical `www` origin.
+
+### Files changed
+
+- `next.config.ts`
+- `next.config.test.ts`
+- `.env.example`
+- `package.json`
+- `scripts/apply-site-rework-content.ts`
+- `scripts/validate-content.ts`
+- `src/app/(public)/about/page.tsx`
+- `src/app/sitemap.ts`
+- `src/components/public/*`
+- `src/lib/email/templates/*`
+- `src/lib/auth/patch-secure-auth-email-templates.test.ts`
+- `src/modules/public/*`
+- `docs/analytics-events.md`
+- `docs/github-reference-project-plan.md`
+- `docs/site-rework-report.md`
+- `docs/CURRENT_PRODUCT_SURFACE.md`
+- `docs/ENVIRONMENT_VARIABLES.md`
+- `docs/UI_UX_SKILL.md`
+- `docs/IMPLEMENTATION_PLAN.md`
+- `docs/blog-email-templates.md`
+- `docs/EMAIL_PROVIDERS.md`
+- `CHANGELOG.md`
+
+### Home changes
+
+- Home hero CTA labels now match the brief: `Explore my work`, `About me`, and `Connect on LinkedIn`.
+- Home CTA clicks are marked for analytics.
+- Featured Insight card clicks emit `home_featured_insight_click`.
+- Cards now show modification date when it differs from publication date.
+
+### About changes
+
+- Expanded About page into the requested structure: hero, professional summary, four core areas, career progression, selected work, leadership principles, technical experience, and final CTA.
+- About selected work is queried from canonical Featured Insights instead of duplicating article metadata.
+- About metadata now includes the requested title, description, OG title, OG description, and canonical `/about`.
+- Résumé CTA is conditional on `NEXT_PUBLIC_RESUME_URL` or `RESUME_URL`; no URL was invented.
+
+### Navigation changes
+
+- Footer now prioritizes LinkedIn, GitHub, résumé when configured, email, and RSS before editorial navigation.
+- Removed the obsolete SK footer link.
+- Header navigation from the previous rework remains concise and mobile-scrollable.
+
+### Category model
+
+- Added category aliases for approved names containing `&`, such as `Software & Solution Architecture` and `Career & Reflections`.
+- Sitemap now excludes empty category archives.
+
+### Complete tag migration
+
+- Existing `docs/tag-migration.md` and `docs/tag-migration.json` remain the migration inventory.
+- Added approved-manuscript aliases for `oauth2 -> oauth-2`, `openidconnect -> openid-connect`, `zero-trust`, `abuse-prevention`, `ai-evaluation`, and `ai-quality`.
+
+### Redirect map
+
+- Added native permanent redirects in `next.config.ts` for:
+  - apex host to canonical `www`;
+  - strategic article aliases for Text-to-SQL, architecture, TecleTaxi, and career articles;
+  - legacy category aliases to the five canonical editorial categories.
+- Existing DB-backed and route-level redirect handling remains for dynamic legacy paths and tag aliases.
+
+### Canonical-URL decisions
+
+- Preserved current public date-based `/blog/YYYY-MM-DD-slug` canonical URLs where already established.
+- The approved-content migrator maps short manuscript slugs to date-based canonical slugs and creates redirects from aliases.
+
+### Publication-date corrections
+
+- The migrator preserves manuscript `date` as `publishedAt` and manuscript `lastmod` as `updatedAt` when present.
+- Validation now fails when `updatedAt` is earlier than `publishedAt`.
+- Production legacy date corrections still require running the approved-content migrator against the intended database.
+
+### Article replacements and additions
+
+- Added `npm run content:apply-site-rework`.
+- Dry-run parser successfully processed all eight approved manuscripts from the attachment:
+  - Text-to-SQL
+  - Architecture
+  - Career
+  - TecleTaxi
+  - API security
+  - Distributed cache
+  - AI evaluation
+  - Agent observability
+- The script is dry-run by default and requires `--apply`, a valid `DATABASE_URL`, and an existing admin author user before updating content.
+
+### Image changes and missing images
+
+- Added required alt text fallbacks for Text-to-SQL, TecleTaxi, architecture, career, API security, and cache strategic articles.
+- No fake bitmap or unrelated stock art was added.
+- Article-specific production image assets remain a database/Vercel Blob content operation.
+
+### SEO changes
+
+- About metadata now supports custom OG title/description.
+- `Person` JSON-LD now includes profile image and verified `knowsAbout` values.
+- Article JSON-LD author object now includes the same image and `knowsAbout` values.
+- Sitemap excludes empty category archives and includes public canonical pages through existing generation.
+
+### Structured-data changes
+
+- Existing `WebSite`, `BlogPosting`, and `BreadcrumbList` JSON-LD remain.
+- `Person` JSON-LD now includes name, URL, image, job title, LinkedIn/GitHub `sameAs`, and `knowsAbout`.
+
+### Accessibility changes
+
+- About page keeps one H1 and uses section headings for summary, core areas, career, selected work, principles, technical experience, and final CTA.
+- Approved-content migrator strips the manuscript H1 because the public article template renders the title.
+- Content validation now fails on top-level H1 in article bodies.
+
+### Performance changes
+
+- No new animation or heavy client library added.
+- Conversion analytics uses a single delegated click listener instead of per-link client components.
+- Scroll-depth tracking uses `requestAnimationFrame` throttling.
+
+### Analytics implementation
+
+- Added public conversion events documented in `docs/analytics-events.md`.
+- Events cover About visit, article entry, Featured Insight clicks, LinkedIn/résumé/GitHub/email CTAs, article CTA, related article click, article scroll depth, article completion, search results, page views, UTM fields, and Web Vitals.
+- No duplicate page-view tracking was introduced.
+
+### GitHub reference-project preparation
+
+- Created `docs/github-reference-project-plan.md`.
+- The plan covers architecture, Mermaid diagram, repository tree, README manuscript, ADR template, security model, evaluation plan, observability plan, test strategy, and unpublished draft portfolio entry.
+- No external GitHub repository was created or pushed.
+
+### Validation script
+
+- `scripts/validate-content.ts` now checks `updatedAt >= publishedAt`, duplicate H1 risk, and AI-discovery endpoints as valid internal paths.
+- Existing validation still checks slug, dates, canonical URLs, category resolution, tag canonicalization, duplicate tags, assets, and internal links.
+
+### Commands executed
+
+- `npm run typecheck` - passed.
+- `npm run test -- next.config.test.ts src/components/public/google-analytics.test.ts src/components/public/site-footer.test.ts src/modules/public/public-site-config.test.ts src/modules/public/seo.test.ts src/modules/public/editorial-taxonomy.test.ts src/lib/email/templates/email-templates.test.ts src/lib/auth/patch-secure-auth-email-templates.test.ts` - 7 files passed, 35 tests passed.
+- `npm run content:apply-site-rework -- --content-dir /tmp/.../.codex-site-rework/approved-content` - dry-run succeeded for all 8 manuscripts.
+- `npm run validate` - passed.
+
+### Test/build results
+
+- Typecheck: passed.
+- Lint: passed with 1 existing warning in generated `coverage/lcov-report/block-navigation.js`.
+- Test coverage: 163 files passed, 1084 tests passed.
+- Content validation: checked 0 local posts/categories/tags/assets; 0 errors, 0 warnings.
+- Production build: passed; Next generated 49 static pages and all dynamic routes successfully.
+
+### Pre-existing failures
+
+- No blocking pre-existing failure observed.
+- Persistent non-blocking lint warning remains in generated coverage output.
+- Local configured database contains 0 posts, so content validation cannot prove production article bodies without applying the migrator to the target DB.
+
+### Manual external actions
+
+- Set `APP_BASE_URL`/blog `baseUrl` consistently to `https://www.tgoliveira11.tech` in production settings if not already.
+- Confirm apex-to-www redirect behavior in the hosting/CDN dashboard after deployment.
+- Configure `NEXT_PUBLIC_RESUME_URL` or `RESUME_URL` only when a verified résumé URL is available.
+- Extract the attached bundle, then apply approved manuscripts to the intended DB with:
+  `rm -rf /tmp/tgoliveira-codex-site-rework && unzip -q /Users/thiago.oliveira/Downloads/tgoliveira-codex-site-rework.zip -d /tmp/tgoliveira-codex-site-rework`
+  `npm run content:apply-site-rework -- --apply --content-dir /tmp/tgoliveira-codex-site-rework/.codex-site-rework/approved-content`
+- After applying content, run `npm run content:migrate-taxonomy -- --apply` if legacy taxonomy rows still exist.
+- Update missing production cover images/alt text in the asset system where DB content still lacks images.
+
+### Risks and assumptions
+
+- The local DB is empty; article body replacement/addition was implemented as a dry-run-safe migrator, not applied locally.
+- The current canonical slug policy preserves date-based public URLs to avoid losing existing URL equity.
+- The résumé CTA is intentionally hidden until a verified URL exists.

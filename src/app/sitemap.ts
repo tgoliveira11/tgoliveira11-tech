@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       config,
       posts,
       tags,
-      categories,
+      categories: categories.filter((category) => category.postCount > 0),
     }),
     {
       url: `${baseUrl}${ABOUT_SITEMAP_ENTRY.path}`,

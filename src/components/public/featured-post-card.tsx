@@ -20,6 +20,9 @@ export function FeaturedPostCard({ bundle, label }: { bundle: PublicPostBundle; 
             href={postHref}
             className="relative block aspect-[16/10] overflow-hidden bg-[var(--surface-subtle)] lg:aspect-auto lg:min-h-[20rem]"
             aria-label={`View cover image for ${post.title}`}
+            data-analytics-event="home_featured_insight_click"
+            data-analytics-component="featured_insights"
+            data-analytics-article-slug={post.slug}
           >
             <PostImage
               src={coverAsset.publicUrl}
@@ -48,13 +51,20 @@ export function FeaturedPostCard({ bundle, label }: { bundle: PublicPostBundle; 
           </div>
 
           <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-            <Link href={postHref} className="hover:text-[var(--primary)]">
+            <Link
+              href={postHref}
+              className="hover:text-[var(--primary)]"
+              data-analytics-event="home_featured_insight_click"
+              data-analytics-component="featured_insights"
+              data-analytics-article-slug={post.slug}
+            >
               {post.title}
             </Link>
           </h2>
 
           <PostMeta
             publishedAt={post.publishedAt}
+            updatedAt={post.updatedAt}
             readingTimeMinutes={post.readingTimeMinutes}
             className="mt-3"
           />
@@ -89,6 +99,9 @@ export function FeaturedPostCard({ bundle, label }: { bundle: PublicPostBundle; 
             <Link
               href={postHref}
               className="inline-flex items-center gap-2 text-sm font-medium text-[var(--primary)] hover:underline"
+              data-analytics-event="home_featured_insight_click"
+              data-analytics-component="featured_insights"
+              data-analytics-article-slug={post.slug}
             >
               Read post
               <span aria-hidden="true">→</span>

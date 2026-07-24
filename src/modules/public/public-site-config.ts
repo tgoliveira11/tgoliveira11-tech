@@ -16,8 +16,6 @@ export const PUBLIC_SITE_CONFIG = {
   footer: {
     showDescription: false,
     compact: true,
-    /** External Selah Keep site — shown after RSS in the public footer. */
-    skUrl: "https://selahkeep.com",
   },
 } as const;
 

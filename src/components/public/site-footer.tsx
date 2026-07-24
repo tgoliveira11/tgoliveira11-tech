@@ -5,7 +5,7 @@ import {
   getPublicSiteTitle,
   PUBLIC_SITE_CONFIG,
 } from "@/modules/public/public-site-config";
-import { PUBLIC_AUTHOR_PROFILE, PUBLIC_PROFILE_LINKS } from "@/modules/public/author-profile";
+import { PUBLIC_AUTHOR_PROFILE } from "@/modules/public/author-profile";
 import { PUBLIC_CONTENT_MAX_WIDTH_CLASS } from "./public-layout-constants";
 
 export function SiteFooter({ config }: { config: BlogConfig }) {
@@ -26,6 +26,64 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
           </div>
           <nav aria-label="Footer navigation">
             <ul className="flex flex-wrap gap-x-4 gap-y-2">
+              <li>
+                <a
+                  href={PUBLIC_AUTHOR_PROFILE.linkedIn}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--primary)]"
+                  data-analytics-event="linkedin_cta_click"
+                  data-analytics-component="site_footer"
+                >
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a
+                  href={PUBLIC_AUTHOR_PROFILE.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--primary)]"
+                  data-analytics-event="github_cta_click"
+                  data-analytics-component="site_footer"
+                >
+                  GitHub
+                </a>
+              </li>
+              {PUBLIC_AUTHOR_PROFILE.resumeUrl ? (
+                <li>
+                  <a
+                    href={PUBLIC_AUTHOR_PROFILE.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[var(--primary)]"
+                    data-analytics-event="resume_download_click"
+                    data-analytics-component="site_footer"
+                  >
+                    Résumé
+                  </a>
+                </li>
+              ) : null}
+              <li>
+                <a
+                  href={`mailto:${PUBLIC_AUTHOR_PROFILE.email}`}
+                  className="hover:text-[var(--primary)]"
+                  data-analytics-event="email_contact_click"
+                  data-analytics-component="site_footer"
+                >
+                  Email
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/rss.xml"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--primary)]"
+                >
+                  RSS
+                </a>
+              </li>
               <li>
                 <Link href="/categories/ai-engineering" className="hover:text-[var(--primary)]">
                   AI Engineering
@@ -61,50 +119,10 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                   Articles
                 </Link>
               </li>
-              {PUBLIC_PROFILE_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[var(--primary)]"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-              <li>
-                <a
-                  href={`mailto:${PUBLIC_AUTHOR_PROFILE.email}`}
-                  className="hover:text-[var(--primary)]"
-                >
-                  Contact
-                </a>
-              </li>
               <li>
                 <Link href="/search" className="hover:text-[var(--primary)]">
                   Search
                 </Link>
-              </li>
-              <li>
-                <a
-                  href="/rss.xml"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[var(--primary)]"
-                >
-                  RSS
-                </a>
-              </li>
-              <li>
-                <a
-                  href={PUBLIC_SITE_CONFIG.footer.skUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[var(--primary)]"
-                >
-                  SK
-                </a>
               </li>
             </ul>
           </nav>

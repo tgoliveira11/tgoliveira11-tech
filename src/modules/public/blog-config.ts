@@ -17,7 +17,7 @@ export type BlogConfig = {
 const DEFAULT_CONFIG: BlogConfig = {
   title: SITE_NAME,
   description: SITE_INTRODUCTION,
-  baseUrl: "http://localhost:3000",
+  baseUrl: "https://www.tgoliveira11.tech",
   postsPerPage: 12,
   rssEnabled: true,
   analyticsEnabled: true,

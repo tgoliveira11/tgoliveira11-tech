@@ -21,15 +21,21 @@ describe("Google Analytics public wiring", () => {
     expect(rootLayout).not.toContain("GoogleAnalytics");
   });
 
-  it("tracks SPA page views, site search, and web vitals", () => {
+  it("tracks SPA page views, site search, conversions, UTM values, and web vitals", () => {
     const source = readSource("src/components/public/google-analytics.tsx");
+    const postViewTracker = readSource("src/components/public/post-view-tracker.tsx");
 
     expect(source).toContain("googletagmanager.com/gtag/js");
     expect(source).toContain("send_page_view: false");
     expect(source).toContain('"page_view"');
     expect(source).toContain('"view_search_results"');
+    expect(source).toContain('"about_page_visit"');
+    expect(source).toContain('"entry_article"');
+    expect(source).toContain("data-analytics-event");
+    expect(source).toContain("utm_campaign");
     expect(source).toContain("useReportWebVitals");
     expect(source).toContain("metric_rating");
+    expect(postViewTracker).toContain('"article_scroll_depth"');
+    expect(postViewTracker).toContain('"article_completion"');
   });
 });
-

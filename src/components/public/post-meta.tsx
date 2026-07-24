@@ -12,16 +12,23 @@ export function formatPublishedDate(date: Date | null | undefined) {
 
 export function PostMeta({
   publishedAt,
+  updatedAt,
   readingTimeMinutes,
   className = "",
 }: {
   publishedAt: Date | null | undefined;
+  updatedAt?: Date | null | undefined;
   readingTimeMinutes: number | null | undefined;
   className?: string;
 }) {
   const publishedLabel = formatPublishedDate(publishedAt);
+  const showUpdated =
+    updatedAt &&
+    publishedAt &&
+    updatedAt.getTime() > publishedAt.getTime() + 60_000;
+  const updatedLabel = showUpdated ? formatPublishedDate(updatedAt) : null;
 
-  if (!publishedLabel && !readingTimeMinutes) {
+  if (!publishedLabel && !updatedLabel && !readingTimeMinutes) {
     return null;
   }
 
@@ -30,7 +37,15 @@ export function PostMeta({
       {publishedLabel ? (
         <time dateTime={publishedAt?.toISOString()}>{publishedLabel}</time>
       ) : null}
-      {publishedLabel && readingTimeMinutes ? <span aria-hidden="true">·</span> : null}
+      {updatedLabel ? (
+        <>
+          <span aria-hidden="true">·</span>
+          <time dateTime={updatedAt?.toISOString()}>Updated {updatedLabel}</time>
+        </>
+      ) : null}
+      {(publishedLabel || updatedLabel) && readingTimeMinutes ? (
+        <span aria-hidden="true">·</span>
+      ) : null}
       {readingTimeMinutes ? <span>{readingTimeMinutes} min read</span> : null}
     </div>
   );
