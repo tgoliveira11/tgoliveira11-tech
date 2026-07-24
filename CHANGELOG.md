@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Conversion-oriented public analytics events for hero CTAs, Featured Insights, About visits, article entry, related articles, résumé/GitHub/email/LinkedIn CTAs, and article scroll/completion.
 - Dry-run approved-content migrator for the site rework manuscripts (`npm run content:apply-site-rework`).
 - Reference plan for the future `production-text-to-sql-reference` GitHub project.
+- Static public cover images for the distributed cache, enterprise AI evaluation, and agentic observability articles.
 
 ### Changed
 
@@ -31,12 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Preserve RSS and AI-readable alternate links, canonical metadata, and advanced Googlebot indexing directives across public pages.
 - Complete article metadata with canonical URLs, author profile links, Open Graph Article tags, fallback social images, Twitter cards, and BlogPosting JSON-LD.
 - Sync PostForge upstream (`7359a65`): secure-auth v0.2/v0.3 env mappings (magic link, captcha, GitHub OAuth, invites, profile, HIBP), additional test coverage from template.
+- Audit PostForge upstream `0.1.2` (`af7ebc1`) and document the selective sync strategy for preserving local SEO, analytics, AI discovery, auth, branding, and production content customizations.
 
 ### Fixed
 
 - Preserve static priority article aliases and legacy taxonomy URLs through canonical redirects or alias-aware archive resolution.
 - Keep the public header navigation stable by replacing the cramped inline search form with a normal Search nav link and horizontal overflow handling.
 - Clean production content validation issues by demoting legacy body H1 headings, restoring slug-aligned publication dates, canonicalizing the B2B mobility slug to 2026-07-24, and filling missing cover metadata.
+- Assign production cover and Open Graph asset metadata for the distributed cache, enterprise AI evaluation, and agentic observability articles.
+- Ignore generated coverage reports in ESLint flat config so validation stays warning-free.
 
 ### Security
 

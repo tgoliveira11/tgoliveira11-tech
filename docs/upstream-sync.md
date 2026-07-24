@@ -44,6 +44,7 @@ That adds `upstream` (if needed) and sets its push URL to `no_push` so accidenta
 2. **Fetch/merge from `upstream` only when you want template improvements.**
 3. **Review upstream changes before they land on `main`.** Prefer the automated PR (`sync/postforge-upstream`) or a manual merge with validation.
 4. **Do not blindly accept upstream defaults** for blog-specific files (see protected areas below).
+5. **Compare upstream by branch commit, not by release tag.** This fork and PostForge can both publish tags such as `v0.1.2`, and those tags may point to different commits in each repository.
 
 ---
 
@@ -52,7 +53,7 @@ That adds `upstream` (if needed) and sets its push URL to `no_push` so accidenta
 | Script | What it does |
 |--------|----------------|
 | `npm run sync:upstream:configure` | Ensure `upstream` exists and is fetch-only (`push → no_push`) |
-| `npm run sync:upstream:fetch` | `git fetch upstream` |
+| `npm run sync:upstream:fetch` | `git fetch upstream` (branch refs only; do not force-fetch tags from PostForge into this fork) |
 | `npm run sync:upstream:status` | Show divergence between `main`, `origin/main`, and `upstream/main` |
 | `npm run sync:upstream:merge` | Fetch upstream and merge `upstream/main` into the **current branch** (aborts if the working tree is dirty) |
 
@@ -100,6 +101,53 @@ The workflow:
 6. Does **not** push anything to PostForge
 
 If upstream and local `main` have conflicts, the workflow **fails** and you must merge locally (see manual sync above).
+
+---
+
+## Current audit: PostForge 0.1.2
+
+Reviewed on 2026-07-24.
+
+| Check | Result |
+|-------|--------|
+| Local `VERSION` / `package.json` | `0.1.2` / `0.1.2` |
+| Upstream `VERSION` / `package.json` | `0.1.2` / `0.1.2` |
+| Upstream branch | `upstream/main` at `af7ebc1` (`chore: release 0.1.2`) |
+| Origin alignment | `main` and `origin/main` are aligned at the time of audit |
+| Direct merge dry-run | Not clean; manual conflict review required |
+
+PostForge `0.1.2` includes the generic public discovery / SEO / analytics work from
+`622f69c`. This fork already carries site-specific equivalents or supersets:
+
+- Google Analytics 4 on public routes, including page views, search, Web Vitals, UTM data, CTA clicks, related-article clicks, article entry, scroll depth, and completion.
+- Public discovery endpoints at `/llms.txt` and `/llms-full.txt`.
+- Article metadata with canonical URLs, Open Graph Article tags, Twitter cards, BlogPosting JSON-LD, sitemap, robots, RSS, and canonical domain redirects.
+- DB-backed production content validation adapted to the editorial taxonomy and production cleanup workflow.
+
+Therefore, do not replace local implementations with upstream defaults during a sync
+unless the upstream change adds behavior that is still missing here. Treat these as
+local customizations unless a review proves otherwise:
+
+- `src/components/public/google-analytics.tsx`
+- `src/modules/public/ai-discovery.ts`
+- `src/modules/public/seo.ts`
+- `src/modules/public/sitemap.ts`
+- `scripts/validate-content.ts`
+- `next.config.ts`
+- public branding, About content, editorial taxonomy, and content migration scripts
+
+One upstream-only item worth revisiting later is the generic
+`scripts/validate-content.test.ts`. It cannot be imported as-is because this fork's
+validator has production and editorial-taxonomy rules that differ from PostForge's
+template validator, but similar helper-level tests would be useful if the validator is
+refactored.
+
+### Tag note
+
+Fetching with explicit tags can fail because local release tags and upstream release
+tags share names while pointing at different commits. Use `git fetch upstream main`
+or `npm run sync:upstream:fetch`, and use commit SHAs such as `af7ebc1` when auditing
+PostForge changes.
 
 ---
 
