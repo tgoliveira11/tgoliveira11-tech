@@ -13,12 +13,12 @@ export function AboutPageContent() {
         className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8 lg:p-10"
       >
         <div className="grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:items-start lg:gap-10">
-          <figure className="mx-auto w-full max-w-[280px] lg:mx-0">
-            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--background)] shadow-[var(--shadow-sm)]">
+          <figure className="mx-auto w-full max-w-[260px] lg:mx-0">
+            <div className="aspect-square w-full overflow-hidden rounded-full bg-[var(--background)] shadow-[var(--shadow-sm)]">
               <AboutProfileImage
                 priority
-                className="h-auto w-full object-cover object-center"
-                sizes="(max-width: 1024px) 280px, 280px"
+                className="h-full w-full rounded-full object-cover object-center"
+                sizes="(max-width: 1024px) 260px, 260px"
               />
             </div>
             <figcaption className="mt-4 text-center text-sm text-[var(--muted)] lg:text-left">

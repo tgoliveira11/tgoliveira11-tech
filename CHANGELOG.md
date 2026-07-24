@@ -18,11 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reposition public site identity around Thiago Goulart de Oliveira, AI platforms, cloud/solution architecture, and engineering leadership.
 - Rework homepage, navigation, article metadata, RSS, sitemap taxonomy output, author CTA, and related-article logic around the new editorial IA.
 - Normalize public tag display/archive behavior to lowercase kebab-case with migration documentation.
+- Use the approved square profile photo on About surfaces and apply circular presentation in CSS.
 - Sync PostForge upstream (`7359a65`): secure-auth v0.2/v0.3 env mappings (magic link, captcha, GitHub OAuth, invites, profile, HIBP), additional test coverage from template.
 
 ### Fixed
 
 - Preserve static priority article aliases and legacy taxonomy URLs through canonical redirects or alias-aware archive resolution.
+- Keep the public header navigation stable by replacing the cramped inline search form with a normal Search nav link and horizontal overflow handling.
 
 ### Security
 

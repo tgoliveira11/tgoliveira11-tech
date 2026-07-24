@@ -12,9 +12,9 @@ export function AboutPreview() {
     >
       <div className="grid gap-6 sm:grid-cols-[minmax(0,140px)_minmax(0,1fr)] sm:items-center sm:gap-8">
         <div className="mx-auto w-full max-w-[140px] sm:mx-0">
-          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--background)] shadow-[var(--shadow-sm)]">
+          <div className="aspect-square w-full overflow-hidden rounded-full bg-[var(--background)] shadow-[var(--shadow-sm)]">
             <AboutProfileImage
-              className="h-auto w-full object-cover object-center"
+              className="h-full w-full rounded-full object-cover object-center"
               sizes="140px"
             />
           </div>
