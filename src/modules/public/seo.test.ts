@@ -118,14 +118,17 @@ describe("seo helpers", () => {
       config,
     });
 
-    expect(resolved.description).toBe("A test blog");
+    expect(resolved.description).toContain("production AI systems");
   });
 
   it("builds site metadata from blog config", () => {
     const metadata = buildSiteMetadata(config);
 
-    expect(metadata.title).toEqual({ default: "PostForge", template: "%s | PostForge" });
-    expect(metadata.description).toBe("A test blog");
+    expect(metadata.title).toEqual({
+      default: "Thiago Goulart de Oliveira",
+      template: "%s | Thiago Goulart de Oliveira",
+    });
+    expect(metadata.description).toContain("production AI systems");
     expect(metadata.metadataBase?.toString()).toBe("https://example.com/");
   });
 

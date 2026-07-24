@@ -1,5 +1,6 @@
 import type { BlogConfig } from "./blog-config";
 import type { PublicPostBundle } from "./public-posts.repository";
+import { getPublicSiteDescription, getPublicSiteTitle } from "./public-site-config";
 import { publicPostPath } from "@/modules/posts/slug";
 
 function escapeXml(value: string): string {
@@ -13,6 +14,8 @@ function escapeXml(value: string): string {
 
 export function buildRssXml(config: BlogConfig, bundles: PublicPostBundle[]): string {
   const baseUrl = config.baseUrl.replace(/\/$/, "");
+  const siteTitle = getPublicSiteTitle(config);
+  const siteDescription = getPublicSiteDescription(config);
   const items = bundles
     .map((bundle) => {
       const link = `${baseUrl}${publicPostPath(bundle.post.slug)}`;
@@ -36,9 +39,9 @@ export function buildRssXml(config: BlogConfig, bundles: PublicPostBundle[]): st
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>${escapeXml(config.title)}</title>
+    <title>${escapeXml(siteTitle)}</title>
     <link>${escapeXml(baseUrl)}</link>
-    <description>${escapeXml(config.description)}</description>
+    <description>${escapeXml(siteDescription)}</description>
     <language>en</language>
     ${items}
   </channel>

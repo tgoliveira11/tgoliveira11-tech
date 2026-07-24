@@ -10,7 +10,22 @@ import { publishedPostFilter } from "@/modules/posts/posts.repository";
 import type { Post } from "@/modules/posts/posts.types";
 import { tags } from "@/modules/tags/tags.schema";
 import type { Tag } from "@/modules/tags/tags.types";
-import { findPublicPostNeighbors, getPublicPostOrderBy } from "./public-post-order";
+import {
+  canonicalizeCategorySlug,
+  canonicalizeTag,
+  canonicalizeTagList,
+  canonicalizeTagSlug,
+  EDITORIAL_CATEGORIES,
+  getEditorialCategoryBySlug,
+  isEditorialCategorySlug,
+  resolveEditorialCategoryForPost,
+  toCategoryRecord,
+} from "./editorial-taxonomy";
+import {
+  comparePublicPostOrder,
+  findPublicPostNeighbors,
+  getPublicPostOrderBy,
+} from "./public-post-order";
 
 export type { PaginatedResult } from "@/lib/pagination";
 export type PublicPostBundle = {
@@ -126,62 +141,88 @@ export async function listPublishedPostBundlesByCategorySlug(
   categorySlug: string,
   options: { limit?: number; offset?: number } = {}
 ): Promise<{ category: Category; posts: PublicPostBundle[] } | null> {
-  const [category] = await db
-    .select()
-    .from(categories)
-    .where(eq(categories.slug, categorySlug))
-    .limit(1);
+  const canonicalSlug = canonicalizeCategorySlug(categorySlug);
+  if (!isEditorialCategorySlug(canonicalSlug)) {
+    return null;
+  }
 
-  if (!category) return null;
+  const category = toCategoryRecord(getEditorialCategoryBySlug(canonicalSlug)!);
+  const bundles = await listPublishedPostBundles({ limit: 1000 });
+  const filtered = bundles.filter((bundle) => bundle.category?.slug === canonicalSlug);
+  const offset = options.offset ?? 0;
+  const limit = options.limit ?? 12;
 
-  const rows = await db
-    .select()
-    .from(posts)
-    .where(and(eq(posts.categoryId, category.id), publishedPostFilter()))
-    .orderBy(...getPublicPostOrderBy())
-    .limit(options.limit ?? 12)
-    .offset(options.offset ?? 0);
-
-  const bundles = await Promise.all(rows.map((post) => hydratePostBundle(post)));
-  return { category, posts: bundles };
+  return { category, posts: filtered.slice(offset, offset + limit) };
 }
 
 export async function listPublishedPostBundlesByTagSlug(
   tagSlug: string,
   options: { limit?: number; offset?: number } = {}
 ): Promise<{ tag: Tag; posts: PublicPostBundle[] } | null> {
-  const [tag] = await db.select().from(tags).where(eq(tags.slug, tagSlug)).limit(1);
-  if (!tag) return null;
+  const canonicalSlug = canonicalizeTagSlug(tagSlug);
+  const bundles = await listPublishedPostBundles({ limit: 1000 });
+  const filtered = bundles.filter((bundle) =>
+    bundle.tags.some((tag) => tag.slug === canonicalSlug)
+  );
 
-  const rows = await db
-    .select({ post: posts })
-    .from(postTags)
-    .innerJoin(posts, eq(postTags.postId, posts.id))
-    .where(and(eq(postTags.tagId, tag.id), publishedPostFilter()))
-    .orderBy(...getPublicPostOrderBy())
-    .limit(options.limit ?? 12)
-    .offset(options.offset ?? 0);
+  if (filtered.length === 0) {
+    return null;
+  }
 
-  const bundles = await Promise.all(rows.map((row) => hydratePostBundle(row.post)));
-  return { tag, posts: bundles };
+  const offset = options.offset ?? 0;
+  const limit = options.limit ?? 12;
+  const tag =
+    filtered.flatMap((bundle) => bundle.tags).find((candidate) => candidate.slug === canonicalSlug) ??
+    ({
+      id: `canonical-${canonicalSlug}`,
+      name: canonicalSlug,
+      slug: canonicalSlug,
+      createdAt: new Date(0),
+      updatedAt: new Date(0),
+    } satisfies Tag);
+
+  return { tag, posts: filtered.slice(offset, offset + limit) };
 }
 
 export async function listPublicTags(): Promise<PopularTag[]> {
-  return db
-    .select({
-      id: tags.id,
-      name: tags.name,
-      slug: tags.slug,
-      createdAt: tags.createdAt,
-      updatedAt: tags.updatedAt,
-      postCount: sql<number>`count(distinct ${posts.id})::int`,
-    })
+  const rows = await db
+    .select({ tag: tags, postId: posts.id })
     .from(tags)
     .innerJoin(postTags, eq(tags.id, postTags.tagId))
     .innerJoin(posts, eq(postTags.postId, posts.id))
-    .where(publishedPostFilter())
-    .groupBy(tags.id, tags.name, tags.slug, tags.createdAt, tags.updatedAt)
-    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(tags.name));
+    .where(publishedPostFilter());
+
+  const grouped = new Map<string, Tag & { postIds: Set<string> }>();
+
+  for (const row of rows) {
+    const canonical = canonicalizeTag(row.tag);
+    const existing = grouped.get(canonical.slug);
+    if (existing) {
+      existing.postIds.add(row.postId);
+      if (row.tag.updatedAt > existing.updatedAt) {
+        existing.updatedAt = row.tag.updatedAt;
+      }
+      continue;
+    }
+
+    grouped.set(canonical.slug, {
+      ...canonical,
+      id: `canonical-${canonical.slug}`,
+      postIds: new Set([row.postId]),
+    });
+  }
+
+  return [...grouped.values()]
+    .map(({ postIds, ...tag }) => ({
+      ...tag,
+      postCount: postIds.size,
+    }))
+    .sort((left, right) => {
+      if (right.postCount !== left.postCount) {
+        return right.postCount - left.postCount;
+      }
+      return left.name.localeCompare(right.name);
+    });
 }
 
 export async function listPopularTags(limit: number): Promise<PopularTag[]> {
@@ -190,28 +231,46 @@ export async function listPopularTags(limit: number): Promise<PopularTag[]> {
 }
 
 export async function listPublicCategories(): Promise<PopularCategory[]> {
-  return db
-    .select({
-      id: categories.id,
-      name: categories.name,
-      slug: categories.slug,
-      description: categories.description,
-      createdAt: categories.createdAt,
-      updatedAt: categories.updatedAt,
-      postCount: sql<number>`count(distinct ${posts.id})::int`,
-    })
-    .from(categories)
-    .innerJoin(posts, eq(categories.id, posts.categoryId))
-    .where(publishedPostFilter())
-    .groupBy(
-      categories.id,
-      categories.name,
-      categories.slug,
-      categories.description,
-      categories.createdAt,
-      categories.updatedAt
-    )
-    .orderBy(desc(sql`count(distinct ${posts.id})`), asc(categories.name));
+  const bundles = await listPublishedPostBundles({ limit: 1000 });
+  const grouped = new Map<string, PopularCategory>(
+    EDITORIAL_CATEGORIES.map((category) => [
+      category.slug,
+      {
+        ...toCategoryRecord(category),
+        postCount: 0,
+      },
+    ])
+  );
+
+  for (const bundle of bundles) {
+    if (!bundle.category) {
+      continue;
+    }
+
+    const existing = grouped.get(bundle.category.slug);
+    if (existing) {
+      existing.postCount += 1;
+      if (bundle.post.updatedAt > existing.updatedAt) {
+        existing.updatedAt = bundle.post.updatedAt;
+      }
+      continue;
+    }
+
+    grouped.set(bundle.category.slug, {
+      ...bundle.category,
+      postCount: 1,
+    });
+  }
+
+  const categoryRank: ReadonlyMap<string, number> = new Map(
+    EDITORIAL_CATEGORIES.map((category, index) => [category.slug, index])
+  );
+
+  return [...grouped.values()].sort(
+    (left, right) =>
+      (categoryRank.get(left.slug) ?? Number.MAX_SAFE_INTEGER) -
+      (categoryRank.get(right.slug) ?? Number.MAX_SAFE_INTEGER)
+  );
 }
 
 export async function listPopularCategories(limit: number): Promise<PopularCategory[]> {
@@ -266,6 +325,48 @@ export async function listPublishedPostsWithPublicOrder(): Promise<Post[]> {
     .orderBy(asc(posts.publicOrder), desc(posts.publishedAt));
 }
 
+export async function listRelatedPublishedPostBundles(
+  bundle: PublicPostBundle,
+  limit = 3
+): Promise<PublicPostBundle[]> {
+  const currentCategorySlug = bundle.category?.slug ?? null;
+  const currentTagSlugs = new Set(bundle.tags.map((tag) => tag.slug));
+  const currentIsTechnical = currentCategorySlug !== "career-reflections";
+  const seenSlugs = new Set([bundle.post.slug]);
+  const candidates = await listPublishedPostBundles({
+    limit: 1000,
+    excludePostId: bundle.post.id,
+  });
+
+  return candidates
+    .filter((candidate) => {
+      if (seenSlugs.has(candidate.post.slug)) {
+        return false;
+      }
+      seenSlugs.add(candidate.post.slug);
+
+      if (currentIsTechnical && candidate.category?.slug === "career-reflections") {
+        return false;
+      }
+
+      return true;
+    })
+    .map((candidate) => {
+      const overlappingTags = candidate.tags.filter((tag) => currentTagSlugs.has(tag.slug)).length;
+      const sameCategory = currentCategorySlug && candidate.category?.slug === currentCategorySlug;
+      const score = (sameCategory ? 100 : 0) + overlappingTags * 10;
+      return { candidate, score };
+    })
+    .sort((left, right) => {
+      if (right.score !== left.score) {
+        return right.score - left.score;
+      }
+      return comparePublicPostOrder(left.candidate.post, right.candidate.post);
+    })
+    .slice(0, limit)
+    .map((scored) => scored.candidate);
+}
+
 async function hydratePostBundle(post: Post): Promise<PublicPostBundle> {
   const [categoryRow, tagRows, coverAsset] = await Promise.all([
     post.categoryId
@@ -281,11 +382,17 @@ async function hydratePostBundle(post: Post): Promise<PublicPostBundle> {
       ? db.select().from(assets).where(eq(assets.id, post.coverAssetId)).limit(1)
       : Promise.resolve([]),
   ]);
+  const canonicalTags = canonicalizeTagList(tagRows.map((row) => row.tag));
+  const canonicalCategory = resolveEditorialCategoryForPost(
+    post,
+    categoryRow[0] ?? null,
+    canonicalTags
+  );
 
   return {
     post,
-    category: categoryRow[0] ?? null,
-    tags: tagRows.map((row) => row.tag),
+    category: canonicalCategory,
+    tags: canonicalTags,
     coverAsset: coverAsset[0] ?? null,
   };
 }

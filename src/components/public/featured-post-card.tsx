@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { PostImage } from "@/components/public/post-image";
 import { PostMeta } from "@/components/public/post-meta";
+import { getPostImageAltText } from "@/modules/public/editorial-taxonomy";
 import { getFeaturedPostLabel, limitTagsForDisplay } from "@/modules/public/public-display";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import { publicPostPath } from "@/modules/posts/slug";
 
-export function FeaturedPostCard({ bundle }: { bundle: PublicPostBundle }) {
+export function FeaturedPostCard({ bundle, label }: { bundle: PublicPostBundle; label?: string }) {
   const { post, category, tags, coverAsset } = bundle;
-  const label = getFeaturedPostLabel(bundle);
+  const displayLabel = label ?? getFeaturedPostLabel(bundle);
   const { visible: visibleTags, hiddenCount } = limitTagsForDisplay(tags);
   const postHref = publicPostPath(post.slug);
 
@@ -22,7 +23,7 @@ export function FeaturedPostCard({ bundle }: { bundle: PublicPostBundle }) {
           >
             <PostImage
               src={coverAsset.publicUrl}
-              alt={coverAsset.altText ?? post.title}
+              alt={getPostImageAltText(post, coverAsset.altText)}
               width={coverAsset.width}
               height={coverAsset.height}
               priority
@@ -34,7 +35,7 @@ export function FeaturedPostCard({ bundle }: { bundle: PublicPostBundle }) {
         <div className={`flex flex-col justify-center p-6 sm:p-8 ${coverAsset ? "" : "lg:col-span-2"}`}>
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex rounded-full bg-[var(--accent-muted)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
-              {label}
+              {displayLabel}
             </span>
             {category ? (
               <Link

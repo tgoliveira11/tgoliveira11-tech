@@ -15,7 +15,7 @@ export function AboutCtaLinks({
   layout?: "row" | "stack";
 }) {
   const { blog, profileLinks } = ABOUT_PAGE_CONTENT.ctas;
-  const [githubLink, linkedInLink] = profileLinks;
+  const [linkedInLink, githubLink] = profileLinks;
   const containerClass =
     layout === "stack"
       ? "flex flex-col items-stretch gap-3"

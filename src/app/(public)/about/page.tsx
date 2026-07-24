@@ -11,6 +11,9 @@ export async function generateMetadata() {
     ...buildSiteMetadata(config),
     title: ABOUT_PAGE_CONTENT.metadata.title,
     description: ABOUT_PAGE_CONTENT.metadata.description,
+    alternates: {
+      canonical: "/about",
+    },
   };
 }
 

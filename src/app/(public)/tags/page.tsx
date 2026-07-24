@@ -11,7 +11,10 @@ export async function generateMetadata() {
   return {
     ...buildSiteMetadata(config),
     title: "Tags",
-    description: "Explore posts by topic.",
+    description: "Explore canonical article tags.",
+    alternates: {
+      canonical: "/tags",
+    },
   };
 }
 
@@ -25,7 +28,7 @@ export default async function TagsIndexPage() {
         <PublicPageHero
           eyebrow="Topics"
           title="Tags"
-          description="Explore posts by topic."
+          description="Explore canonical article tags."
         />
         <section aria-labelledby="tags-list-heading">
           <h2 id="tags-list-heading" className="sr-only">

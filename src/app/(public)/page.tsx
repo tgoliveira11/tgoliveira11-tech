@@ -1,6 +1,6 @@
 import { PublicEmptyState } from "@/components/public/public-empty-state";
 import { AboutPreview } from "@/components/public/about-preview";
-import { FeaturedPostCard } from "@/components/public/featured-post-card";
+import { FeaturedInsightsSection } from "@/components/public/featured-insights-section";
 import { HomeHero } from "@/components/public/home-hero";
 import { PublicLayout } from "@/components/public/public-layout";
 import { RecentPostsSection } from "@/components/public/recent-posts-section";
@@ -18,24 +18,20 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const { config, featuredPost, recent } = await getHomePagePosts();
-  const hasPublishedPosts = Boolean(featuredPost);
+  const { config, featuredInsights, recent } = await getHomePagePosts();
+  const hasPublishedPosts = featuredInsights.length > 0 || recent.length > 0;
   const topics = hasPublishedPosts ? await getHomePageTopics() : null;
 
-  const primaryPostsHref = recent.length > 0 ? "#recent-posts" : featuredPost ? "#featured-post" : "/blog";
+  const primaryPostsHref =
+    featuredInsights.length > 0 ? "#featured-insights" : recent.length > 0 ? "#recent-posts" : "/blog";
 
   return (
     <PublicLayout config={config}>
       <div className="space-y-14">
         <HomeHero primaryPostsHref={primaryPostsHref} />
 
-        {featuredPost ? (
-          <section id="featured-post" aria-labelledby="featured-post-heading" className="scroll-mt-24">
-            <h2 id="featured-post-heading" className="sr-only">
-              Featured post
-            </h2>
-            <FeaturedPostCard bundle={featuredPost} />
-          </section>
+        {featuredInsights.length > 0 ? (
+          <FeaturedInsightsSection posts={featuredInsights} />
         ) : (
           <PublicEmptyState
             title="No posts published yet"
@@ -43,13 +39,13 @@ export default async function HomePage() {
           />
         )}
 
-        {hasPublishedPosts ? <RecentPostsSection posts={recent} /> : null}
-
-        <AboutPreview />
+        {hasPublishedPosts ? <RecentPostsSection posts={recent} heading="Latest articles" /> : null}
 
         {hasPublishedPosts && topics ? (
           <TopicsSection categories={topics.popularCategories} tags={topics.popularTags} />
         ) : null}
+
+        <AboutPreview />
       </div>
     </PublicLayout>
   );

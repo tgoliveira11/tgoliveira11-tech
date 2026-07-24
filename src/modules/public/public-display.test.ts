@@ -4,7 +4,9 @@ import {
   formatPublishedPostCount,
   formatTopicPostCount,
   limitTagsForDisplay,
+  pickFeaturedInsightPosts,
   pickFeaturedPost,
+  splitHomeEditorialSections,
   splitHomePosts,
 } from "@/modules/public/public-display";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
@@ -96,6 +98,31 @@ describe("public display helpers", () => {
 
     expect(featuredPost?.post.id).toBe("featured");
     expect(recent.map((bundle) => bundle.post.id)).toEqual(["two", "three"]);
+  });
+
+  it("prioritizes strategic featured insights and excludes them from latest articles", () => {
+    const bundles = [
+      makeBundle("latest", { slug: "latest-post" }),
+      makeBundle("architecture", { slug: "2023-06-16-software-solution-system-architecture" }),
+      makeBundle("career", { slug: "2024-10-08-a-letter-to-my-past-self" }),
+      makeBundle("api", { slug: "2023-06-04-api-security" }),
+      makeBundle("other", { slug: "other-post" }),
+      makeBundle("tail", { slug: "tail-post" }),
+    ];
+
+    expect(pickFeaturedInsightPosts(bundles, 3).map((bundle) => bundle.post.id)).toEqual([
+      "architecture",
+      "career",
+      "api",
+    ]);
+
+    const { featuredInsights, recent } = splitHomeEditorialSections(bundles, 2, 3);
+    expect(featuredInsights.map((bundle) => bundle.post.id)).toEqual([
+      "architecture",
+      "career",
+      "api",
+    ]);
+    expect(recent.map((bundle) => bundle.post.id)).toEqual(["latest", "other"]);
   });
 
   it("returns empty home sections when there are no published posts", () => {

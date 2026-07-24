@@ -7,11 +7,15 @@ export function PostList({
   emptyMessage = "No published posts yet.",
   layout = "stack",
   variant = "default",
+  maxTags,
+  showPromotionBadges,
 }: {
   posts: PublicPostBundle[];
   emptyMessage?: string;
   layout?: "stack" | "grid";
   variant?: "default" | "compact";
+  maxTags?: number;
+  showPromotionBadges?: boolean;
 }) {
   if (posts.length === 0) {
     return (
@@ -33,7 +37,12 @@ export function PostList({
     <ul className={listClassName}>
       {posts.map((bundle) => (
         <li key={bundle.post.id} className="h-full">
-          <PostCard bundle={bundle} variant={variant} showPromotionBadges={variant === "default"} />
+          <PostCard
+            bundle={bundle}
+            variant={variant}
+            maxTags={maxTags}
+            showPromotionBadges={showPromotionBadges ?? variant === "default"}
+          />
         </li>
       ))}
     </ul>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PostImage } from "@/components/public/post-image";
 import { PostMeta } from "@/components/public/post-meta";
+import { getPostImageAltText } from "@/modules/public/editorial-taxonomy";
 import { DEFAULT_VISIBLE_TAGS, limitTagsForDisplay } from "@/modules/public/public-display";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import { publicPostPath } from "@/modules/posts/slug";
@@ -37,7 +38,7 @@ export function PostCard({
         >
           <PostImage
             src={coverAsset.publicUrl}
-            alt={coverAsset.altText ?? post.title}
+            alt={getPostImageAltText(post, coverAsset.altText)}
             width={coverAsset.width}
             height={coverAsset.height}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"

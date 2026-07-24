@@ -1,0 +1,2122 @@
+[
+  {
+    "from": "aadl",
+    "to": "aadl",
+    "affectedArticles": 1
+  },
+  {
+    "from": "abac",
+    "to": "abac",
+    "affectedArticles": 1
+  },
+  {
+    "from": "abstractions",
+    "to": "abstractions",
+    "affectedArticles": 2
+  },
+  {
+    "from": "accessControl",
+    "to": "access-control",
+    "affectedArticles": 2
+  },
+  {
+    "from": "accountSecurity",
+    "to": "account-security",
+    "affectedArticles": 1
+  },
+  {
+    "from": "activeGeoReplication",
+    "to": "active-geo-replication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "adaptability",
+    "to": "adaptability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "adr",
+    "to": "adr",
+    "affectedArticles": 1
+  },
+  {
+    "from": "aerospike",
+    "to": "aerospike",
+    "affectedArticles": 1
+  },
+  {
+    "from": "agenticAI",
+    "to": "agentic-ai",
+    "affectedArticles": 1
+  },
+  {
+    "from": "aiTools",
+    "to": "ai-tools",
+    "affectedArticles": 1
+  },
+  {
+    "from": "aks",
+    "to": "aks",
+    "affectedArticles": 2
+  },
+  {
+    "from": "amazonElastiCache",
+    "to": "amazon-elasti-cache",
+    "affectedArticles": 1
+  },
+  {
+    "from": "analyticalThinking",
+    "to": "analytical-thinking",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apacheIgnite",
+    "to": "apache-ignite",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apiDesign",
+    "to": "api-design",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apiGateway",
+    "to": "api-gateway",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apiKeys",
+    "to": "api-keys",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apiManagement",
+    "to": "api-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apis",
+    "to": "apis",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apiSecurity",
+    "to": "api-security",
+    "affectedArticles": 1
+  },
+  {
+    "from": "apm",
+    "to": "apm",
+    "affectedArticles": 1
+  },
+  {
+    "from": "applicationMonitoring",
+    "to": "application-monitoring",
+    "affectedArticles": 1
+  },
+  {
+    "from": "applicationPerformance",
+    "to": "application-performance",
+    "affectedArticles": 1
+  },
+  {
+    "from": "applicationSecurity",
+    "to": "application-security",
+    "affectedArticles": 1
+  },
+  {
+    "from": "appRouter",
+    "to": "app-router",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architecturalPatterns",
+    "to": "architectural-patterns",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architecturalStyles",
+    "to": "architectural-styles",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architectureAssessment",
+    "to": "architecture-assessment",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architectureDecision",
+    "to": "architecture-decision",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architectureDecisionRecords",
+    "to": "architecture-decision-records",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architectureDesign",
+    "to": "architecture-design",
+    "affectedArticles": 1
+  },
+  {
+    "from": "architecturePatterns",
+    "to": "architecture-patterns",
+    "affectedArticles": 1
+  },
+  {
+    "from": "artificialIntelligence",
+    "to": "artificial-intelligence",
+    "affectedArticles": 2
+  },
+  {
+    "from": "assumptions",
+    "to": "assumptions",
+    "affectedArticles": 1
+  },
+  {
+    "from": "asynchronousCommunication",
+    "to": "asynchronous-communication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "asynchronousMessaging",
+    "to": "asynchronous-messaging",
+    "affectedArticles": 1
+  },
+  {
+    "from": "asynchronousProcessing",
+    "to": "asynchronous-processing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "asynchronousProgramming",
+    "to": "asynchronous-programming",
+    "affectedArticles": 1
+  },
+  {
+    "from": "atam",
+    "to": "atam",
+    "affectedArticles": 1
+  },
+  {
+    "from": "atomicOperations",
+    "to": "atomic-operations",
+    "affectedArticles": 1
+  },
+  {
+    "from": "auditing",
+    "to": "auditing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "auditLogs",
+    "to": "audit-logs",
+    "affectedArticles": 1
+  },
+  {
+    "from": "authentication",
+    "to": "authentication",
+    "affectedArticles": 2
+  },
+  {
+    "from": "authenticationSecurity",
+    "to": "authentication-security",
+    "affectedArticles": 1
+  },
+  {
+    "from": "authorization",
+    "to": "authorization",
+    "affectedArticles": 1
+  },
+  {
+    "from": "authPackage",
+    "to": "auth-package",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azure",
+    "to": "azure",
+    "affectedArticles": 4
+  },
+  {
+    "from": "azureAPIManagement",
+    "to": "azure-api-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureApplicationInsights",
+    "to": "azure-application-insights",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureAppService",
+    "to": "azure-app-service",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureCacheForRedis",
+    "to": "azure-cache-for-redis",
+    "affectedArticles": 2
+  },
+  {
+    "from": "azureCosmosDB",
+    "to": "azure-cosmos-db",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureDevOps",
+    "to": "azure-dev-ops",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureEventGrid",
+    "to": "azure-event-grid",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureEventHubs",
+    "to": "azure-event-hubs",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureFunctions",
+    "to": "azure-functions",
+    "affectedArticles": 2
+  },
+  {
+    "from": "azureKubernetesService",
+    "to": "azure-kubernetes-service",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureLogicApps",
+    "to": "azure-logic-apps",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureMonitor",
+    "to": "azure-monitor",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureServiceBus",
+    "to": "azure-service-bus",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureSQLDatabase",
+    "to": "azure-sql-database",
+    "affectedArticles": 1
+  },
+  {
+    "from": "azureStack",
+    "to": "azure-stack",
+    "affectedArticles": 1
+  },
+  {
+    "from": "b2b-platform",
+    "to": "b2b-platform",
+    "affectedArticles": 1
+  },
+  {
+    "from": "basicAuthentication",
+    "to": "basic-authentication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "becomeToAchieve",
+    "to": "become-to-achieve",
+    "affectedArticles": 1
+  },
+  {
+    "from": "bigData",
+    "to": "big-data",
+    "affectedArticles": 1
+  },
+  {
+    "from": "boundedContext",
+    "to": "bounded-context",
+    "affectedArticles": 1
+  },
+  {
+    "from": "bpmn",
+    "to": "bpmn",
+    "affectedArticles": 1
+  },
+  {
+    "from": "burnout",
+    "to": "burnout",
+    "affectedArticles": 1
+  },
+  {
+    "from": "burnoutPrevention",
+    "to": "burnout-prevention",
+    "affectedArticles": 2
+  },
+  {
+    "from": "burpSuite",
+    "to": "burp-suite",
+    "affectedArticles": 1
+  },
+  {
+    "from": "businessAlignment",
+    "to": "business-alignment",
+    "affectedArticles": 2
+  },
+  {
+    "from": "businessIntelligence",
+    "to": "business-intelligence",
+    "affectedArticles": 1
+  },
+  {
+    "from": "businessRequirements",
+    "to": "business-requirements",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cacheLayer",
+    "to": "cache-layer",
+    "affectedArticles": 1
+  },
+  {
+    "from": "caching",
+    "to": "caching",
+    "affectedArticles": 3
+  },
+  {
+    "from": "careerAdvancement",
+    "to": "career-advancement",
+    "affectedArticles": 1
+  },
+  {
+    "from": "careerGrowth",
+    "to": "career-growth",
+    "affectedArticles": 1
+  },
+  {
+    "from": "careerJourney",
+    "to": "career-journey",
+    "affectedArticles": 1
+  },
+  {
+    "from": "careerReflection",
+    "to": "career-reflection",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cep",
+    "to": "cep",
+    "affectedArticles": 1
+  },
+  {
+    "from": "chatGPT",
+    "to": "chat-gpt",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cleanArchitecture",
+    "to": "clean-architecture",
+    "affectedArticles": 3
+  },
+  {
+    "from": "cleanCode",
+    "to": "clean-code",
+    "affectedArticles": 2
+  },
+  {
+    "from": "cloud-architecture",
+    "to": "cloud-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cloudArchitecture",
+    "to": "cloud-architecture",
+    "affectedArticles": 6
+  },
+  {
+    "from": "cloudBestPractices",
+    "to": "cloud-best-practices",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cloudComputing",
+    "to": "cloud-computing",
+    "affectedArticles": 4
+  },
+  {
+    "from": "cloudDatabases",
+    "to": "cloud-databases",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cloudMigration",
+    "to": "cloud-migration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cloudMonitoring",
+    "to": "cloud-monitoring",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cloudServices",
+    "to": "cloud-services",
+    "affectedArticles": 1
+  },
+  {
+    "from": "codeExtensibility",
+    "to": "code-extensibility",
+    "affectedArticles": 1
+  },
+  {
+    "from": "codeFlexibility",
+    "to": "code-flexibility",
+    "affectedArticles": 1
+  },
+  {
+    "from": "codeMaintainability",
+    "to": "code-maintainability",
+    "affectedArticles": 2
+  },
+  {
+    "from": "codeQuality",
+    "to": "code-quality",
+    "affectedArticles": 1
+  },
+  {
+    "from": "codeRepository",
+    "to": "code-repository",
+    "affectedArticles": 1
+  },
+  {
+    "from": "codeReusability",
+    "to": "code-reusability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "coding",
+    "to": "coding",
+    "affectedArticles": 1
+  },
+  {
+    "from": "collaborationTools",
+    "to": "collaboration-tools",
+    "affectedArticles": 1
+  },
+  {
+    "from": "collaborativeLearning",
+    "to": "collaborative-learning",
+    "affectedArticles": 1
+  },
+  {
+    "from": "communicationChallenges",
+    "to": "communication-challenges",
+    "affectedArticles": 1
+  },
+  {
+    "from": "communityDrivenLearning",
+    "to": "community-driven-learning",
+    "affectedArticles": 1
+  },
+  {
+    "from": "compiledFiles",
+    "to": "compiled-files",
+    "affectedArticles": 1
+  },
+  {
+    "from": "complexEventProcessing",
+    "to": "complex-event-processing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "complexity",
+    "to": "complexity",
+    "affectedArticles": 1
+  },
+  {
+    "from": "complexSystems",
+    "to": "complex-systems",
+    "affectedArticles": 1
+  },
+  {
+    "from": "conservationOfEnergy",
+    "to": "conservation-of-energy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "containerization",
+    "to": "containerization",
+    "affectedArticles": 1
+  },
+  {
+    "from": "containerOrchestration",
+    "to": "container-orchestration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "continuousImprovement",
+    "to": "continuous-improvement",
+    "affectedArticles": 1
+  },
+  {
+    "from": "continuousLearning",
+    "to": "continuous-learning",
+    "affectedArticles": 2
+  },
+  {
+    "from": "continuousSecurity",
+    "to": "continuous-security",
+    "affectedArticles": 1
+  },
+  {
+    "from": "corporateCulture",
+    "to": "corporate-culture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "costEfficiency",
+    "to": "cost-efficiency",
+    "affectedArticles": 1
+  },
+  {
+    "from": "costSavings",
+    "to": "cost-savings",
+    "affectedArticles": 1
+  },
+  {
+    "from": "couchbase",
+    "to": "couchbase",
+    "affectedArticles": 1
+  },
+  {
+    "from": "criticalThinking",
+    "to": "critical-thinking",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cSharp",
+    "to": "csharp",
+    "affectedArticles": 4
+  },
+  {
+    "from": "csrf",
+    "to": "csrf",
+    "affectedArticles": 1
+  },
+  {
+    "from": "customerRepository",
+    "to": "customer-repository",
+    "affectedArticles": 1
+  },
+  {
+    "from": "cybersecurity",
+    "to": "cybersecurity",
+    "affectedArticles": 2
+  },
+  {
+    "from": "dast",
+    "to": "dast",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataAnalysis",
+    "to": "data-analysis",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataArchitecture",
+    "to": "data-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "databaseArchitecture",
+    "to": "database-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "databasePerformance",
+    "to": "database-performance",
+    "affectedArticles": 1
+  },
+  {
+    "from": "databaseScaling",
+    "to": "database-scaling",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataBreaches",
+    "to": "data-breaches",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataDrivenSystems",
+    "to": "data-driven-systems",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataEngineering",
+    "to": "data-engineering",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataManagement",
+    "to": "data-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataPersistence",
+    "to": "data-persistence",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataPrivacy",
+    "to": "data-privacy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataProcessing",
+    "to": "data-processing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dataProtection",
+    "to": "data-protection",
+    "affectedArticles": 1
+  },
+  {
+    "from": "ddd",
+    "to": "ddd",
+    "affectedArticles": 3
+  },
+  {
+    "from": "decisionMaking",
+    "to": "decision-making",
+    "affectedArticles": 1
+  },
+  {
+    "from": "decoratorPattern",
+    "to": "decorator-pattern",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dependencyInjection",
+    "to": "dependency-injection",
+    "affectedArticles": 3
+  },
+  {
+    "from": "dependencyInversionPrinciple",
+    "to": "dependency-inversion-principle",
+    "affectedArticles": 2
+  },
+  {
+    "from": "dependencyManagement",
+    "to": "dependency-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "designPatterns",
+    "to": "design-patterns",
+    "affectedArticles": 2
+  },
+  {
+    "from": "designPrinciples",
+    "to": "design-principles",
+    "affectedArticles": 1
+  },
+  {
+    "from": "determinism",
+    "to": "determinism",
+    "affectedArticles": 1
+  },
+  {
+    "from": "developerCommunity",
+    "to": "developer-community",
+    "affectedArticles": 1
+  },
+  {
+    "from": "developerEnvironment",
+    "to": "developer-environment",
+    "affectedArticles": 1
+  },
+  {
+    "from": "developerProductivity",
+    "to": "developer-productivity",
+    "affectedArticles": 1
+  },
+  {
+    "from": "developerTools",
+    "to": "developer-tools",
+    "affectedArticles": 2
+  },
+  {
+    "from": "developmentWorkflow",
+    "to": "development-workflow",
+    "affectedArticles": 1
+  },
+  {
+    "from": "devOps",
+    "to": "dev-ops",
+    "affectedArticles": 2
+  },
+  {
+    "from": "devSecOps",
+    "to": "dev-sec-ops",
+    "affectedArticles": 1
+  },
+  {
+    "from": "digitalWorkplace",
+    "to": "digital-workplace",
+    "affectedArticles": 1
+  },
+  {
+    "from": "disasterRecovery",
+    "to": "disaster-recovery",
+    "affectedArticles": 1
+  },
+  {
+    "from": "distributedApplications",
+    "to": "distributed-applications",
+    "affectedArticles": 1
+  },
+  {
+    "from": "distributedArchitecture",
+    "to": "distributed-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "distributedCaching",
+    "to": "distributed-caching",
+    "affectedArticles": 1
+  },
+  {
+    "from": "distributedDatabases",
+    "to": "distributed-databases",
+    "affectedArticles": 1
+  },
+  {
+    "from": "distributedSystems",
+    "to": "distributed-systems",
+    "affectedArticles": 3
+  },
+  {
+    "from": "distributedTeams",
+    "to": "distributed-teams",
+    "affectedArticles": 1
+  },
+  {
+    "from": "distributedTracing",
+    "to": "distributed-tracing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "docker",
+    "to": "docker",
+    "affectedArticles": 1
+  },
+  {
+    "from": "domainDrivenDesign",
+    "to": "domain-driven-design",
+    "affectedArticles": 3
+  },
+  {
+    "from": "domainEvents",
+    "to": "domain-events",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dotNet",
+    "to": "dotnet",
+    "affectedArticles": 2
+  },
+  {
+    "from": "dotNetCore",
+    "to": "dotnet-core",
+    "affectedArticles": 2
+  },
+  {
+    "from": "drizzleORM",
+    "to": "drizzle-orm",
+    "affectedArticles": 1
+  },
+  {
+    "from": "dynamicApplicationSecurityTesting",
+    "to": "dynamic-application-security-testing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "eda",
+    "to": "eda",
+    "affectedArticles": 1
+  },
+  {
+    "from": "elasticDatabase",
+    "to": "elastic-database",
+    "affectedArticles": 1
+  },
+  {
+    "from": "emailVerification",
+    "to": "email-verification",
+    "affectedArticles": 1
+  },
+  {
+    "from": "employeeSatisfaction",
+    "to": "employee-satisfaction",
+    "affectedArticles": 1
+  },
+  {
+    "from": "employeeWellbeing",
+    "to": "employee-wellbeing",
+    "affectedArticles": 2
+  },
+  {
+    "from": "energyManagement",
+    "to": "energy-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "engineering-leadership",
+    "to": "engineering-leadership",
+    "affectedArticles": 1
+  },
+  {
+    "from": "englishLearning",
+    "to": "english-learning",
+    "affectedArticles": 1
+  },
+  {
+    "from": "enterpriseAI",
+    "to": "enterprise-ai",
+    "affectedArticles": 1
+  },
+  {
+    "from": "enterpriseArchitecture",
+    "to": "enterprise-architecture",
+    "affectedArticles": 2
+  },
+  {
+    "from": "entrepreneurship",
+    "to": "entrepreneurship",
+    "affectedArticles": 1
+  },
+  {
+    "from": "environmentConfiguration",
+    "to": "environment-configuration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "eventDrivenArchitecture",
+    "to": "event-driven-architecture",
+    "affectedArticles": 4
+  },
+  {
+    "from": "eventProcessing",
+    "to": "event-processing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "evictionPolicies",
+    "to": "eviction-policies",
+    "affectedArticles": 1
+  },
+  {
+    "from": "faas",
+    "to": "faas",
+    "affectedArticles": 1
+  },
+  {
+    "from": "factoryPattern",
+    "to": "factory-pattern",
+    "affectedArticles": 1
+  },
+  {
+    "from": "fintech",
+    "to": "fintech",
+    "affectedArticles": 1
+  },
+  {
+    "from": "flexibility",
+    "to": "flexibility",
+    "affectedArticles": 2
+  },
+  {
+    "from": "focusAndDiscipline",
+    "to": "focus-and-discipline",
+    "affectedArticles": 1
+  },
+  {
+    "from": "fullStackDevelopment",
+    "to": "full-stack-development",
+    "affectedArticles": 1
+  },
+  {
+    "from": "functionAsAService",
+    "to": "function-as-a-service",
+    "affectedArticles": 1
+  },
+  {
+    "from": "futureOfWork",
+    "to": "future-of-work",
+    "affectedArticles": 1
+  },
+  {
+    "from": "generativeAI",
+    "to": "generative-ai",
+    "affectedArticles": 2
+  },
+  {
+    "from": "geoReplication",
+    "to": "geo-replication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "git",
+    "to": "git",
+    "affectedArticles": 1
+  },
+  {
+    "from": "github",
+    "to": "github",
+    "affectedArticles": 2
+  },
+  {
+    "from": "gitHubTemplates",
+    "to": "git-hub-templates",
+    "affectedArticles": 1
+  },
+  {
+    "from": "gitignore",
+    "to": "gitignore",
+    "affectedArticles": 1
+  },
+  {
+    "from": "globalApplications",
+    "to": "global-applications",
+    "affectedArticles": 1
+  },
+  {
+    "from": "globalTaxiApp",
+    "to": "global-taxi-app",
+    "affectedArticles": 1
+  },
+  {
+    "from": "globalTeams",
+    "to": "global-teams",
+    "affectedArticles": 1
+  },
+  {
+    "from": "growthMindset",
+    "to": "growth-mindset",
+    "affectedArticles": 1
+  },
+  {
+    "from": "habits",
+    "to": "habits",
+    "affectedArticles": 1
+  },
+  {
+    "from": "hazelcast",
+    "to": "hazelcast",
+    "affectedArticles": 1
+  },
+  {
+    "from": "healthyWorkplace",
+    "to": "healthy-workplace",
+    "affectedArticles": 1
+  },
+  {
+    "from": "highAvailability",
+    "to": "high-availability",
+    "affectedArticles": 2
+  },
+  {
+    "from": "highPerformance",
+    "to": "high-performance",
+    "affectedArticles": 1
+  },
+  {
+    "from": "horizontalScaling",
+    "to": "horizontal-scaling",
+    "affectedArticles": 1
+  },
+  {
+    "from": "https",
+    "to": "https",
+    "affectedArticles": 1
+  },
+  {
+    "from": "humanAndAI",
+    "to": "human-and-ai",
+    "affectedArticles": 1
+  },
+  {
+    "from": "humanPotential",
+    "to": "human-potential",
+    "affectedArticles": 1
+  },
+  {
+    "from": "hybridCloud",
+    "to": "hybrid-cloud",
+    "affectedArticles": 1
+  },
+  {
+    "from": "hybridWork",
+    "to": "hybrid-work",
+    "affectedArticles": 1
+  },
+  {
+    "from": "informationFlow",
+    "to": "information-flow",
+    "affectedArticles": 1
+  },
+  {
+    "from": "infrastructureDesign",
+    "to": "infrastructure-design",
+    "affectedArticles": 1
+  },
+  {
+    "from": "inMemoryDataStores",
+    "to": "in-memory-data-stores",
+    "affectedArticles": 1
+  },
+  {
+    "from": "innovation",
+    "to": "innovation",
+    "affectedArticles": 1
+  },
+  {
+    "from": "inputValidation",
+    "to": "input-validation",
+    "affectedArticles": 1
+  },
+  {
+    "from": "interfaces",
+    "to": "interfaces",
+    "affectedArticles": 2
+  },
+  {
+    "from": "interfaceSegregationPrinciple",
+    "to": "interface-segregation-principle",
+    "affectedArticles": 1
+  },
+  {
+    "from": "iTArchitecture",
+    "to": "i-t-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "jwt",
+    "to": "jwt",
+    "affectedArticles": 1
+  },
+  {
+    "from": "k8s",
+    "to": "k8s",
+    "affectedArticles": 1
+  },
+  {
+    "from": "keyValueStore",
+    "to": "key-value-store",
+    "affectedArticles": 1
+  },
+  {
+    "from": "knowledgeSharing",
+    "to": "knowledge-sharing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "kql",
+    "to": "kql",
+    "affectedArticles": 1
+  },
+  {
+    "from": "kubernetes",
+    "to": "kubernetes",
+    "affectedArticles": 1
+  },
+  {
+    "from": "kustoQueryLanguage",
+    "to": "kusto-query-language",
+    "affectedArticles": 1
+  },
+  {
+    "from": "leadership",
+    "to": "leadership",
+    "affectedArticles": 1
+  },
+  {
+    "from": "learningAndDevelopment",
+    "to": "learning-and-development",
+    "affectedArticles": 1
+  },
+  {
+    "from": "lifeReflections",
+    "to": "life-reflections",
+    "affectedArticles": 1
+  },
+  {
+    "from": "liskovSubstitutionPrinciple",
+    "to": "liskov-substitution-principle",
+    "affectedArticles": 1
+  },
+  {
+    "from": "loadTesting",
+    "to": "load-testing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "logAnalytics",
+    "to": "log-analytics",
+    "affectedArticles": 1
+  },
+  {
+    "from": "logging",
+    "to": "logging",
+    "affectedArticles": 2
+  },
+  {
+    "from": "logic",
+    "to": "logic",
+    "affectedArticles": 1
+  },
+  {
+    "from": "looseCoupling",
+    "to": "loose-coupling",
+    "affectedArticles": 2
+  },
+  {
+    "from": "lowLatency",
+    "to": "low-latency",
+    "affectedArticles": 1
+  },
+  {
+    "from": "maintainability",
+    "to": "maintainability",
+    "affectedArticles": 2
+  },
+  {
+    "from": "maintainableCode",
+    "to": "maintainable-code",
+    "affectedArticles": 1
+  },
+  {
+    "from": "managedServices",
+    "to": "managed-services",
+    "affectedArticles": 1
+  },
+  {
+    "from": "memcached",
+    "to": "memcached",
+    "affectedArticles": 1
+  },
+  {
+    "from": "mentalEnergy",
+    "to": "mental-energy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "mentalHealth",
+    "to": "mental-health",
+    "affectedArticles": 2
+  },
+  {
+    "from": "mentorship",
+    "to": "mentorship",
+    "affectedArticles": 2
+  },
+  {
+    "from": "microservices",
+    "to": "microservices",
+    "affectedArticles": 7
+  },
+  {
+    "from": "microsoftTechnologies",
+    "to": "microsoft-technologies",
+    "affectedArticles": 1
+  },
+  {
+    "from": "migrationProcess",
+    "to": "migration-process",
+    "affectedArticles": 1
+  },
+  {
+    "from": "mindfulness",
+    "to": "mindfulness",
+    "affectedArticles": 1
+  },
+  {
+    "from": "minifiedFiles",
+    "to": "minified-files",
+    "affectedArticles": 1
+  },
+  {
+    "from": "mobility",
+    "to": "mobility",
+    "affectedArticles": 1
+  },
+  {
+    "from": "mocking",
+    "to": "mocking",
+    "affectedArticles": 1
+  },
+  {
+    "from": "modelDrivenEngineering",
+    "to": "model-driven-engineering",
+    "affectedArticles": 1
+  },
+  {
+    "from": "modernArchitecture",
+    "to": "modern-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "modularity",
+    "to": "modularity",
+    "affectedArticles": 1
+  },
+  {
+    "from": "monolithToMicroservices",
+    "to": "monolith-to-microservices",
+    "affectedArticles": 1
+  },
+  {
+    "from": "moq",
+    "to": "moq",
+    "affectedArticles": 1
+  },
+  {
+    "from": "motivation",
+    "to": "motivation",
+    "affectedArticles": 1
+  },
+  {
+    "from": "networking",
+    "to": "networking",
+    "affectedArticles": 1
+  },
+  {
+    "from": "nextAuth",
+    "to": "next-auth",
+    "affectedArticles": 1
+  },
+  {
+    "from": "nextJS",
+    "to": "nextjs",
+    "affectedArticles": 1
+  },
+  {
+    "from": "noSQL",
+    "to": "no-sql",
+    "affectedArticles": 1
+  },
+  {
+    "from": "npmPackage",
+    "to": "npm-package",
+    "affectedArticles": 1
+  },
+  {
+    "from": "nuance",
+    "to": "nuance",
+    "affectedArticles": 1
+  },
+  {
+    "from": "oauth2",
+    "to": "oauth2",
+    "affectedArticles": 1
+  },
+  {
+    "from": "objectOrientedProgramming",
+    "to": "object-oriented-programming",
+    "affectedArticles": 1
+  },
+  {
+    "from": "observability",
+    "to": "observability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "observerPattern",
+    "to": "observer-pattern",
+    "affectedArticles": 1
+  },
+  {
+    "from": "onPremises",
+    "to": "on-premises",
+    "affectedArticles": 1
+  },
+  {
+    "from": "oop",
+    "to": "oop",
+    "affectedArticles": 1
+  },
+  {
+    "from": "openClosedPrinciple",
+    "to": "open-closed-principle",
+    "affectedArticles": 1
+  },
+  {
+    "from": "openSource",
+    "to": "open-source",
+    "affectedArticles": 1
+  },
+  {
+    "from": "organizationalCulture",
+    "to": "organizational-culture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "overcomingChallenges",
+    "to": "overcoming-challenges",
+    "affectedArticles": 1
+  },
+  {
+    "from": "overwork",
+    "to": "overwork",
+    "affectedArticles": 1
+  },
+  {
+    "from": "owaspZap",
+    "to": "owasp-zap",
+    "affectedArticles": 1
+  },
+  {
+    "from": "passkeys",
+    "to": "passkeys",
+    "affectedArticles": 1
+  },
+  {
+    "from": "passwordReset",
+    "to": "password-reset",
+    "affectedArticles": 1
+  },
+  {
+    "from": "penetrationTesting",
+    "to": "penetration-testing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "performanceAssessment",
+    "to": "performance-assessment",
+    "affectedArticles": 1
+  },
+  {
+    "from": "performanceMonitoring",
+    "to": "performance-monitoring",
+    "affectedArticles": 1
+  },
+  {
+    "from": "performanceTuning",
+    "to": "performance-tuning",
+    "affectedArticles": 1
+  },
+  {
+    "from": "personalDevelopment",
+    "to": "personal-development",
+    "affectedArticles": 1
+  },
+  {
+    "from": "personalEnergy",
+    "to": "personal-energy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "philosophyOfLife",
+    "to": "philosophy-of-life",
+    "affectedArticles": 1
+  },
+  {
+    "from": "physicalEnergy",
+    "to": "physical-energy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "platformAgnosticArchitecture",
+    "to": "platform-agnostic-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "possibility",
+    "to": "possibility",
+    "affectedArticles": 1
+  },
+  {
+    "from": "postgreSQL",
+    "to": "postgresql",
+    "affectedArticles": 1
+  },
+  {
+    "from": "powerBI",
+    "to": "power-bi",
+    "affectedArticles": 1
+  },
+  {
+    "from": "probability",
+    "to": "probability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "problemSolving",
+    "to": "problem-solving",
+    "affectedArticles": 2
+  },
+  {
+    "from": "product-engineering",
+    "to": "product-engineering",
+    "affectedArticles": 1
+  },
+  {
+    "from": "product-strategy",
+    "to": "product-strategy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "productivity",
+    "to": "productivity",
+    "affectedArticles": 3
+  },
+  {
+    "from": "professionalAutonomy",
+    "to": "professional-autonomy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "professionalDevelopment",
+    "to": "professional-development",
+    "affectedArticles": 1
+  },
+  {
+    "from": "professionalGrowth",
+    "to": "professional-growth",
+    "affectedArticles": 1
+  },
+  {
+    "from": "programming",
+    "to": "programming",
+    "affectedArticles": 2
+  },
+  {
+    "from": "pubSub",
+    "to": "pub-sub",
+    "affectedArticles": 1
+  },
+  {
+    "from": "purpose",
+    "to": "purpose",
+    "affectedArticles": 1
+  },
+  {
+    "from": "questioningBeliefs",
+    "to": "questioning-beliefs",
+    "affectedArticles": 1
+  },
+  {
+    "from": "rateLimiting",
+    "to": "rate-limiting",
+    "affectedArticles": 2
+  },
+  {
+    "from": "rbac",
+    "to": "rbac",
+    "affectedArticles": 1
+  },
+  {
+    "from": "realTimeAnalysis",
+    "to": "real-time-analysis",
+    "affectedArticles": 1
+  },
+  {
+    "from": "realTimeAnalytics",
+    "to": "real-time-analytics",
+    "affectedArticles": 1
+  },
+  {
+    "from": "reasoning",
+    "to": "reasoning",
+    "affectedArticles": 1
+  },
+  {
+    "from": "recognitionAndReward",
+    "to": "recognition-and-reward",
+    "affectedArticles": 1
+  },
+  {
+    "from": "redis",
+    "to": "redis",
+    "affectedArticles": 1
+  },
+  {
+    "from": "reliability",
+    "to": "reliability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteCodeExecution",
+    "to": "remote-code-execution",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteCollaboration",
+    "to": "remote-collaboration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteCulture",
+    "to": "remote-culture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteLeadership",
+    "to": "remote-leadership",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteProductivity",
+    "to": "remote-productivity",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteTeams",
+    "to": "remote-teams",
+    "affectedArticles": 1
+  },
+  {
+    "from": "remoteWork",
+    "to": "remote-work",
+    "affectedArticles": 2
+  },
+  {
+    "from": "replication",
+    "to": "replication",
+    "affectedArticles": 2
+  },
+  {
+    "from": "repositoryManagement",
+    "to": "repository-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "repositoryPattern",
+    "to": "repository-pattern",
+    "affectedArticles": 2
+  },
+  {
+    "from": "restAPIs",
+    "to": "rest-apis",
+    "affectedArticles": 1
+  },
+  {
+    "from": "roslynSecurityGuard",
+    "to": "roslyn-security-guard",
+    "affectedArticles": 1
+  },
+  {
+    "from": "saaSDevelopment",
+    "to": "saas-development",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sameCodebase",
+    "to": "same-codebase",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sast",
+    "to": "sast",
+    "affectedArticles": 1
+  },
+  {
+    "from": "scalability",
+    "to": "scalability",
+    "affectedArticles": 6
+  },
+  {
+    "from": "scalableSystems",
+    "to": "scalable-systems",
+    "affectedArticles": 1
+  },
+  {
+    "from": "secureAuth",
+    "to": "secure-auth",
+    "affectedArticles": 1
+  },
+  {
+    "from": "secureCoding",
+    "to": "secure-coding",
+    "affectedArticles": 1
+  },
+  {
+    "from": "secureSDLC",
+    "to": "secure-sdlc",
+    "affectedArticles": 1
+  },
+  {
+    "from": "security",
+    "to": "security",
+    "affectedArticles": 1
+  },
+  {
+    "from": "securityAssessment",
+    "to": "security-assessment",
+    "affectedArticles": 1
+  },
+  {
+    "from": "securityPipeline",
+    "to": "security-pipeline",
+    "affectedArticles": 1
+  },
+  {
+    "from": "securityTesting",
+    "to": "security-testing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "self-knowledge",
+    "to": "self-knowledge",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sensitiveDataProtection",
+    "to": "sensitive-data-protection",
+    "affectedArticles": 1
+  },
+  {
+    "from": "serverlessArchitecture",
+    "to": "serverless-architecture",
+    "affectedArticles": 2
+  },
+  {
+    "from": "serverlessFunctions",
+    "to": "serverless-functions",
+    "affectedArticles": 1
+  },
+  {
+    "from": "serviceCollection",
+    "to": "service-collection",
+    "affectedArticles": 1
+  },
+  {
+    "from": "serviceCommunication",
+    "to": "service-communication",
+    "affectedArticles": 2
+  },
+  {
+    "from": "sessionManagement",
+    "to": "session-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sharding",
+    "to": "sharding",
+    "affectedArticles": 2
+  },
+  {
+    "from": "siem",
+    "to": "siem",
+    "affectedArticles": 1
+  },
+  {
+    "from": "singleResponsibilityPrinciple",
+    "to": "single-responsibility-principle",
+    "affectedArticles": 2
+  },
+  {
+    "from": "smokeAndFire",
+    "to": "smoke-and-fire",
+    "affectedArticles": 1
+  },
+  {
+    "from": "softwareArchitecture",
+    "to": "software-architecture",
+    "affectedArticles": 10
+  },
+  {
+    "from": "softwareDesign",
+    "to": "software-design",
+    "affectedArticles": 4
+  },
+  {
+    "from": "softwareDevelopment",
+    "to": "software-development",
+    "affectedArticles": 5
+  },
+  {
+    "from": "softwareEngineering",
+    "to": "software-engineering",
+    "affectedArticles": 7
+  },
+  {
+    "from": "softwareIndustry",
+    "to": "software-industry",
+    "affectedArticles": 1
+  },
+  {
+    "from": "softwarePatterns",
+    "to": "software-patterns",
+    "affectedArticles": 1
+  },
+  {
+    "from": "softwareSolutions",
+    "to": "software-solutions",
+    "affectedArticles": 1
+  },
+  {
+    "from": "softwareSystems",
+    "to": "software-systems",
+    "affectedArticles": 1
+  },
+  {
+    "from": "solidPrinciples",
+    "to": "solid-principles",
+    "affectedArticles": 2
+  },
+  {
+    "from": "solutionArchitect",
+    "to": "solution-architect",
+    "affectedArticles": 1
+  },
+  {
+    "from": "solutionArchitecture",
+    "to": "solution-architecture",
+    "affectedArticles": 4
+  },
+  {
+    "from": "sonarQube",
+    "to": "sonar-qube",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sourceCodeManagement",
+    "to": "source-code-management",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sourceControl",
+    "to": "source-control",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sqlInjection",
+    "to": "sql-injection",
+    "affectedArticles": 1
+  },
+  {
+    "from": "ssl",
+    "to": "ssl",
+    "affectedArticles": 1
+  },
+  {
+    "from": "stackOverflow",
+    "to": "stack-overflow",
+    "affectedArticles": 1
+  },
+  {
+    "from": "stakeholderCollaboration",
+    "to": "stakeholder-collaboration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "startupExperience",
+    "to": "startup-experience",
+    "affectedArticles": 1
+  },
+  {
+    "from": "staticApplicationSecurityTesting",
+    "to": "static-application-security-testing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "streamAnalytics",
+    "to": "stream-analytics",
+    "affectedArticles": 1
+  },
+  {
+    "from": "sustainablePerformance",
+    "to": "sustainable-performance",
+    "affectedArticles": 2
+  },
+  {
+    "from": "synchronousCommunication",
+    "to": "synchronous-communication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "systemArchitecture",
+    "to": "system-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "systemDesign",
+    "to": "system-design",
+    "affectedArticles": 2
+  },
+  {
+    "from": "systemFlexibility",
+    "to": "system-flexibility",
+    "affectedArticles": 2
+  },
+  {
+    "from": "systemIntegration",
+    "to": "system-integration",
+    "affectedArticles": 2
+  },
+  {
+    "from": "systemReliability",
+    "to": "system-reliability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "systemResilience",
+    "to": "system-resilience",
+    "affectedArticles": 2
+  },
+  {
+    "from": "systemScalability",
+    "to": "system-scalability",
+    "affectedArticles": 2
+  },
+  {
+    "from": "systemsDesign",
+    "to": "systems-design",
+    "affectedArticles": 2
+  },
+  {
+    "from": "systemsIntegration",
+    "to": "systems-integration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "systemsThinking",
+    "to": "systems-thinking",
+    "affectedArticles": 1
+  },
+  {
+    "from": "talentAccess",
+    "to": "talent-access",
+    "affectedArticles": 1
+  },
+  {
+    "from": "team-scaling",
+    "to": "team-scaling",
+    "affectedArticles": 1
+  },
+  {
+    "from": "teamCollaboration",
+    "to": "team-collaboration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "teamCommunication",
+    "to": "team-communication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "teamDevelopment",
+    "to": "team-development",
+    "affectedArticles": 1
+  },
+  {
+    "from": "techCommunity",
+    "to": "tech-community",
+    "affectedArticles": 1
+  },
+  {
+    "from": "techLeadership",
+    "to": "tech-leadership",
+    "affectedArticles": 1
+  },
+  {
+    "from": "technicalArchitecture",
+    "to": "technical-architecture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "technicalKnowledge",
+    "to": "technical-knowledge",
+    "affectedArticles": 1
+  },
+  {
+    "from": "technicalLeadership",
+    "to": "technical-leadership",
+    "affectedArticles": 2
+  },
+  {
+    "from": "technologyAssessment",
+    "to": "technology-assessment",
+    "affectedArticles": 1
+  },
+  {
+    "from": "technologyProfessionals",
+    "to": "technology-professionals",
+    "affectedArticles": 1
+  },
+  {
+    "from": "technologyStrategy",
+    "to": "technology-strategy",
+    "affectedArticles": 1
+  },
+  {
+    "from": "telemetryData",
+    "to": "telemetry-data",
+    "affectedArticles": 1
+  },
+  {
+    "from": "testability",
+    "to": "testability",
+    "affectedArticles": 1
+  },
+  {
+    "from": "Text-to-SQL",
+    "to": "text-to-sql",
+    "affectedArticles": 1
+  },
+  {
+    "from": "tfsToGitMigration",
+    "to": "tfs-to-git-migration",
+    "affectedArticles": 1
+  },
+  {
+    "from": "thermodynamics",
+    "to": "thermodynamics",
+    "affectedArticles": 1
+  },
+  {
+    "from": "threatModeling",
+    "to": "threat-modeling",
+    "affectedArticles": 1
+  },
+  {
+    "from": "tls",
+    "to": "tls",
+    "affectedArticles": 1
+  },
+  {
+    "from": "tokenBasedAuthentication",
+    "to": "token-based-authentication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "totp",
+    "to": "totp",
+    "affectedArticles": 1
+  },
+  {
+    "from": "truthSeeking",
+    "to": "truth-seeking",
+    "affectedArticles": 1
+  },
+  {
+    "from": "ttlSupport",
+    "to": "ttl-support",
+    "affectedArticles": 1
+  },
+  {
+    "from": "twoFactorAuthentication",
+    "to": "two-factor-authentication",
+    "affectedArticles": 1
+  },
+  {
+    "from": "typeScript",
+    "to": "typescript",
+    "affectedArticles": 1
+  },
+  {
+    "from": "uncertainty",
+    "to": "uncertainty",
+    "affectedArticles": 1
+  },
+  {
+    "from": "unconventionalPaths",
+    "to": "unconventional-paths",
+    "affectedArticles": 1
+  },
+  {
+    "from": "unitTesting",
+    "to": "unit-testing",
+    "affectedArticles": 1
+  },
+  {
+    "from": "useCases",
+    "to": "use-cases",
+    "affectedArticles": 1
+  },
+  {
+    "from": "userStories",
+    "to": "user-stories",
+    "affectedArticles": 1
+  },
+  {
+    "from": "versionControl",
+    "to": "version-control",
+    "affectedArticles": 1
+  },
+  {
+    "from": "verticalScaling",
+    "to": "vertical-scaling",
+    "affectedArticles": 1
+  },
+  {
+    "from": "visualStudio",
+    "to": "visual-studio",
+    "affectedArticles": 1
+  },
+  {
+    "from": "vulnerabilityDetection",
+    "to": "vulnerability-detection",
+    "affectedArticles": 1
+  },
+  {
+    "from": "vulnerabilityScanners",
+    "to": "vulnerability-scanners",
+    "affectedArticles": 1
+  },
+  {
+    "from": "webApplications",
+    "to": "web-applications",
+    "affectedArticles": 1
+  },
+  {
+    "from": "webAuthn",
+    "to": "webauthn",
+    "affectedArticles": 1
+  },
+  {
+    "from": "webSecurity",
+    "to": "web-security",
+    "affectedArticles": 3
+  },
+  {
+    "from": "wellBeing",
+    "to": "well-being",
+    "affectedArticles": 1
+  },
+  {
+    "from": "wildfiresInBrazil",
+    "to": "wildfires-in-brazil",
+    "affectedArticles": 1
+  },
+  {
+    "from": "work-lifeBalance",
+    "to": "work-life-balance",
+    "affectedArticles": 1
+  },
+  {
+    "from": "workFromHome",
+    "to": "work-from-home",
+    "affectedArticles": 1
+  },
+  {
+    "from": "workLifeBalance",
+    "to": "work-life-balance",
+    "affectedArticles": 2
+  },
+  {
+    "from": "workplaceCulture",
+    "to": "workplace-culture",
+    "affectedArticles": 1
+  },
+  {
+    "from": "xss",
+    "to": "xss",
+    "affectedArticles": 1
+  }
+]

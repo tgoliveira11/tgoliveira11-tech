@@ -1,4 +1,5 @@
 import { publicPostPath } from "@/modules/posts/slug";
+import { getCanonicalPostAliasTarget } from "@/modules/public/editorial-taxonomy";
 
 /**
  * Root-level legacy post URLs from the old GitHub Pages blog:
@@ -17,9 +18,15 @@ export function parseLegacyRootPostSlug(pathname: string): string | null {
 
 export function getLegacyPostRedirectPath(pathname: string): string | null {
   const slug = parseLegacyRootPostSlug(pathname);
-  if (!slug) {
+  if (slug) {
+    return publicPostPath(slug);
+  }
+
+  const singleSegment = /^\/([a-z0-9-]+)\/?$/i.exec(pathname);
+  if (!singleSegment) {
     return null;
   }
 
-  return publicPostPath(slug);
+  const aliasTarget = getCanonicalPostAliasTarget(singleSegment[1].toLowerCase());
+  return aliasTarget ? publicPostPath(aliasTarget) : null;
 }

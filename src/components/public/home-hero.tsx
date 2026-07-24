@@ -11,7 +11,7 @@ const textLinkClass =
   "text-sm font-medium text-[var(--primary)] underline-offset-4 transition hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]";
 
 export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
-  const [githubLink, linkedInLink] = PUBLIC_PROFILE_LINKS;
+  const [linkedInLink, githubLink] = PUBLIC_PROFILE_LINKS;
 
   return (
     <section
@@ -38,26 +38,26 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
 
           <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-start">
             <Link href={primaryPostsHref} className={primaryButtonClass}>
-              Read latest posts
+              Read featured insights
             </Link>
-            {githubLink ? (
-              <a
-                href={githubLink.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={secondaryButtonClass}
-              >
-                {githubLink.label}
-              </a>
-            ) : null}
             {linkedInLink ? (
               <a
                 href={linkedInLink.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${textLinkClass} px-1 py-2.5 sm:ml-1`}
+                className={secondaryButtonClass}
               >
                 {linkedInLink.label}
+              </a>
+            ) : null}
+            {githubLink ? (
+              <a
+                href={githubLink.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${textLinkClass} px-1 py-2.5 sm:ml-1`}
+              >
+                {githubLink.label}
               </a>
             ) : null}
           </div>

@@ -20,7 +20,14 @@ import { buildSiteMetadata } from "@/modules/public/seo";
 
 export async function generateMetadata() {
   const config = await getBlogConfig();
-  return { ...buildSiteMetadata(config), title: "Search", description: "Search published articles." };
+  return {
+    ...buildSiteMetadata(config),
+    title: "Search",
+    description: "Search published articles.",
+    alternates: {
+      canonical: "/search",
+    },
+  };
 }
 
 export default async function SearchPage({
@@ -82,9 +89,9 @@ export default async function SearchPage({
               <div className="mt-10">
                 <PublicSectionHeading
                   id="search-recent-heading"
-                  title="Recent posts"
+                  title="Latest articles"
                   description="While you decide what to search for, here are the latest articles."
-                  action={{ href: "/blog", label: "View all posts" }}
+                  action={{ href: "/blog", label: "View all articles" }}
                 />
                 <PostList posts={recentPosts} layout="grid" variant="compact" />
               </div>

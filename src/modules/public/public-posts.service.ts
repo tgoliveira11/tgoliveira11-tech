@@ -6,19 +6,19 @@ import {
   readPublicPostsPageSize,
 } from "@/lib/env";
 import { normalizePage } from "@/lib/pagination";
-import { HOME_TOPICS_TAG_LIMIT, splitHomePosts } from "./public-display";
+import { HOME_TOPICS_TAG_LIMIT, splitHomeEditorialSections } from "./public-display";
 
 export async function getHomePagePosts() {
   const config = await getBlogConfig();
   const recentLimit = readHomeRecentPostsLimit();
   const bundles = await repo.listPublishedPostBundles({
-    limit: recentLimit + 5,
+    limit: recentLimit + 12,
   });
-  const { featuredPost, recent } = splitHomePosts(bundles, recentLimit);
+  const { featuredInsights, recent } = splitHomeEditorialSections(bundles, recentLimit);
 
   return {
     config,
-    featuredPost,
+    featuredInsights,
     recent,
   };
 }
@@ -70,6 +70,7 @@ export {
   listAllTags,
   listAllCategories,
   getPublishedNeighbors,
+  listRelatedPublishedPostBundles,
   listPublishedPostsForFeed,
   listPublishedSlugs,
   countPublishedPosts,

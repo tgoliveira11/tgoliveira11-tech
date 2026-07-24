@@ -13,8 +13,12 @@ export async function generateMetadata() {
   const config = await getBlogConfig();
   return {
     ...buildSiteMetadata(config),
-    title: "Blog",
-    description: "All published articles.",
+    title: "Articles",
+    description:
+      "All published articles on AI engineering, architecture, engineering leadership, technology strategy, and career reflections.",
+    alternates: {
+      canonical: "/blog",
+    },
   };
 }
 
@@ -30,7 +34,11 @@ export default async function BlogListingPage({
   return (
     <PublicLayout config={config}>
       <PublicPageShell>
-        <PublicPageHero eyebrow="Archive" title="Blog" description="All published articles." />
+        <PublicPageHero
+          eyebrow="Archive"
+          title="Articles"
+          description="All published articles on AI engineering, architecture, engineering leadership, technology strategy, and career reflections."
+        />
 
         <section aria-labelledby="blog-posts-heading">
           <h2 id="blog-posts-heading" className="sr-only">

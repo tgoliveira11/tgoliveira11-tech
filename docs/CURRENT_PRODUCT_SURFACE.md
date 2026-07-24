@@ -2,7 +2,7 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-06-15 (secure-auth 0.5.0 upgrade)  
+**Last reviewed:** 2026-07-24 (site repositioning and taxonomy canonicalization)
 **Deployed domain (planned):** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
@@ -25,13 +25,16 @@ Living inventory of what **tgoliveira11-tech** exposes today. Update this file w
 | `/blog` | shipped | Paginated post index (`PUBLIC_POSTS_PAGE_SIZE`, default 5) |
 | `/blog/[slug]` | shipped | Published post detail |
 | `/tags`, `/tags/[slug]` | shipped | Tag index and filtered posts |
-| `/categories`, `/categories/[slug]` | shipped | Category index and filtered posts |
+| `/categories`, `/categories/[slug]` | shipped | Canonical editorial category index and filtered posts |
 | `/search` | shipped | Full-text search |
 | `/about` | shipped | Static about page |
+| `/opengraph-image` | shipped | Default branded social preview image |
 | `/rss.xml` | shipped | RSS feed (dynamic) |
 | `/sitemap.xml` | shipped | Sitemap (dynamic) |
 | `/robots.txt` | shipped | Robots (dynamic) |
 | `/:YYYY-MM-DD-slug` | shipped | 308 redirect → `/blog/[slug]` via `src/proxy.ts` (legacy GitHub Pages URLs) |
+
+Canonical editorial categories: AI Engineering, Software & Solution Architecture, Engineering Leadership, Technology Strategy, Career & Reflections.
 
 ---
 
@@ -144,6 +147,8 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |
 | GitHub Pages import CLI | shipped | `npm run import:github-pages` |
+| Content validation CLI | shipped | `npm run content:validate` |
+| Taxonomy migration CLI | shipped | `npm run content:migrate-taxonomy` (dry-run by default; `-- --apply` updates DB) |
 | Upstream PostForge sync | shipped | Weekly workflow + `npm run sync:upstream:merge` |
 
 ---
