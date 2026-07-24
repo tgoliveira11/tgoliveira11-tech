@@ -5,9 +5,11 @@ export type PublicProfileLink = {
 
 /** Public author identity and profile links for the blog surface. */
 export const PUBLIC_AUTHOR_PROFILE = {
-  name: "Thiago Oliveira",
+  name: "Thiago Goulart de Oliveira",
   fullName: "Thiago Goulart de Oliveira",
+  title: "Engineering Director",
   location: "Santos, Brazil",
+  email: "thiago@tgoliveira11.tech",
   github: "https://github.com/tgoliveira11",
   linkedIn: "https://www.linkedin.com/in/tgoliveira",
   website: "https://tgoliveira11.tech",
@@ -19,32 +21,32 @@ export type HomeHeroHighlight = {
 };
 
 export const HOME_HERO_CONTENT = {
-  eyebrow: "Personal blog · Software architecture · Engineering leadership · AI",
-  title: "Hi, I'm Thiago Oliveira.",
+  eyebrow: "Engineering Director · AI Platforms · Cloud & Solution Architecture",
+  title: "Thiago Goulart de Oliveira",
   subtitle:
-    "I write about software architecture, engineering leadership, AI, delivery, career decisions, and the lessons learned from more than two decades building technology across different business contexts.",
+    "I write about building production AI systems, scalable architectures, engineering organizations, and technology-driven products.",
   secondaryParagraph:
-    "This is where I organize technical notes, reflections, experiments, and practical ideas from my journey as an engineer, architect, and technology leader.",
+    "The articles here focus on enterprise AI platforms, agentic systems, software and solution architecture, product engineering, technology strategy, and engineering leadership.",
   highlights: [
     {
-      title: "Architecture & Engineering",
+      title: "Enterprise AI Platforms",
       description:
-        "Notes on systems, APIs, integrations, cloud, security, and maintainable software.",
+        "Production AI systems, agentic workflows, evaluation, observability, governance, and reliability.",
     },
     {
-      title: "Leadership & Delivery",
+      title: "Architecture & Cloud",
       description:
-        "Reflections on leading teams, making technical decisions, and delivering real business outcomes.",
+        "Software, solution, and system architecture across distributed systems, APIs, security, and cloud.",
     },
     {
-      title: "AI & Technology",
+      title: "Leadership & Strategy",
       description:
-        "Experiments and thoughts on AI, developer productivity, and the future of software work.",
+        "Engineering management, product engineering, platform strategy, and technology-led business outcomes.",
     },
   ] satisfies HomeHeroHighlight[],
 } as const;
 
 export const PUBLIC_PROFILE_LINKS: PublicProfileLink[] = [
-  { label: "GitHub", href: PUBLIC_AUTHOR_PROFILE.github },
   { label: "LinkedIn", href: PUBLIC_AUTHOR_PROFILE.linkedIn },
+  { label: "GitHub", href: PUBLIC_AUTHOR_PROFILE.github },
 ];

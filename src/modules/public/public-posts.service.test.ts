@@ -96,9 +96,13 @@ describe("getHomePagePosts", () => {
 
     const result = await getHomePagePosts();
 
-    expect(listPublishedPostBundlesMock).toHaveBeenCalledWith({ limit: 8 });
-    expect(result.featuredPost?.post.id).toBe("post-a");
-    expect(result.recent.map((bundle) => bundle.post.id)).toEqual(["post-b", "post-c"]);
+    expect(listPublishedPostBundlesMock).toHaveBeenCalledWith({ limit: 15 });
+    expect(result.featuredInsights.map((bundle) => bundle.post.id)).toEqual([
+      "post-a",
+      "post-b",
+      "post-c",
+    ]);
+    expect(result.recent).toEqual([]);
   });
 
   it("respects HOME_RECENT_POSTS_LIMIT when slicing recent posts", async () => {
@@ -108,14 +112,17 @@ describe("getHomePagePosts", () => {
       makeBundle("2", { publicOrder: 1 }),
       makeBundle("3", { publicOrder: 2 }),
       makeBundle("4", { publicOrder: 3 }),
+      makeBundle("5", { publicOrder: 4 }),
+      makeBundle("6", { publicOrder: 5 }),
+      makeBundle("7", { publicOrder: 6 }),
     ];
     listPublishedPostBundlesMock.mockResolvedValue(bundles);
 
     const result = await getHomePagePosts();
 
-    expect(listPublishedPostBundlesMock).toHaveBeenCalledWith({ limit: 7 });
+    expect(listPublishedPostBundlesMock).toHaveBeenCalledWith({ limit: 14 });
     expect(result.recent).toHaveLength(2);
-    expect(result.recent.map((bundle) => bundle.post.id)).toEqual(["2", "3"]);
+    expect(result.recent.map((bundle) => bundle.post.id)).toEqual(["6", "7"]);
   });
 });
 

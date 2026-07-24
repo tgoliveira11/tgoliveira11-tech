@@ -1,10 +1,11 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { PublicLayout } from "@/components/public/public-layout";
 import { PublicBackLink } from "@/components/public/public-breadcrumbs";
 import { PublicPageHero } from "@/components/public/public-page-hero";
 import { PublicPageShell } from "@/components/public/public-page-shell";
 import { PostList } from "@/components/public/post-list";
 import { getBlogConfig } from "@/modules/public/blog-config";
+import { canonicalizeTagSlug } from "@/modules/public/editorial-taxonomy";
 import { listPublishedPostBundlesByTagSlug } from "@/modules/public/public-posts.service";
 import { buildSiteMetadata } from "@/modules/public/seo";
 
@@ -12,19 +13,28 @@ type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const result = await listPublishedPostBundlesByTagSlug(slug, { limit: 1 });
+  const canonicalSlug = canonicalizeTagSlug(slug);
+  const result = await listPublishedPostBundlesByTagSlug(canonicalSlug, { limit: 1 });
   if (!result) return { title: "Tag not found" };
   const config = await getBlogConfig();
   return {
     ...buildSiteMetadata(config),
-    title: `Tag: ${result.tag.name}`,
+    title: `#${result.tag.name}`,
     description: `Posts tagged with #${result.tag.name}.`,
+    alternates: {
+      canonical: `/tags/${result.tag.slug}`,
+    },
   };
 }
 
 export default async function TagDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const result = await listPublishedPostBundlesByTagSlug(slug);
+  const canonicalSlug = canonicalizeTagSlug(slug);
+  if (canonicalSlug !== slug) {
+    permanentRedirect(`/tags/${canonicalSlug}`);
+  }
+
+  const result = await listPublishedPostBundlesByTagSlug(canonicalSlug);
   if (!result) notFound();
 
   const config = await getBlogConfig();

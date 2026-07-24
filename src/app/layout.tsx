@@ -5,10 +5,11 @@ import { Providers } from "@/components/providers";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { secureAuth } from "@/lib/auth/secure-auth";
 import { readPublicSiteTheme } from "@/lib/env";
+import { SITE_INTRODUCTION, SITE_NAME } from "@/modules/public/editorial-taxonomy";
 
 export const metadata: Metadata = {
-  title: "PostForge",
-  description: "Markdown-based blog publishing platform",
+  title: SITE_NAME,
+  description: SITE_INTRODUCTION,
 };
 
 export const dynamic = "force-dynamic";

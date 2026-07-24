@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { PublicLayout } from "@/components/public/public-layout";
 import { PublicBackLink } from "@/components/public/public-breadcrumbs";
 import { PublicPageHero } from "@/components/public/public-page-hero";
@@ -6,25 +6,35 @@ import { PublicPageShell } from "@/components/public/public-page-shell";
 import { PostList } from "@/components/public/post-list";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { listPublishedPostBundlesByCategorySlug } from "@/modules/public/public-posts.service";
+import { canonicalizeCategorySlug } from "@/modules/public/editorial-taxonomy";
 import { buildSiteMetadata } from "@/modules/public/seo";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const result = await listPublishedPostBundlesByCategorySlug(slug, { limit: 1 });
+  const canonicalSlug = canonicalizeCategorySlug(slug);
+  const result = await listPublishedPostBundlesByCategorySlug(canonicalSlug, { limit: 1 });
   if (!result) return { title: "Category not found" };
   const config = await getBlogConfig();
   return {
     ...buildSiteMetadata(config),
-    title: `Category: ${result.category.name}`,
+    title: result.category.name,
     description: result.category.description ?? `Posts in ${result.category.name}.`,
+    alternates: {
+      canonical: `/categories/${result.category.slug}`,
+    },
   };
 }
 
 export default async function CategoryDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const result = await listPublishedPostBundlesByCategorySlug(slug);
+  const canonicalSlug = canonicalizeCategorySlug(slug);
+  if (canonicalSlug !== slug) {
+    permanentRedirect(`/categories/${canonicalSlug}`);
+  }
+
+  const result = await listPublishedPostBundlesByCategorySlug(canonicalSlug);
   if (!result) notFound();
 
   const config = await getBlogConfig();

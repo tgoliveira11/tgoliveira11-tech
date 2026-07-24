@@ -61,7 +61,8 @@ describe("blog config", () => {
 
     await expect(getBlogConfig()).resolves.toEqual({
       title: "Env Blog",
-      description: "Markdown-based blog publishing platform",
+      description:
+        "I write about building production AI systems, scalable architectures, engineering organizations, and technology-driven products.",
       baseUrl: "https://env.example.com",
       postsPerPage: 12,
       rssEnabled: true,

@@ -4,13 +4,37 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "/blog", label: "Blog", match: (pathname: string) => pathname === "/blog" || pathname.startsWith("/blog/") },
-  { href: "/about", label: "About", match: (pathname: string) => pathname === "/about" },
-  { href: "/tags", label: "Tags", match: (pathname: string) => pathname === "/tags" || pathname.startsWith("/tags/") },
+  { href: "/", label: "Home", match: (pathname: string) => pathname === "/" },
   {
-    href: "/categories",
-    label: "Categories",
-    match: (pathname: string) => pathname === "/categories" || pathname.startsWith("/categories/"),
+    href: "/categories/ai-engineering",
+    label: "AI Engineering",
+    match: (pathname: string) => pathname === "/categories/ai-engineering",
+  },
+  {
+    href: "/categories/software-solution-architecture",
+    label: "Architecture",
+    match: (pathname: string) => pathname === "/categories/software-solution-architecture",
+  },
+  {
+    href: "/categories/engineering-leadership",
+    label: "Engineering Leadership",
+    match: (pathname: string) => pathname === "/categories/engineering-leadership",
+  },
+  {
+    href: "/categories/technology-strategy",
+    label: "Technology Strategy",
+    match: (pathname: string) => pathname === "/categories/technology-strategy",
+  },
+  {
+    href: "/categories/career-reflections",
+    label: "Reflections",
+    match: (pathname: string) => pathname === "/categories/career-reflections",
+  },
+  { href: "/about", label: "About", match: (pathname: string) => pathname === "/about" },
+  {
+    href: "/blog",
+    label: "All Articles",
+    match: (pathname: string) => pathname === "/blog" || pathname.startsWith("/blog/"),
   },
   { href: "/search", label: "Search", match: (pathname: string) => pathname === "/search", hideable: true },
 ] as const;

@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-function createChain(result: unknown, terminal: "limit" | "offset" | "orderBy" | "where" = "limit") {
-  const terminalMock = vi.fn().mockResolvedValue(result);
+function createChain(result: unknown, _terminal: "limit" | "offset" | "orderBy" | "where" = "limit") {
+  void _terminal;
   const chain: Record<string, ReturnType<typeof vi.fn>> = {};
   const self = () => chain;
   for (const method of ["from", "where", "orderBy", "groupBy", "innerJoin", "leftJoin", "limit", "offset"]) {
     chain[method] = vi.fn(self);
   }
-  chain[terminal] = terminalMock;
+  chain.then = vi.fn((resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
+    Promise.resolve(result).then(resolve, reject)
+  );
+  chain.catch = vi.fn((reject: (reason: unknown) => unknown) =>
+    Promise.resolve(result).catch(reject)
+  );
+  chain.finally = vi.fn((onFinally: () => void) => Promise.resolve(result).finally(onFinally));
   return chain;
 }
 
@@ -71,7 +77,7 @@ function makePost(id: string, overrides: Partial<Post> = {}): Post {
 
 describe("public posts repository extended", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    selectMock.mockReset();
   });
 
   it("listPublishedPostBundlesPaginated returns paginated bundles", async () => {
@@ -128,8 +134,8 @@ describe("public posts repository extended", () => {
   it("listPublishedPostBundlesByCategorySlug returns category and posts", async () => {
     const category = {
       id: "cat-1",
-      name: "Engineering",
-      slug: "engineering",
+      name: "Technology & Architecture",
+      slug: "technology-architecture",
       description: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -137,19 +143,19 @@ describe("public posts repository extended", () => {
     const post = makePost("post-1", { categoryId: "cat-1" });
 
     selectMock
-      .mockReturnValueOnce({ from: vi.fn(() => createChain([category], "limit")) })
       .mockReturnValueOnce({ from: vi.fn(() => createChain([post], "offset")) })
+      .mockReturnValueOnce({ from: vi.fn(() => createChain([category], "limit")) })
       .mockReturnValueOnce({ from: vi.fn(() => createChain([], "orderBy")) })
       .mockReturnValueOnce({ from: vi.fn(() => createChain([], "orderBy")) });
 
-    const result = await listPublishedPostBundlesByCategorySlug("engineering");
+    const result = await listPublishedPostBundlesByCategorySlug("software-solution-architecture");
 
-    expect(result?.category).toEqual(category);
+    expect(result?.category.name).toBe("Software & Solution Architecture");
     expect(result?.posts).toHaveLength(1);
   });
 
   it("listPublishedPostBundlesByTagSlug returns null when tag missing", async () => {
-    selectMock.mockReturnValueOnce({ from: vi.fn(() => createChain([], "limit")) });
+    selectMock.mockReturnValueOnce({ from: vi.fn(() => createChain([], "offset")) });
 
     await expect(listPublishedPostBundlesByTagSlug("missing")).resolves.toBeNull();
   });
@@ -165,50 +171,48 @@ describe("public posts repository extended", () => {
     const post = makePost("post-1");
 
     selectMock
-      .mockReturnValueOnce({ from: vi.fn(() => createChain([tag], "limit")) })
-      .mockReturnValueOnce({ from: vi.fn(() => createChain([{ post }], "offset")) })
-      .mockReturnValueOnce({ from: vi.fn(() => createChain([], "orderBy")) });
+      .mockReturnValueOnce({ from: vi.fn(() => createChain([post], "offset")) })
+      .mockReturnValueOnce({ from: vi.fn(() => createChain([{ tag }], "orderBy")) });
 
     const result = await listPublishedPostBundlesByTagSlug("typescript");
 
-    expect(result?.tag).toEqual(tag);
+    expect(result?.tag.slug).toBe("typescript");
+    expect(result?.tag.name).toBe("typescript");
     expect(result?.posts).toHaveLength(1);
   });
 
   it("listPublicTags and listPopularTags slice results", async () => {
+    const now = new Date();
     const rows = [
-      { id: "tag-1", name: "A", slug: "a", postCount: 3, createdAt: new Date(), updatedAt: new Date() },
-      { id: "tag-2", name: "B", slug: "b", postCount: 2, createdAt: new Date(), updatedAt: new Date() },
+      {
+        tag: { id: "tag-1", name: "softwareArchitecture", slug: "softwarearchitecture", createdAt: now, updatedAt: now },
+        postId: "post-1",
+      },
+      {
+        tag: { id: "tag-2", name: "cloudArchitecture", slug: "cloudarchitecture", createdAt: now, updatedAt: now },
+        postId: "post-2",
+      },
     ];
     selectMock
-      .mockReturnValueOnce({ from: vi.fn(() => createChain(rows, "orderBy")) })
-      .mockReturnValueOnce({ from: vi.fn(() => createChain(rows, "orderBy")) });
+      .mockReturnValueOnce({ from: vi.fn(() => createChain(rows, "where")) })
+      .mockReturnValueOnce({ from: vi.fn(() => createChain(rows, "where")) });
 
     const all = await listPublicTags();
     expect(all).toHaveLength(2);
+    expect(all.map((tag) => tag.slug)).toEqual(["cloud-architecture", "software-architecture"]);
 
     const popular = await listPopularTags(1);
     expect(popular).toHaveLength(1);
   });
 
   it("listPublicCategories and listPopularCategories slice results", async () => {
-    const rows = [
-      {
-        id: "cat-1",
-        name: "A",
-        slug: "a",
-        description: null,
-        postCount: 3,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
     selectMock
-      .mockReturnValueOnce({ from: vi.fn(() => createChain(rows, "orderBy")) })
-      .mockReturnValueOnce({ from: vi.fn(() => createChain(rows, "orderBy")) });
+      .mockReturnValueOnce({ from: vi.fn(() => createChain([], "offset")) })
+      .mockReturnValueOnce({ from: vi.fn(() => createChain([], "offset")) });
 
     const all = await listPublicCategories();
-    expect(all).toHaveLength(1);
+    expect(all).toHaveLength(5);
+    expect(all[0]?.slug).toBe("ai-engineering");
 
     const popular = await listPopularCategories(1);
     expect(popular).toHaveLength(1);

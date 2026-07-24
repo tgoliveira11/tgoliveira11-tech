@@ -7,9 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Canonical editorial taxonomy for AI Engineering, Software & Solution Architecture, Engineering Leadership, Technology Strategy, and Career & Reflections.
+- DB-backed content validation and dry-run taxonomy migration scripts.
+- Default branded Open Graph image route for social previews.
+
 ### Changed
 
+- Reposition public site identity around Thiago Goulart de Oliveira, AI platforms, cloud/solution architecture, and engineering leadership.
+- Rework homepage, navigation, article metadata, RSS, sitemap taxonomy output, author CTA, and related-article logic around the new editorial IA.
+- Normalize public tag display/archive behavior to lowercase kebab-case with migration documentation.
 - Sync PostForge upstream (`7359a65`): secure-auth v0.2/v0.3 env mappings (magic link, captcha, GitHub OAuth, invites, profile, HIBP), additional test coverage from template.
+
+### Fixed
+
+- Preserve static priority article aliases and legacy taxonomy URLs through canonical redirects or alias-aware archive resolution.
+
+### Security
+
+- Upgrade Next.js, `eslint-config-next`, `next-auth`, `js-yaml`, `@tailwindcss/postcss`, `postcss`, and `sharp` resolution to clear high+ `npm audit` findings in CI.
 
 ## [0.1.2] - 2026-07-02
 

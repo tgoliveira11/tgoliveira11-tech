@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "validate": "npm run typecheck && npm run lint && npm run test:coverage && npm run build",
+    "validate": "npm run typecheck && npm run lint && npm run test:coverage && npm run content:validate && npm run build",
+    "content:validate": "tsx scripts/validate-content.ts",
+    "content:migrate-taxonomy": "tsx scripts/migrate-site-taxonomy.ts",
     "audit": "npm audit",
     "audit:prod": "npm audit --omit=dev",
     "audit:ci": "npm audit --audit-level=moderate",
@@ -28,7 +30,8 @@
   },
   "overrides": {
     "esbuild": "^0.28.1",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.23",
+    "sharp": "^0.35.3",
     "uuid": "^11.1.1",
     "drizzle-kit": {
       "@esbuild-kit/esm-loader": "npm:tsx@^4.22.4"
@@ -41,9 +44,9 @@
     "@vercel/speed-insights": "^2.0.0",
     "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.2",
-    "js-yaml": "^4.2.0",
-    "next": "16.2.9",
-    "next-auth": "^4.24.14",
+    "js-yaml": "^4.3.0",
+    "next": "^16.2.11",
+    "next-auth": "^4.24.15",
     "postgres": "^3.4.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -61,7 +64,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/js-yaml": "^4.0.9",
     "@types/mdast": "^4.0.4",
     "@types/node": "^20",
@@ -71,7 +74,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
-    "eslint-config-next": "16.2.9",
+    "eslint-config-next": "^16.2.11",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
     "typescript": "^5",

@@ -18,8 +18,8 @@ export function TopicsSection({
     <section aria-labelledby="explore-topics-heading" className="public-topics">
       <PublicSectionHeading
         id="explore-topics-heading"
-        title="Explore topics"
-        description="Browse by category or jump into a tag."
+        title="Browse by category"
+        description="Use the editorial categories to find AI, architecture, leadership, strategy, and reflection pieces."
       />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">

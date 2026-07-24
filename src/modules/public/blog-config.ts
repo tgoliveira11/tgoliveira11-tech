@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/get-db";
 import { blogSettings } from "@/modules/settings/blog-settings.schema";
 import { readEnv } from "@/lib/env";
+import { SITE_INTRODUCTION, SITE_NAME } from "./editorial-taxonomy";
 
 export type BlogConfig = {
   title: string;
@@ -14,8 +15,8 @@ export type BlogConfig = {
 };
 
 const DEFAULT_CONFIG: BlogConfig = {
-  title: "PostForge",
-  description: "Markdown-based blog publishing platform",
+  title: SITE_NAME,
+  description: SITE_INTRODUCTION,
   baseUrl: "http://localhost:3000",
   postsPerPage: 12,
   rssEnabled: true,

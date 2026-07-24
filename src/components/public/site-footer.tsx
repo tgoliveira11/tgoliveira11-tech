@@ -5,6 +5,7 @@ import {
   getPublicSiteTitle,
   PUBLIC_SITE_CONFIG,
 } from "@/modules/public/public-site-config";
+import { PUBLIC_AUTHOR_PROFILE, PUBLIC_PROFILE_LINKS } from "@/modules/public/author-profile";
 import { PUBLIC_CONTENT_MAX_WIDTH_CLASS } from "./public-layout-constants";
 
 export function SiteFooter({ config }: { config: BlogConfig }) {
@@ -26,8 +27,28 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
           <nav aria-label="Footer navigation">
             <ul className="flex flex-wrap gap-x-4 gap-y-2">
               <li>
-                <Link href="/blog" className="hover:text-[var(--primary)]">
-                  Blog
+                <Link href="/categories/ai-engineering" className="hover:text-[var(--primary)]">
+                  AI Engineering
+                </Link>
+              </li>
+              <li>
+                <Link href="/categories/software-solution-architecture" className="hover:text-[var(--primary)]">
+                  Architecture
+                </Link>
+              </li>
+              <li>
+                <Link href="/categories/engineering-leadership" className="hover:text-[var(--primary)]">
+                  Leadership
+                </Link>
+              </li>
+              <li>
+                <Link href="/categories/technology-strategy" className="hover:text-[var(--primary)]">
+                  Strategy
+                </Link>
+              </li>
+              <li>
+                <Link href="/categories/career-reflections" className="hover:text-[var(--primary)]">
+                  Reflections
                 </Link>
               </li>
               <li>
@@ -36,14 +57,29 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                 </Link>
               </li>
               <li>
-                <Link href="/tags" className="hover:text-[var(--primary)]">
-                  Tags
+                <Link href="/blog" className="hover:text-[var(--primary)]">
+                  Articles
                 </Link>
               </li>
+              {PUBLIC_PROFILE_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[var(--primary)]"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
               <li>
-                <Link href="/categories" className="hover:text-[var(--primary)]">
-                  Categories
-                </Link>
+                <a
+                  href={`mailto:${PUBLIC_AUTHOR_PROFILE.email}`}
+                  className="hover:text-[var(--primary)]"
+                >
+                  Contact
+                </a>
               </li>
               <li>
                 <Link href="/search" className="hover:text-[var(--primary)]">

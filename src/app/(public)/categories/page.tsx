@@ -11,7 +11,11 @@ export async function generateMetadata() {
   return {
     ...buildSiteMetadata(config),
     title: "Categories",
-    description: "Browse posts by category.",
+    description:
+      "Browse articles by editorial category: AI Engineering, Software & Solution Architecture, Engineering Leadership, Technology Strategy, and Career & Reflections.",
+    alternates: {
+      canonical: "/categories",
+    },
   };
 }
 
@@ -23,9 +27,9 @@ export default async function CategoriesIndexPage() {
     <PublicLayout config={config}>
       <PublicPageShell>
         <PublicPageHero
-          eyebrow="Topics"
+          eyebrow="Editorial navigation"
           title="Categories"
-          description="Browse posts by category."
+          description="Browse articles by the five editorial categories that organize this site."
         />
         <section aria-labelledby="categories-list-heading">
           <h2 id="categories-list-heading" className="sr-only">

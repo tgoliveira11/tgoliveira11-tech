@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PostImage } from "@/components/public/post-image";
 import { ArticleMeta } from "@/components/public/article-meta";
+import { getPostImageAltText } from "@/modules/public/editorial-taxonomy";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 
 export function ArticleHeader({ bundle }: { bundle: PublicPostBundle }) {
@@ -35,7 +36,7 @@ export function ArticleHeader({ bundle }: { bundle: PublicPostBundle }) {
         <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-subtle)]">
           <PostImage
             src={coverAsset.publicUrl}
-            alt={coverAsset.altText ?? post.title}
+            alt={getPostImageAltText(post, coverAsset.altText)}
             width={coverAsset.width}
             height={coverAsset.height}
             className="aspect-[16/9] w-full object-cover"
