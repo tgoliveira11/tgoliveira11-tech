@@ -143,7 +143,6 @@ See `.env.example` for:
 | `PUBLIC_POSTS_PAGE_SIZE` | Posts per page on `/blog` | `5` | Positive integer, max `50`; invalid values fall back to `5` |
 | `HOME_RECENT_POSTS_LIMIT` | Recent posts shown on home (below featured) | `12` | Positive integer, max `48`; invalid values fall back to `12` |
 | `HOME_POPULAR_CATEGORIES_LIMIT` | Top categories on home “Explore by category” | `6` | Positive integer, max `24`; invalid values fall back to `6` |
-| Résumé URL | Public résumé CTA path | `/files/thiago-goulart-de-oliveira-resume.pdf` | Static asset; no environment variable required |
 
 ### Public appearance
 

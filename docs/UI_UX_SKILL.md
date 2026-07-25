@@ -269,7 +269,7 @@ PublicLayout
 - Home `/` does not highlight nav items
 - Sticky header with backdrop blur
 - When the visitor has an authenticated session, `PublicLayout` passes `showAdminLink` to `SiteHeader`, which renders a discreet `Admin` link to `/admin` after the main nav and before the theme toggle. This is a convenience link only; `/admin` remains protected by `requireAdminSession()`.
-- Footer priority links are LinkedIn, GitHub, résumé when configured, email, and RSS.
+- Footer priority links are LinkedIn, GitHub, email, and RSS.
 - Footer RSS link opens `/rss.xml` in a new tab (`target="_blank"`, `rel="noopener noreferrer"`)
 
 ### Admin header navigation

@@ -24,10 +24,10 @@ export function AboutPageContent({
   } = ABOUT_PAGE_CONTENT;
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10 sm:space-y-12">
       <section
         aria-labelledby="about-hero-heading"
-        className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-8 lg:p-10"
+        className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 sm:rounded-2xl sm:p-8 lg:p-10"
       >
         <div className="grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:items-start lg:gap-10">
           <figure className="mx-auto w-full max-w-[220px] sm:max-w-[260px] lg:mx-0">
@@ -76,13 +76,13 @@ export function AboutPageContent({
         aria-labelledby="about-summary-heading"
         className="grid gap-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:items-start"
       >
-        <div className="max-w-xl">
+        <div className="min-w-0 max-w-xl">
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-[var(--primary)]">
             Professional summary
           </p>
           <h2
             id="about-summary-heading"
-            className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl"
+            className="mt-3 break-words text-2xl font-semibold tracking-tight sm:text-3xl"
           >
             {professionalSummary.heading}
           </h2>
@@ -90,7 +90,7 @@ export function AboutPageContent({
             {audienceNote}
           </p>
         </div>
-        <div className="max-w-3xl space-y-5 text-base leading-8 text-[var(--muted)]">
+        <div className="min-w-0 max-w-3xl space-y-5 text-base leading-8 text-[var(--muted)]">
           {professionalSummary.paragraphs.map((paragraph) => (
             <p key={paragraph} className="text-pretty">
               {paragraph}
@@ -102,7 +102,7 @@ export function AboutPageContent({
       <section aria-labelledby="about-core-areas-heading">
         <h2
           id="about-core-areas-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+          className="break-words text-2xl font-semibold tracking-tight sm:text-3xl"
         >
           Core areas
         </h2>
@@ -112,7 +112,7 @@ export function AboutPageContent({
               key={area.title}
               className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[var(--shadow-sm)] sm:p-6"
             >
-              <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
+              <h3 className="break-words text-lg font-semibold tracking-tight text-[var(--foreground)]">
                 {area.title}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
@@ -125,15 +125,15 @@ export function AboutPageContent({
 
       <section
         aria-labelledby="about-career-heading"
-        className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-6 sm:p-8"
+        className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-5 sm:p-8"
       >
         <h2
           id="about-career-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+          className="break-words text-2xl font-semibold tracking-tight sm:text-3xl"
         >
           {careerProgression.heading}
         </h2>
-        <p className="mt-5 text-base font-medium leading-relaxed text-[var(--foreground)]">
+        <p className="mt-5 break-words text-base font-medium leading-relaxed text-[var(--foreground)]">
           {careerProgression.sequence}
         </p>
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--muted)] text-pretty">
@@ -146,7 +146,7 @@ export function AboutPageContent({
           <div className="mb-6">
             <h2
               id="about-selected-work-heading"
-              className="text-2xl font-semibold tracking-tight sm:text-3xl"
+              className="break-words text-2xl font-semibold tracking-tight sm:text-3xl"
             >
               {selectedWork.heading}
             </h2>
@@ -169,7 +169,7 @@ export function AboutPageContent({
       <section aria-labelledby="about-principles-heading">
         <h2
           id="about-principles-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+          className="break-words text-2xl font-semibold tracking-tight sm:text-3xl"
         >
           Leadership principles
         </h2>
@@ -179,7 +179,7 @@ export function AboutPageContent({
               key={principle.title}
               className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[var(--shadow-sm)] sm:p-6"
             >
-              <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
+              <h3 className="break-words text-lg font-semibold tracking-tight text-[var(--foreground)]">
                 {principle.title}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
@@ -193,7 +193,7 @@ export function AboutPageContent({
       <section aria-labelledby="about-experience-heading">
         <h2
           id="about-experience-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+          className="break-words text-2xl font-semibold tracking-tight sm:text-3xl"
         >
           Areas of technical experience
         </h2>
@@ -203,7 +203,7 @@ export function AboutPageContent({
               key={section.id}
               className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[var(--shadow-sm)] sm:p-6"
             >
-              <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
+              <h3 className="break-words text-lg font-semibold tracking-tight text-[var(--foreground)]">
                 {section.title}
               </h3>
               <ul className="mt-4 space-y-2">
@@ -227,11 +227,11 @@ export function AboutPageContent({
 
       <section
         aria-labelledby="about-final-cta-heading"
-        className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-sm)] sm:p-8"
+        className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[var(--shadow-sm)] sm:p-8"
       >
         <h2
           id="about-final-cta-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+          className="break-words text-2xl font-semibold tracking-tight sm:text-3xl"
         >
           {finalCta.heading}
         </h2>

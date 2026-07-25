@@ -68,7 +68,7 @@ export function PostCard({
           {category ? (
             <Link
               href={`/categories/${category.slug}`}
-              className="text-xs font-medium uppercase tracking-wide text-[var(--muted)] hover:text-[var(--primary)]"
+              className="break-words text-xs font-medium uppercase tracking-wide text-[var(--muted)] hover:text-[var(--primary)]"
             >
               {category.name}
             </Link>
@@ -76,7 +76,7 @@ export function PostCard({
         </div>
 
         <h2
-          className={`font-semibold tracking-tight ${
+          className={`break-words font-semibold leading-tight tracking-tight ${
             isCompact ? "mt-1.5 text-base leading-snug" : "mt-2 text-2xl"
           }`}
         >
@@ -117,7 +117,7 @@ export function PostCard({
               <li key={tag.id}>
                 <Link
                   href={`/tags/${tag.slug}`}
-                  className="inline-flex rounded-full border border-[var(--border)] bg-[var(--background)] px-2.5 py-0.5 text-xs hover:border-[var(--primary)] hover:text-[var(--primary)]"
+                  className="inline-flex max-w-full break-words rounded-full border border-[var(--border)] bg-[var(--background)] px-2.5 py-0.5 text-xs hover:border-[var(--primary)] hover:text-[var(--primary)]"
                 >
                   #{tag.name}
                 </Link>

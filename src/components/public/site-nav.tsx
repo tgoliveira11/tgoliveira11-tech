@@ -43,8 +43,11 @@ export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Main navigation" className="w-full">
-      <ul className="flex flex-wrap gap-1 sm:gap-2">
+    <nav
+      aria-label="Main navigation"
+      className="-mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:w-full sm:px-0"
+    >
+      <ul className="flex min-w-max gap-1 sm:min-w-0 sm:flex-wrap sm:gap-2">
         {NAV_LINKS.map((link) => {
           if (hideSearchLink && "hideable" in link && link.hideable) {
             return null;
@@ -56,7 +59,7 @@ export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }
               <Link
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`inline-flex whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] sm:px-3 ${
+                className={`inline-flex whitespace-nowrap rounded-md px-2.5 py-1.5 text-[0.8125rem] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] sm:px-3 sm:text-sm ${
                   isActive
                     ? "bg-[var(--accent-muted)] text-[var(--primary)]"
                     : "text-[var(--muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--foreground)]"

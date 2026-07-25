@@ -2,7 +2,7 @@
 
 This repository powers Thiago Goulart de Oliveira's professional website and technical publication platform. The site presents selected work and writing on enterprise AI, agentic systems, cloud and solution architecture, product engineering, engineering leadership, and technology strategy.
 
-[Live website](https://www.tgoliveira11.tech/) · [LinkedIn](https://www.linkedin.com/in/tgoliveira) · [GitHub](https://github.com/tgoliveira11) · [Résumé](https://www.tgoliveira11.tech/files/thiago-goulart-de-oliveira-resume.pdf)
+[Live website](https://www.tgoliveira11.tech/) · [LinkedIn](https://www.linkedin.com/in/tgoliveira) · [GitHub](https://github.com/tgoliveira11)
 
 ## Purpose
 
@@ -12,7 +12,7 @@ The site has three primary objectives:
 2. Publish practical, evidence-based technical and leadership content.
 3. Provide hiring managers, recruiters, engineers, and technology leaders with a clear view of his experience, thinking, and selected work.
 
-The website is not intended to be a generic personal blog or a complete replacement for LinkedIn or the résumé. It is a curated professional surface built around current positioning, selected writing, and durable public discovery.
+The website is not intended to be a generic personal blog or a complete replacement for direct professional conversations. It is a curated professional surface built around current positioning, selected writing, and durable public discovery.
 
 ## Professional focus
 
@@ -105,7 +105,7 @@ Images use two paths:
 - static public assets under `public/images` and `public/files`;
 - uploaded post assets with database metadata and either local filesystem storage or Vercel Blob, selected through `UPLOAD_PROVIDER`.
 
-Public rendering uses Next `Image` for profile and post images. The Next config allows Vercel Blob hostnames and adds cache/security headers for public metadata, article pages, discovery endpoints, and the résumé PDF.
+Public rendering uses Next `Image` for profile and post images. The Next config allows Vercel Blob hostnames and adds cache/security headers for public metadata, article pages, and discovery endpoints.
 
 ## Repository structure
 
@@ -117,7 +117,7 @@ Public rendering uses Next `Image` for profile and post images. The Next config 
 |-- src/lib                 Cross-cutting utilities for auth, environment parsing, email, security, pagination, uploads, and legacy redirects.
 |-- src/modules             Feature modules for posts, taxonomy, assets, analytics, public rendering, import, redirects, settings, and admin authorization.
 |-- drizzle                 Committed Drizzle migrations and migration metadata.
-|-- public                  Static assets, brand icons, About imagery, cover images, and the public résumé PDF.
+|-- public                  Static assets, brand icons, About imagery, and cover images.
 |-- scripts                 Content validation, migrations, import, upstream sync, inspection, and icon generation scripts.
 |-- docs                    Maintainer documentation for environment, deployment, releases, product surface, and upstream sync.
 |-- .github/workflows       CI, security, release, branch-name, ZAP, and upstream synchronization workflows.
@@ -173,8 +173,6 @@ Important environment groups include:
 - uploads: local filesystem or Vercel Blob through `UPLOAD_PROVIDER`;
 - public behavior: pagination, recent posts, category limits, forced theme, RSS and analytics settings through blog settings;
 - operations: `CRON_SECRET`, audit/security-related flags, and deployment-specific HTTPS cookie settings.
-
-The public résumé path is `/files/thiago-goulart-de-oliveira-resume.pdf`, backed by `public/files/thiago-goulart-de-oliveira-resume.pdf`.
 
 ## Validation and CI
 
