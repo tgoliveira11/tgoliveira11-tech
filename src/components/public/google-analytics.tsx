@@ -212,6 +212,8 @@ function GoogleAnalyticsConversionEvents({ measurementId }: { measurementId: str
         link_text: target.textContent?.trim(),
         component: target.dataset.analyticsComponent,
         article_slug: target.dataset.analyticsArticleSlug,
+        source: target.dataset.analyticsSource,
+        file: target.dataset.analyticsFile,
       });
     }
 

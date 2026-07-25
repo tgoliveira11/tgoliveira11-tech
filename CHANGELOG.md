@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dry-run approved-content migrator for the site rework manuscripts (`npm run content:apply-site-rework`).
 - Reference plan for the future `production-text-to-sql-reference` GitHub project.
 - Static public cover images for the distributed cache, enterprise AI evaluation, and agentic observability articles.
+- Stable public résumé asset at `/files/thiago-goulart-de-oliveira-resume.pdf`.
 
 ### Changed
 
@@ -33,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete article metadata with canonical URLs, author profile links, Open Graph Article tags, fallback social images, Twitter cards, and BlogPosting JSON-LD.
 - Sync PostForge upstream (`7359a65`): secure-auth v0.2/v0.3 env mappings (magic link, captcha, GitHub OAuth, invites, profile, HIBP), additional test coverage from template.
 - Audit PostForge upstream `0.1.2` (`af7ebc1`) and document the selective sync strategy for preserving local SEO, analytics, AI discovery, auth, branding, and production content customizations.
+- Shorten public navigation labels for Leadership, Strategy, and Articles while preserving route and archive names.
+- Improve About-page text density and update the homepage About card title and CTA copy.
+- Track résumé downloads through the existing GA4 event pipeline as `resume_download`.
 
 ### Fixed
 
@@ -41,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clean production content validation issues by demoting legacy body H1 headings, restoring slug-aligned publication dates, canonicalizing the B2B mobility slug to 2026-07-24, and filling missing cover metadata.
 - Assign production cover and Open Graph asset metadata for the distributed cache, enterprise AI evaluation, and agentic observability articles.
 - Ignore generated coverage reports in ESLint flat config so validation stays warning-free.
+- Remove homepage category-card line clamping so editorial descriptions render without ellipses.
+- Add About-page Person and BreadcrumbList structured data.
 
 ### Security
 

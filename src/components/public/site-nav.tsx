@@ -17,12 +17,12 @@ const NAV_LINKS = [
   },
   {
     href: "/categories/engineering-leadership",
-    label: "Engineering Leadership",
+    label: "Leadership",
     match: (pathname: string) => pathname === "/categories/engineering-leadership",
   },
   {
     href: "/categories/technology-strategy",
-    label: "Technology Strategy",
+    label: "Strategy",
     match: (pathname: string) => pathname === "/categories/technology-strategy",
   },
   {
@@ -33,7 +33,7 @@ const NAV_LINKS = [
   { href: "/about", label: "About", match: (pathname: string) => pathname === "/about" },
   {
     href: "/blog",
-    label: "All Articles",
+    label: "Articles",
     match: (pathname: string) => pathname === "/blog" || pathname.startsWith("/blog/"),
   },
   { href: "/search", label: "Search", match: (pathname: string) => pathname === "/search", hideable: true },
@@ -43,8 +43,8 @@ export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Main navigation">
-      <ul className="flex flex-nowrap gap-1 sm:gap-2">
+    <nav aria-label="Main navigation" className="w-full">
+      <ul className="flex flex-wrap gap-1 sm:gap-2">
         {NAV_LINKS.map((link) => {
           if (hideSearchLink && "hideable" in link && link.hideable) {
             return null;
@@ -56,7 +56,7 @@ export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }
               <Link
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`inline-flex whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] ${
+                className={`inline-flex whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] sm:px-3 ${
                   isActive
                     ? "bg-[var(--accent-muted)] text-[var(--primary)]"
                     : "text-[var(--muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--foreground)]"

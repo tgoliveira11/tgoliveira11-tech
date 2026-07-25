@@ -5,7 +5,10 @@ import {
   getPublicSiteTitle,
   PUBLIC_SITE_CONFIG,
 } from "@/modules/public/public-site-config";
-import { PUBLIC_AUTHOR_PROFILE } from "@/modules/public/author-profile";
+import {
+  PUBLIC_AUTHOR_PROFILE,
+  RESUME_DOWNLOAD_FILENAME,
+} from "@/modules/public/author-profile";
 import { PUBLIC_CONTENT_MAX_WIDTH_CLASS } from "./public-layout-constants";
 
 export function SiteFooter({ config }: { config: BlogConfig }) {
@@ -38,6 +41,22 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                   LinkedIn
                 </a>
               </li>
+              {PUBLIC_AUTHOR_PROFILE.resumeUrl ? (
+                <li>
+                  <a
+                    href={PUBLIC_AUTHOR_PROFILE.resumeUrl}
+                    download={RESUME_DOWNLOAD_FILENAME}
+                    aria-label="Download Thiago Goulart de Oliveira résumé as a PDF"
+                    className="hover:text-[var(--primary)]"
+                    data-analytics-event="resume_download"
+                    data-analytics-component="site_footer"
+                    data-analytics-source="footer"
+                    data-analytics-file={RESUME_DOWNLOAD_FILENAME}
+                  >
+                    Résumé
+                  </a>
+                </li>
+              ) : null}
               <li>
                 <a
                   href={PUBLIC_AUTHOR_PROFILE.github}
@@ -50,20 +69,6 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
                   GitHub
                 </a>
               </li>
-              {PUBLIC_AUTHOR_PROFILE.resumeUrl ? (
-                <li>
-                  <a
-                    href={PUBLIC_AUTHOR_PROFILE.resumeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[var(--primary)]"
-                    data-analytics-event="resume_download_click"
-                    data-analytics-component="site_footer"
-                  >
-                    Résumé
-                  </a>
-                </li>
-              ) : null}
               <li>
                 <a
                   href={`mailto:${PUBLIC_AUTHOR_PROFILE.email}`}

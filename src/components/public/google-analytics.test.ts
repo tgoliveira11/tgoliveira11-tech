@@ -32,6 +32,8 @@ describe("Google Analytics public wiring", () => {
     expect(source).toContain('"about_page_visit"');
     expect(source).toContain('"entry_article"');
     expect(source).toContain("data-analytics-event");
+    expect(source).toContain("analyticsSource");
+    expect(source).toContain("analyticsFile");
     expect(source).toContain("utm_campaign");
     expect(source).toContain("useReportWebVitals");
     expect(source).toContain("metric_rating");

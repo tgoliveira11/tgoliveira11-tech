@@ -11,6 +11,7 @@ vi.mock("@/modules/public/public-posts.repository", () => ({
 import type { BlogConfig } from "@/modules/public/blog-config";
 import type { PublicPostBundle } from "@/modules/public/public-posts.repository";
 import {
+  buildAboutPageJsonLd,
   buildBlogPostingJsonLd,
   buildArticleBreadcrumbJsonLd,
   buildPostMetadata,
@@ -226,6 +227,29 @@ describe("seo helpers", () => {
     expect(websiteJsonLd.publisher).toMatchObject({
       "@id": "https://example.com/#person",
       url: "https://example.com/about",
+    });
+    expect((websiteJsonLd.publisher as { knowsAbout?: string[] }).knowsAbout).toContain(
+      "Enterprise AI Platforms"
+    );
+  });
+
+  it("builds About page Person and breadcrumb JSON-LD", () => {
+    const jsonLd = buildAboutPageJsonLd(config);
+
+    expect(jsonLd).toHaveLength(2);
+    expect(jsonLd[0]).toMatchObject({
+      "@type": "Person",
+      "@id": "https://example.com/#person",
+      name: "Thiago Goulart de Oliveira",
+      url: "https://example.com/about",
+      jobTitle: "Engineering Director",
+    });
+    expect(jsonLd[1]).toMatchObject({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { position: 1, item: "https://example.com/" },
+        { position: 2, item: "https://example.com/about" },
+      ],
     });
   });
 

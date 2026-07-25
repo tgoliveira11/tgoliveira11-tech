@@ -13,7 +13,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
   return (
     <section
       aria-labelledby="home-hero-heading"
-      className="public-hero relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-10 sm:px-10 sm:py-12 lg:py-14"
+      className="public-hero relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-8 sm:px-10 sm:py-12 lg:py-14"
     >
       <div className="relative z-10 mx-auto max-w-4xl">
         <div className="text-center lg:text-left">
@@ -22,7 +22,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
           </p>
           <h1
             id="home-hero-heading"
-            className="mt-4 text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
+            className="mt-4 break-words text-3xl font-semibold tracking-tight text-balance sm:text-5xl"
           >
             {HOME_HERO_CONTENT.title}
           </h1>
@@ -36,7 +36,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
           <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-start">
             <Link
               href={primaryPostsHref}
-              className={primaryButtonClass}
+              className={`${primaryButtonClass} min-w-0`}
               data-analytics-event="home_explore_work_click"
               data-analytics-component="home_hero"
             >
@@ -44,7 +44,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
             </Link>
             <Link
               href="/about"
-              className={secondaryButtonClass}
+              className={`${secondaryButtonClass} min-w-0`}
               data-analytics-event="about_cta_click"
               data-analytics-component="home_hero"
             >
@@ -55,7 +55,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
                 href={linkedInLink.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={secondaryButtonClass}
+                className={`${secondaryButtonClass} min-w-0`}
                 data-analytics-event="linkedin_cta_click"
                 data-analytics-component="home_hero"
               >

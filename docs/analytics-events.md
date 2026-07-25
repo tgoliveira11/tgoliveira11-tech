@@ -24,7 +24,7 @@ This site uses the existing GA4 public integration and does not add a second pag
 | `about_work_cta_click` | About page work CTA | `component`, `link_url`, `link_text` |
 | `about_selected_work_click` | About selected work article card | `component`, `article_slug`, `link_url`, `link_text` |
 | `linkedin_cta_click` | LinkedIn CTA in hero, About, or footer | `component`, `link_url`, `link_text` |
-| `resume_download_click` | Résumé CTA when configured | `component`, `link_url`, `link_text` |
+| `resume_download` | Résumé CTA in About hero, About final CTA, or footer | `source`, `file`, `component`, `link_url`, `link_text` |
 | `github_cta_click` | GitHub CTA in About/footer | `component`, `link_url`, `link_text` |
 | `email_contact_click` | Footer email link | `component`, `link_url`, `link_text` |
 | `article_cta_click` | Article LinkedIn CTA | `component`, `link_url`, `link_text` |
@@ -39,4 +39,4 @@ This site uses the existing GA4 public integration and does not add a second pag
 
 - Internal canonical URLs are not modified with UTM parameters.
 - Campaign UTMs should be added only to campaign/source links where appropriate.
-- The résumé CTA is intentionally conditional because no verified résumé URL is committed in the repository. Set `NEXT_PUBLIC_RESUME_URL` or `RESUME_URL` to enable it.
+- The résumé file is served from `/files/thiago-goulart-de-oliveira-resume.pdf`; the GA4 event uses `file=thiago-goulart-de-oliveira-resume.pdf` and a source such as `about-hero`, `about-final-cta`, or `footer`.

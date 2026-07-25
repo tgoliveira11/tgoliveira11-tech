@@ -2,7 +2,7 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-07-24 (static editorial covers, PostForge 0.1.2 upstream audit, site rework follow-up, conversion analytics, redirects, public discovery, and production content cleanup)
+**Last reviewed:** 2026-07-24 (résumé asset, static editorial covers, PostForge 0.1.2 upstream audit, site rework follow-up, conversion analytics, redirects, public discovery, and production content cleanup)
 **Canonical deployed domain:** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
@@ -28,6 +28,7 @@ Living inventory of what **tgoliveira11-tech** exposes today. Update this file w
 | `/categories`, `/categories/[slug]` | shipped | Canonical editorial category index and filtered posts |
 | `/search` | shipped | Full-text search |
 | `/about` | shipped | Static about page |
+| `/files/thiago-goulart-de-oliveira-resume.pdf` | shipped | Static public résumé PDF with PDF content type and download filename headers |
 | `/opengraph-image` | shipped | Default branded social preview image |
 | `/rss.xml` | shipped | RSS feed (dynamic) |
 | `/sitemap.xml` | shipped | Sitemap (dynamic) |
@@ -150,9 +151,10 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | `@tgoliveira/outpost` | shipped | `^1.2.0` — transactional email outbox + admin UI |
 | Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
 | Static public cover assets | shipped | Selected editorial covers are stored under `/public/images/covers` and referenced from production asset metadata. |
+| Static public résumé asset | shipped | `/public/files/thiago-goulart-de-oliveira-resume.pdf`, linked from About and footer |
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |
-| Google Analytics 4 | shipped | Public route group only; measurement ID `G-XJ5W80DYKL`; tracks page views, search terms, Web Vitals, CTA clicks, Featured Insight clicks, related-article clicks, article entry, scroll depth, completion, and UTM fields |
+| Google Analytics 4 | shipped | Public route group only; measurement ID `G-XJ5W80DYKL`; tracks page views, search terms, Web Vitals, résumé downloads, CTA clicks, Featured Insight clicks, related-article clicks, article entry, scroll depth, completion, and UTM fields |
 | GitHub Pages import CLI | shipped | `npm run import:github-pages` |
 | Content validation CLI | shipped | `npm run content:validate` |
 | Taxonomy migration CLI | shipped | `npm run content:migrate-taxonomy` (dry-run by default; `-- --apply` updates DB) |
@@ -184,6 +186,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Legacy URL redirects | `src/proxy.ts` + `src/lib/legacy-post-redirect.ts` |
 | Site rework reference project plan | `docs/github-reference-project-plan.md` |
 | Editorial cover assets | Static public images for selected high-priority posts in `/public/images/covers` |
+| Résumé asset | Stable public path `/files/thiago-goulart-de-oliveira-resume.pdf` |
 
 ---
 

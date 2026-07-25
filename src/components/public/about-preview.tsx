@@ -8,7 +8,7 @@ export function AboutPreview() {
   return (
     <section
       aria-labelledby="about-preview-heading"
-      className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8"
+      className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-8"
     >
       <div className="grid gap-6 sm:grid-cols-[minmax(0,140px)_minmax(0,1fr)] sm:items-center sm:gap-8">
         <div className="mx-auto w-full max-w-[140px] sm:mx-0">
@@ -21,7 +21,7 @@ export function AboutPreview() {
         </div>
 
         <div className="min-w-0 text-center sm:text-left">
-          <h2 id="about-preview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 id="about-preview-heading" className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
             {preview.title}
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--muted)] text-pretty sm:text-lg">

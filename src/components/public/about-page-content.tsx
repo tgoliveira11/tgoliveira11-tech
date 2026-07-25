@@ -27,10 +27,10 @@ export function AboutPageContent({
     <div className="space-y-12">
       <section
         aria-labelledby="about-hero-heading"
-        className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8 lg:p-10"
+        className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-8 lg:p-10"
       >
         <div className="grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:items-start lg:gap-10">
-          <figure className="mx-auto w-full max-w-[260px] lg:mx-0">
+          <figure className="mx-auto w-full max-w-[220px] sm:max-w-[260px] lg:mx-0">
             <div className="aspect-square w-full overflow-hidden rounded-full bg-[var(--background)] shadow-[var(--shadow-sm)]">
               <AboutProfileImage
                 priority
@@ -51,14 +51,14 @@ export function AboutPageContent({
             </p>
             <h1
               id="about-hero-heading"
-              className="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-[2.5rem] lg:leading-tight"
+              className="mt-4 break-words text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-[2.5rem] lg:leading-tight"
             >
               {hero.headline}
             </h1>
             <p className="mt-4 text-lg font-medium leading-relaxed text-[var(--foreground)] text-pretty sm:text-xl">
               {hero.subheadline}
             </p>
-            <div className="mt-6 space-y-4 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+            <div className="mt-6 max-w-3xl space-y-5 text-base leading-8 text-[var(--muted)] sm:text-lg">
               {intro.map((paragraph, index) => (
                 <p key={index} className="text-pretty">
                   {paragraph}
@@ -74,9 +74,9 @@ export function AboutPageContent({
 
       <section
         aria-labelledby="about-summary-heading"
-        className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start"
+        className="grid gap-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:items-start"
       >
-        <div>
+        <div className="max-w-xl">
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-[var(--primary)]">
             Professional summary
           </p>
@@ -86,11 +86,11 @@ export function AboutPageContent({
           >
             {professionalSummary.heading}
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-[var(--muted)] text-pretty">
+          <p className="mt-5 text-base leading-8 text-[var(--muted)] text-pretty">
             {audienceNote}
           </p>
         </div>
-        <div className="space-y-4 text-base leading-relaxed text-[var(--muted)]">
+        <div className="max-w-3xl space-y-5 text-base leading-8 text-[var(--muted)]">
           {professionalSummary.paragraphs.map((paragraph) => (
             <p key={paragraph} className="text-pretty">
               {paragraph}
