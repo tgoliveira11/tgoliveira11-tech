@@ -50,7 +50,7 @@ export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }
   );
 
   return (
-    <nav aria-label="Main navigation" className="flex w-full flex-col items-end md:block">
+    <nav aria-label="Main navigation" className="flex shrink-0 flex-col items-end md:block md:min-w-0">
       <button
         type="button"
         aria-controls={menuId}
@@ -66,7 +66,12 @@ export function SiteNav({ hideSearchLink = false }: { hideSearchLink?: boolean }
         </span>
       </button>
 
-      <div id={menuId} className={`w-full ${isOpen ? "mt-3 block" : "hidden"} md:mt-0 md:block`}>
+      <div
+        id={menuId}
+        className={`absolute left-4 right-4 top-full z-30 mt-2 ${
+          isOpen ? "block" : "hidden"
+        } sm:left-6 sm:right-6 md:static md:z-auto md:mt-0 md:block md:w-full`}
+      >
         <ul className="flex flex-col gap-1 rounded-lg border border-[var(--border)] bg-[var(--card)] p-2 shadow-[var(--shadow-sm)] md:flex-row md:flex-wrap md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none">
           {visibleLinks.map((link) => {
             const isActive = link.match(pathname);

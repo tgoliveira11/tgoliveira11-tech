@@ -17,6 +17,7 @@ describe("admin header view site link", () => {
     expect(viewSiteIndex).toBeGreaterThan(-1);
     expect(themeToggleIndex).toBeGreaterThan(-1);
     expect(viewSiteIndex).toBeLessThan(themeToggleIndex);
+    expect(source).toContain('className="hidden md:inline-flex"');
   });
 
   it("uses a hamburger menu for mobile admin navigation", () => {
