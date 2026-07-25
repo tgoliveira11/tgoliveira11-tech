@@ -19,6 +19,7 @@ const PERSON_IMAGE_PATH = "/images/about/thiago-oliveira.png";
 const PERSON_KNOWS_ABOUT = [
   "Engineering Management",
   "Generative AI",
+  "Enterprise AI Platforms",
   "Agentic Systems",
   "Solution Architecture",
   "Cloud Architecture",
@@ -264,6 +265,32 @@ export function buildWebsiteJsonLd(config: BlogConfig): Record<string, unknown> 
     publisher: buildPersonJsonLd(config),
     inLanguage: "en",
   };
+}
+
+export function buildAboutPageJsonLd(config: BlogConfig): Record<string, unknown>[] {
+  const baseUrl = config.baseUrl.replace(/\/$/, "");
+
+  return [
+    buildPersonJsonLd(config),
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: SITE_NAME,
+          item: `${baseUrl}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "About",
+          item: `${baseUrl}/about`,
+        },
+      ],
+    },
+  ];
 }
 
 export function buildBlogPostingJsonLd(

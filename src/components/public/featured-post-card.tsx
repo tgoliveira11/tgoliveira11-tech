@@ -35,7 +35,7 @@ export function FeaturedPostCard({ bundle, label }: { bundle: PublicPostBundle; 
           </Link>
         ) : null}
 
-        <div className={`flex flex-col justify-center p-6 sm:p-8 ${coverAsset ? "" : "lg:col-span-2"}`}>
+        <div className={`flex min-w-0 flex-col justify-center p-4 sm:p-8 ${coverAsset ? "" : "lg:col-span-2"}`}>
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex rounded-full bg-[var(--accent-muted)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
               {displayLabel}
@@ -50,7 +50,7 @@ export function FeaturedPostCard({ bundle, label }: { bundle: PublicPostBundle; 
             ) : null}
           </div>
 
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="mt-4 break-words text-2xl font-semibold tracking-tight sm:text-4xl">
             <Link
               href={postHref}
               className="hover:text-[var(--primary)]"

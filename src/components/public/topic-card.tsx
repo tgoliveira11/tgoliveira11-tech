@@ -26,7 +26,7 @@ export function TopicCard({
         ) : null}
       </div>
       {description ? (
-        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--muted)]">
+        <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
           {description}
         </p>
       ) : null}

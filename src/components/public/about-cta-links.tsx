@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { PUBLIC_AUTHOR_PROFILE } from "@/modules/public/author-profile";
+import {
+  PUBLIC_AUTHOR_PROFILE,
+  RESUME_DOWNLOAD_FILENAME,
+} from "@/modules/public/author-profile";
 import { ABOUT_PAGE_CONTENT } from "@/modules/public/about-content";
 
 const primaryButtonClass =
@@ -11,9 +14,11 @@ const secondaryButtonClass =
 export function AboutCtaLinks({
   showBlogLink = true,
   layout = "row",
+  resumeSource = showBlogLink ? "about-hero" : "about-final-cta",
 }: {
   showBlogLink?: boolean;
   layout?: "row" | "stack";
+  resumeSource?: "about-hero" | "about-final-cta" | "home-about";
 }) {
   const { blog, profileLinks } = ABOUT_PAGE_CONTENT.ctas;
   const linkedInLink = profileLinks.find((link) => link.label === "LinkedIn");
@@ -38,11 +43,13 @@ export function AboutCtaLinks({
       {PUBLIC_AUTHOR_PROFILE.resumeUrl ? (
         <a
           href={PUBLIC_AUTHOR_PROFILE.resumeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          download={RESUME_DOWNLOAD_FILENAME}
+          aria-label="Download Thiago Goulart de Oliveira résumé as a PDF"
           className={secondaryButtonClass}
-          data-analytics-event="resume_download_click"
+          data-analytics-event="resume_download"
           data-analytics-component="about_cta"
+          data-analytics-source={resumeSource}
+          data-analytics-file={RESUME_DOWNLOAD_FILENAME}
         >
           Download résumé
         </a>

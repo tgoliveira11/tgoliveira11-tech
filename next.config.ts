@@ -14,6 +14,21 @@ const publicMetadataCacheHeader = {
   value: "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
 };
 
+const resumePdfHeaders = [
+  {
+    key: "Content-Type",
+    value: "application/pdf",
+  },
+  {
+    key: "Content-Disposition",
+    value: 'attachment; filename="thiago-goulart-de-oliveira-resume.pdf"',
+  },
+  {
+    key: "Cache-Control",
+    value: "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+  },
+];
+
 const tecleTaxiCanonicalPath =
   "/blog/2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform";
 
@@ -219,6 +234,10 @@ const nextConfig: NextConfig = {
       {
         source: "/llms-full.txt",
         headers: [publicMetadataCacheHeader],
+      },
+      {
+        source: "/files/thiago-goulart-de-oliveira-resume.pdf",
+        headers: resumePdfHeaders,
       },
     ];
   },

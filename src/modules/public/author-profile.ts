@@ -1,9 +1,10 @@
-import { readEnv } from "@/lib/env";
-
 export type PublicProfileLink = {
   label: string;
   href: string;
 };
+
+export const RESUME_PUBLIC_PATH = "/files/thiago-goulart-de-oliveira-resume.pdf" as const;
+export const RESUME_DOWNLOAD_FILENAME = "thiago-goulart-de-oliveira-resume.pdf" as const;
 
 /** Public author identity and profile links for the blog surface. */
 export const PUBLIC_AUTHOR_PROFILE = {
@@ -14,7 +15,7 @@ export const PUBLIC_AUTHOR_PROFILE = {
   email: "thiago@tgoliveira11.tech",
   github: "https://github.com/tgoliveira11",
   linkedIn: "https://www.linkedin.com/in/tgoliveira",
-  resumeUrl: readEnv("NEXT_PUBLIC_RESUME_URL") ?? readEnv("RESUME_URL") ?? null,
+  resumeUrl: RESUME_PUBLIC_PATH,
   website: "https://www.tgoliveira11.tech",
 } as const;
 

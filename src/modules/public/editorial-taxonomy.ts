@@ -19,35 +19,35 @@ export const EDITORIAL_CATEGORIES = [
     slug: "ai-engineering",
     navLabel: "AI Engineering",
     description:
-      "Production AI systems, agentic workflows, enterprise data, evaluation, governance, observability, and reliability.",
+      "Production AI, agentic systems, enterprise data, evaluation, governance, and reliability.",
   },
   {
     name: "Software & Solution Architecture",
     slug: "software-solution-architecture",
     navLabel: "Architecture",
     description:
-      "Software design, distributed systems, cloud architecture, integration, APIs, security, and architectural decision-making.",
+      "Software design, distributed systems, cloud, APIs, integration, security, and architectural decisions.",
   },
   {
     name: "Engineering Leadership",
     slug: "engineering-leadership",
-    navLabel: "Engineering Leadership",
+    navLabel: "Leadership",
     description:
-      "Engineering organizations, people management, team development, delivery systems, technical standards, and organizational effectiveness.",
+      "Teams, management, technical standards, delivery, coaching, and organizational effectiveness.",
   },
   {
     name: "Technology Strategy",
     slug: "technology-strategy",
-    navLabel: "Technology Strategy",
+    navLabel: "Strategy",
     description:
-      "Product engineering, business and technology alignment, platform strategy, commercialization, and digital products.",
+      "Product engineering, platform strategy, commercialization, and business-technology alignment.",
   },
   {
     name: "Career & Reflections",
     slug: "career-reflections",
     navLabel: "Reflections",
     description:
-      "Career development, professional reinvention, culture, learning, and personal reflections.",
+      "Career development, professional reinvention, learning, culture, and personal reflections.",
   },
 ] as const;
 

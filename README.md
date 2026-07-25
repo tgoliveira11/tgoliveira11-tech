@@ -1,220 +1,235 @@
-# PostForge
+# Thiago Goulart de Oliveira — Professional Website
 
-A **Markdown-based blog publishing platform** built with Next.js, TypeScript, PostgreSQL, Drizzle ORM, and [`@tgoliveira/secure-auth`](https://www.npmjs.com/package/@tgoliveira/secure-auth) for authentication and account management.
+This repository powers Thiago Goulart de Oliveira's professional website and technical publication platform. The site presents selected work and writing on enterprise AI, agentic systems, cloud and solution architecture, product engineering, engineering leadership, and technology strategy.
 
-PostForge is a **complete deployable application** — not an npm library. It is intended to be used as a **[GitHub Template Repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)**: each blog owner creates their **own independent repository** from the template, with their own database, content, domain, and deployment.
+[Live website](https://www.tgoliveira11.tech/) · [LinkedIn](https://www.linkedin.com/in/tgoliveira) · [GitHub](https://github.com/tgoliveira11) · [Résumé](https://www.tgoliveira11.tech/files/thiago-goulart-de-oliveira-resume.pdf)
 
-**Official template:** [github.com/tgoliveira11/postforge](https://github.com/tgoliveira11/postforge)
+## Purpose
 
-Licensed under the [MIT License](LICENSE).
+The site has three primary objectives:
 
----
+1. Present Thiago's current professional positioning as an Engineering Director.
+2. Publish practical, evidence-based technical and leadership content.
+3. Provide hiring managers, recruiters, engineers, and technology leaders with a clear view of his experience, thinking, and selected work.
 
-## Features
+The website is not intended to be a generic personal blog or a complete replacement for LinkedIn or the résumé. It is a curated professional surface built around current positioning, selected writing, and durable public discovery.
 
-- **Markdown publishing** — write in Markdown with preview, excerpts, slugs, and reading time
-- **Editorial public site** — home, blog index, post detail, search, tags, categories, RSS, sitemap
-- **Admin workspace** — writing-first post editor, assets, taxonomy, SEO, scheduling, featured/pinned posts
-- **Images & assets** — cover/OG images, upload, insert into Markdown
-- **Public listing control** — manual `publicOrder` for home/blog/tag/category lists; env-driven pagination on `/blog` (`PUBLIC_POSTS_PAGE_SIZE`, default 5)
-- **Analytics** — lightweight post view tracking
-- **Import** — GitHub Pages / Jekyll migration CLI
-- **Auth** — registration, login, 2FA, passkeys, sessions via `@tgoliveira/secure-auth`
-- **Single admin (MVP)** — one `ADMIN_EMAIL` controls publishing; other users can exist but cannot access `/admin`
+## Professional focus
 
----
+### Enterprise AI Platforms
 
-## How PostForge is intended to be used
+Production AI systems, conversational interfaces, agentic workflows, LLM orchestration, Text-to-SQL, governed enterprise data, evaluation, observability, reliability, and responsible AI adoption.
 
-| Approach | When to use |
-|----------|-------------|
-| **GitHub Template** (recommended) | You want your **own blog** — independent repo, database, and deployment |
-| **Fork** | You want to **contribute to PostForge upstream** or maintain a manual upstream relationship |
-| **npm package** | **Not supported today** — PostForge is an app, not a library (see [docs/TEMPLATE_STRATEGY.md](docs/TEMPLATE_STRATEGY.md)) |
+### Software & Solution Architecture
 
-Example independent blogs created from the template:
+Distributed systems, cloud-native platforms, APIs, integration, security, data architecture, scalability, resilience, and architectural decision-making.
 
-- `my-personal-blog`
-- `engineering-notes`
-- `daily-prayer-blog`
+### Engineering Leadership
 
-Each is a separate Git repository — not a branch of PostForge.
+Engineering strategy, team development, coaching, technical standards, cross-functional alignment, delivery systems, and organizational effectiveness.
 
----
+### Product & Technology Strategy
 
-## Create your blog from the template
+Product engineering, platform evolution, commercialization, business and technology alignment, organizational scaling, and pragmatic investment decisions.
 
-1. On GitHub, open [tgoliveira11/postforge](https://github.com/tgoliveira11/postforge) and click **Use this template** → **Create a new repository**.
-2. Clone your new repo, install dependencies, configure `.env.local`, run migrations, and start the dev server.
+## Editorial structure
 
-**Full walkthrough:** [docs/CREATE_A_BLOG.md](docs/CREATE_A_BLOG.md)
+The site uses five canonical editorial categories:
 
-> **Maintainers:** enable template mode under **Settings → General → Template repository** on the upstream PostForge repo. See [docs/TEMPLATE_STRATEGY.md](docs/TEMPLATE_STRATEGY.md).
+1. AI Engineering
+2. Software & Solution Architecture
+3. Engineering Leadership
+4. Technology Strategy
+5. Career & Reflections
 
----
+### AI Engineering
+
+Production AI systems, agentic workflows, enterprise data, evaluation, governance, observability, and reliability.
+
+### Software & Solution Architecture
+
+Software design, distributed systems, cloud architecture, APIs, integration, security, and architectural decisions.
+
+### Engineering Leadership
+
+Teams, management, technical standards, delivery, coaching, and organizational effectiveness.
+
+### Technology Strategy
+
+Product engineering, platform strategy, commercialization, and business-technology alignment.
+
+### Career & Reflections
+
+Career development, professional reinvention, learning, culture, and personal reflections.
+
+Every article should have one primary category. Categories express the main editorial domain; tags provide narrower technical context. Categories and tags must not be treated as interchangeable.
+
+## Featured content
+
+These strategic articles are published on the public site:
+
+1. [What Breaks First When Text-to-SQL Moves from Demo to Production?](https://www.tgoliveira11.tech/blog/2026-07-24-what-breaks-first-when-text-to-sql-moves-from-demo-to-production)
+2. [Software vs. Solution vs. System Architecture: Scope, Decisions and Accountability](https://www.tgoliveira11.tech/blog/2023-06-16-software-solution-system-architecture)
+3. [From Concept to Commercialization: Building and Scaling a B2B Mobility Platform](https://www.tgoliveira11.tech/blog/2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform)
+4. [From Software Engineer to Engineering Director: 24 Years of Reinvention](https://www.tgoliveira11.tech/blog/2024-10-08-a-letter-to-my-past-self)
+5. [Securing Enterprise APIs in Production: Identity, Authorization, Abuse Prevention and Observability](https://www.tgoliveira11.tech/blog/2023-06-04-api-security)
+6. [Choosing a Distributed Cache: Consistency, Availability, Cost and Operational Trade-offs](https://www.tgoliveira11.tech/blog/2022-09-16-in-memory-cache)
+7. [Evaluating Enterprise AI Systems: From Model Accuracy to Operational Trust](https://www.tgoliveira11.tech/blog/2026-07-24-evaluating-enterprise-ai-operational-trust)
+8. [Observability for Agentic Systems: Tracing Decisions, Tools, Data and Failure](https://www.tgoliveira11.tech/blog/2026-07-24-observability-agentic-systems)
+
+## Technology stack
+
+| Area | Implementation |
+|---|---|
+| Application framework | Next.js 16.2.11 App Router with React 19.2.4 |
+| Language | TypeScript 5.9.3 |
+| Package manager | npm with `package-lock.json`; CI installs with `npm ci` |
+| Content model | PostgreSQL with Drizzle ORM; DB-backed posts, revisions, categories, tags, assets, redirects, analytics, and blog settings |
+| Styling | Tailwind CSS 4.3.3 via `@tailwindcss/postcss`, global design tokens in `src/app/globals.css`, plus secure-auth and Outpost package styles |
+| Authentication | `@tgoliveira/secure-auth` 0.5.0, NextAuth integration, app-specific cookies, 2FA/passkey-capable account surfaces, and admin authorization |
+| Analytics | Google Analytics 4 measurement `G-XJ5W80DYKL` on public routes plus DB-backed post-view analytics |
+| SEO | Next metadata, canonical URLs, Open Graph/Twitter metadata, BlogPosting/Website/Person/Breadcrumb JSON-LD, dynamic sitemap, robots, RSS, and AI-readable `llms.txt` endpoints |
+| Deployment | Documented Vercel deployment with managed PostgreSQL, Neon production notes, Vercel Blob support, and manual database migrations |
+| CI | GitHub Actions for validation, branch naming, CodeQL, dependency review, Gitleaks, Semgrep, OWASP ZAP baseline, releases, and upstream sync |
+
+## Architecture
+
+The application is a site-specific fork of PostForge. PostForge remains the upstream template source; this repository carries Thiago's public positioning, editorial taxonomy, assets, analytics, and production content behavior.
+
+Public pages live under `src/app/(public)` and include home, blog listing, article detail, categories, tags, search, About, RSS, sitemap, robots, and AI discovery routes. Admin and account surfaces live under `src/app/admin`, `src/app/settings`, and the secure-auth route groups.
+
+Publishing is database-backed. Markdown content, post lifecycle state, SEO fields, category assignment, tags, cover/OG asset references, revisions, and public ordering are stored in PostgreSQL through Drizzle schemas under `src/modules`.
+
+Images use two paths:
+
+- static public assets under `public/images` and `public/files`;
+- uploaded post assets with database metadata and either local filesystem storage or Vercel Blob, selected through `UPLOAD_PROVIDER`.
+
+Public rendering uses Next `Image` for profile and post images. The Next config allows Vercel Blob hostnames and adds cache/security headers for public metadata, article pages, discovery endpoints, and the résumé PDF.
+
+## Repository structure
+
+```text
+.
+|-- src/app                 Next.js App Router routes for public pages, admin, auth, APIs, sitemap, robots, RSS, and AI discovery.
+|-- src/components          Public, admin, theme, analytics, and shared React components.
+|-- src/db                  Drizzle schema exports and database wiring.
+|-- src/lib                 Cross-cutting utilities for auth, environment parsing, email, security, pagination, uploads, and legacy redirects.
+|-- src/modules             Feature modules for posts, taxonomy, assets, analytics, public rendering, import, redirects, settings, and admin authorization.
+|-- drizzle                 Committed Drizzle migrations and migration metadata.
+|-- public                  Static assets, brand icons, About imagery, cover images, and the public résumé PDF.
+|-- scripts                 Content validation, migrations, import, upstream sync, inspection, and icon generation scripts.
+|-- docs                    Maintainer documentation for environment, deployment, releases, product surface, and upstream sync.
+|-- .github/workflows       CI, security, release, branch-name, ZAP, and upstream synchronization workflows.
+|-- docker-compose.yml      Local PostgreSQL service on host port 5434.
+```
 
 ## Local development
 
-**Prerequisites:** Node.js 20+, npm, Docker (for local PostgreSQL)
+Prerequisites: Node.js 20+, npm, and Docker when using the local PostgreSQL service.
 
 ```bash
-git clone https://github.com/<you>/<your-blog-repo>.git
-cd <your-blog-repo>
-npm install
+git clone https://github.com/tgoliveira11/tgoliveira11-tech.git
+cd tgoliveira11-tech
+npm ci
 cp .env.example .env.local
-# Edit .env.local — set ADMIN_EMAIL and secrets
 docker compose up -d
 npm run db:migrate
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+The development server runs on [http://localhost:3011](http://localhost:3011).
 
----
+| Task | Command |
+|---|---|
+| Install dependencies | `npm ci` |
+| Start development server | `npm run dev` |
+| Produce a production build | `npm run build` |
+| Serve a production build | `npm run start` |
+| Formatting | No dedicated formatting script is configured |
+| Lint | `npm run lint` |
+| Type check | `npm run typecheck` |
+| Run tests | `npm run test` |
+| Run tests with coverage | `npm run test:coverage` |
+| Validate content and internal canonical links | `npm run content:validate` |
+| Full local validation | `npm run validate` |
+| Apply database migrations | `npm run db:migrate` |
+| Open Drizzle Studio | `npm run db:studio` |
+| Generate Drizzle migrations after schema changes | `npm run db:generate` |
+| Audit dependencies | `npm run audit`, `npm run audit:prod`, `npm run audit:security`, or `npm run audit:ci` |
 
-## Environment variables
+There is no separate link-check or route-check script. The content validator checks published content, canonical internal links, taxonomy, cover assets, duplicate canonical URLs, article H1 usage, and selected SEO/content invariants when `DATABASE_URL` is configured.
 
-Copy `.env.example` to `.env.local` and set at minimum:
+## Environment configuration
 
-| Variable | Purpose |
-|----------|---------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `APP_BASE_URL` | Public site URL (e.g. `http://localhost:3000`) |
-| `NEXTAUTH_SECRET` | Auth session secret (long random string) |
-| `ADMIN_EMAIL` | Email allowed to access `/admin` |
-| `EMAIL_PROVIDER` | `console` locally (default); `resend` in production |
-| `PUBLIC_SITE_THEME` | Optional: `light` or `dark` to force public theme (hides toggle) |
+Use `.env.example` as the local template and `docs/ENVIRONMENT_VARIABLES.md` as the detailed reference. Do not commit `.env.local` or production secrets.
 
-**Full reference:** [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) · **Email:** [docs/EMAIL_PROVIDERS.md](docs/EMAIL_PROVIDERS.md)
+Important environment groups include:
 
----
+- application identity and base URLs: `APP_BASE_URL`, `APP_NAME`, `APP_SLUG`, `NEXTAUTH_URL`;
+- database: `DATABASE_URL`, `DATABASE_POOL_MAX`;
+- authentication and admin: `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, cookie isolation, session, password, WebAuthn, 2FA, OAuth, rate-limit, and account-policy variables;
+- email and transactional outbox: console or Resend provider settings plus Outpost HMAC/webhook configuration;
+- uploads: local filesystem or Vercel Blob through `UPLOAD_PROVIDER`;
+- public behavior: pagination, recent posts, category limits, forced theme, RSS and analytics settings through blog settings;
+- operations: `CRON_SECRET`, audit/security-related flags, and deployment-specific HTTPS cookie settings.
 
-## Database setup
+The public résumé path is `/files/thiago-goulart-de-oliveira-resume.pdf`, backed by `public/files/thiago-goulart-de-oliveira-resume.pdf`.
+
+## Validation and CI
+
+For code changes, run:
 
 ```bash
-docker compose up -d          # PostgreSQL on localhost:5432
-npm run db:migrate          # Apply migrations
-npm run db:studio           # Optional: Drizzle Studio UI
+npm run validate
 ```
 
-- Run `npm run db:generate` only when **you change the schema** in code — not on every fresh clone (migrations are already in the repo).
-- Auth tables come from `@tgoliveira/secure-auth` and are included in migrations.
+That command runs type checking, ESLint, test coverage, content validation, and a production build.
 
----
+GitHub Actions currently include:
 
-## First admin account
+- `CI`: `npm ci`, typecheck, lint, tests, build, and high-severity production audit;
+- `Branch name`: PR branch prefix enforcement;
+- `CodeQL`, `Dependency Review`, `Gitleaks`, `Semgrep CE`, and `OWASP ZAP Baseline`;
+- `Release`: manual release workflow;
+- `Sync upstream PostForge`: weekly/manual upstream sync PR workflow.
 
-1. Set `ADMIN_EMAIL` in `.env.local` to the email you will register with.
-2. Open `/register` and create an account with **that same email**.
-3. Sign in and open `/admin`.
+Docs-only changes may skip the full validation run when they do not affect application behavior. For README-only edits, at minimum check the Markdown diff and whitespace with `git diff --check`.
 
-Only the configured `ADMIN_EMAIL` may publish posts.
+## Maintenance practices
 
----
+This repository follows a conservative branch/PR/release model documented in `docs/contributing.md`, `docs/releasing.md`, and `docs/repo-settings.md`.
 
-## First post
+Key maintenance rules:
 
-1. In `/admin`, create a new post.
-2. Add title, slug, excerpt, and Markdown content.
-3. Upload images, set cover/OG if needed, add category and tags.
-4. Save, then publish.
-5. View the public post at `/blog/<slug>`.
+- branch before substantive work;
+- do not commit, push, open PRs, merge, tag, release, or deploy unless explicitly requested;
+- keep `CHANGELOG.md` and `docs/CURRENT_PRODUCT_SURFACE.md` updated when behavior, routes, endpoints, jobs, integrations, or shipped status changes;
+- preserve local customizations when merging upstream PostForge changes;
+- run validation before claiming code work is complete.
 
-**Step-by-step guide:** [docs/FIRST_POST.md](docs/FIRST_POST.md)
-
----
-
-## Production uploads on Vercel
-
-PostForge is a **GitHub template** — every new blog includes production-ready upload support.
-
-| Environment | `UPLOAD_PROVIDER` | Storage |
-|-------------|-------------------|---------|
-| Local dev / VPS | `local` | `./storage/uploads` via `/api/assets/...` |
-| **Vercel production** | `vercel-blob` | Vercel Blob (`@vercel/blob`) |
-
-**Local uploads are for development and VPS hosts with persistent disk.** Vercel’s serverless filesystem is ephemeral — production deploys should use **Vercel Blob**:
-
-```env
-UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<auto-set when Blob store is connected>
-```
-
-No database migration is required — existing `assets` table fields are reused.
-
-- **Vercel + Neon + Blob guide:** [docs/deployment-vercel-neon.md](docs/deployment-vercel-neon.md)
-- **Storage architecture:** [docs/STORAGE_STRATEGY.md](docs/STORAGE_STRATEGY.md)
-
----
+The upstream remote is `https://github.com/tgoliveira11/postforge.git` and is configured as fetch-only. Use the upstream sync scripts and workflow to review PostForge changes without pushing this site's customizations back to the template.
 
 ## Deployment
 
-Recommended low-cost stack:
+The documented production path is Vercel for the Next.js app, managed PostgreSQL for content and auth data, and Vercel Blob for durable uploaded assets on Vercel. The current product surface documents the canonical deployed domain as `www.tgoliveira11.tech` with Vercel and Neon.
 
-- **App:** Vercel Hobby (or any Node host)
-- **Database:** Neon Free or Supabase Free (PostgreSQL)
-- **Storage:** Vercel Blob on Vercel (`UPLOAD_PROVIDER=vercel-blob`) — **do not rely on local disk on serverless**
+Database migrations are manual. Run `npm run db:migrate` against the intended database after reviewing migration contents and before relying on changed schemas in production.
 
-**Deployment guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+Deployments should be treated separately from releases. Releases are manual and tied to the `VERSION` file, git tags, and GitHub Releases.
 
----
+## Long-term content strategy
 
-## Upgrading
+The site should remain a curated professional publication, not a catch-all blog. New content should strengthen one or more of the approved focus areas:
 
-Blogs created from the template **do not auto-update** when PostForge upstream changes. You can merge upstream manually or cherry-pick changes.
+- production AI systems, enterprise AI platforms, and agentic workflows;
+- software and solution architecture for distributed, cloud-native, secure systems;
+- engineering leadership, team development, standards, delivery, and organizational effectiveness;
+- product engineering, commercialization, platform evolution, and technology strategy;
+- career development and reflections when they support the professional narrative.
 
-**Upgrade guide:** [docs/UPGRADING_FROM_POSTFORGE.md](docs/UPGRADING_FROM_POSTFORGE.md)
-
----
-
-## Documentation
-
-| Doc | Description |
-|-----|-------------|
-| [CREATE_A_BLOG.md](docs/CREATE_A_BLOG.md) | Step-by-step: template → running blog |
-| [TEMPLATE_STRATEGY.md](docs/TEMPLATE_STRATEGY.md) | Why template vs fork vs npm |
-| [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | All env vars explained |
-| [FIRST_POST.md](docs/FIRST_POST.md) | Create and publish your first article |
-| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment checklist |
-| [deployment-vercel-neon.md](docs/deployment-vercel-neon.md) | Vercel + Neon + Vercel Blob |
-| [STORAGE_STRATEGY.md](docs/STORAGE_STRATEGY.md) | Local vs Vercel Blob storage |
-| [UPGRADING_FROM_POSTFORGE.md](docs/UPGRADING_FROM_POSTFORGE.md) | Receive upstream updates |
-| [FAQ.md](docs/FAQ.md) | Common questions |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
-| [ROADMAP.md](docs/ROADMAP.md) | Milestones and future work |
-
----
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Development server |
-| `npm run build` | Production build |
-| `npm run start` | Run production build |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript check |
-| `npm test` | Vitest unit tests |
-| `npm run validate` | typecheck + lint + test + build (pre-PR checklist) |
-| `npm run db:generate` | Generate Drizzle migrations (schema changes only) |
-| `npm run db:migrate` | Apply migrations |
-| `npm run db:studio` | Drizzle Studio |
-| `npm run import:github-pages` | Import from GitHub Pages / Jekyll |
-| `npm run audit` | `npm audit` security check |
-
----
-
-## Contributing & releases
-
-- **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) → [docs/contributing.md](docs/contributing.md)
-- **Releases:** manual GitHub Releases only — [docs/releasing.md](docs/releasing.md)
-- **Version source:** [`VERSION`](VERSION) (canonical); `package.json` `version` is synced metadata
-- **Product surface:** [docs/CURRENT_PRODUCT_SURFACE.md](docs/CURRENT_PRODUCT_SURFACE.md)
-
----
+Each article should keep a single primary category, focused tags, a useful excerpt or SEO description, canonical metadata, cover/OG imagery when appropriate, and internal links that point to canonical routes. Public discovery surfaces such as sitemap, RSS, `robots.txt`, `llms.txt`, and `llms-full.txt` should remain accurate so search engines and AI assistants can understand the site.
 
 ## License
 
 MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Thiago Oliveira.
-
-Public sites built with PostForge may show a subtle **“Powered by PostForge”** footer attribution linking to the [official repository](https://github.com/tgoliveira11/postforge). You may customize or remove it in your own blog repo if you prefer.

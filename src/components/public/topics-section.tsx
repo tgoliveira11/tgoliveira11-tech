@@ -45,7 +45,7 @@ export function TopicsSection({
                       {formatTopicPostCount(category.postCount)}
                     </p>
                     {category.description ? (
-                      <p className="mt-2 line-clamp-2 text-sm text-[var(--muted)]">
+                      <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
                         {category.description}
                       </p>
                     ) : null}

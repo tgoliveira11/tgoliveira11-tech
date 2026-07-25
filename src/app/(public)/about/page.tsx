@@ -4,7 +4,11 @@ import { PublicPageShell } from "@/components/public/public-page-shell";
 import { ABOUT_PAGE_CONTENT } from "@/modules/public/about-content";
 import { getBlogConfig } from "@/modules/public/blog-config";
 import { getHomePagePosts } from "@/modules/public/public-posts.service";
-import { buildPublicPageMetadata } from "@/modules/public/seo";
+import {
+  buildAboutPageJsonLd,
+  buildPublicPageMetadata,
+  stringifyJsonLd,
+} from "@/modules/public/seo";
 
 export async function generateMetadata() {
   const config = await getBlogConfig();
@@ -19,12 +23,17 @@ export async function generateMetadata() {
 
 export default async function AboutPage() {
   const { config, featuredInsights } = await getHomePagePosts();
+  const jsonLd = buildAboutPageJsonLd(config);
 
   return (
     <PublicLayout config={config}>
       <PublicPageShell>
         <AboutPageContent selectedInsights={featuredInsights.slice(0, 4)} />
       </PublicPageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: stringifyJsonLd(jsonLd) }}
+      />
     </PublicLayout>
   );
 }

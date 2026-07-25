@@ -32,8 +32,8 @@ export function SiteHeader({
             </div>
           </div>
 
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="-mx-2 min-w-0 flex-1 overflow-x-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="-mx-2 min-w-0 w-full px-2 lg:flex-1">
               <SiteNav />
             </div>
             <div className="hidden shrink-0 items-center gap-2 lg:flex">

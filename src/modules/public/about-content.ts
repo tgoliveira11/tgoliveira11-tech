@@ -31,7 +31,7 @@ export const ABOUT_PAGE_CONTENT = {
     "I currently lead the architecture and engineering delivery of enterprise AI products, including conversational and agent-based systems that combine LLM orchestration, structured data, APIs, Text-to-SQL, and cloud-native deployment.",
   ],
   audienceNote:
-    "The work represented here sits at the intersection of technical leadership, architectural clarity, product engineering, enterprise AI adoption, and business-aligned technology decisions.",
+    "I work where engineering leadership, architecture, enterprise AI, and product strategy meet accountable execution.",
   professionalSummary: {
     heading: "Technology, teams, and accountable execution",
     paragraphs: [
@@ -161,10 +161,10 @@ export const ABOUT_PAGE_CONTENT = {
     profileLinks: PUBLIC_PROFILE_LINKS,
   },
   preview: {
-    title: "About me",
+    title: "About Thiago",
     description:
       "Engineering Director working across enterprise AI platforms, agentic systems, cloud architecture, product engineering, and engineering leadership.",
-    ctaLabel: "Learn more about me",
+    ctaLabel: "View professional background",
   },
 } as const;
 
