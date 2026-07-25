@@ -25,7 +25,7 @@ export function TopicsSection({
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         {categories.length > 0 ? (
           <div>
-            <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center sm:gap-3">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
                 Explore by category
               </h3>
@@ -40,7 +40,7 @@ export function TopicsSection({
                     href={`/categories/${category.slug}`}
                     className="block h-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 transition hover:border-[var(--primary)] hover:shadow-[var(--shadow-sm)]"
                   >
-                    <span className="font-medium">{category.name}</span>
+                    <span className="break-words font-medium">{category.name}</span>
                     <p className="mt-1 text-xs text-[var(--muted)]">
                       {formatTopicPostCount(category.postCount)}
                     </p>
@@ -58,7 +58,7 @@ export function TopicsSection({
 
         {tags.length > 0 ? (
           <div>
-            <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center sm:gap-3">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
                 Popular tags
               </h3>
@@ -71,7 +71,7 @@ export function TopicsSection({
                 <li key={tag.id}>
                   <Link
                     href={`/tags/${tag.slug}`}
-                    className="inline-flex rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-sm transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
+                    className="inline-flex max-w-full break-words rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-sm transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
                   >
                     <span>#{tag.name}</span>
                     <span className="ml-1.5 text-xs text-[var(--muted)]">

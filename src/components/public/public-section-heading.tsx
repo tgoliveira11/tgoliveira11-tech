@@ -13,8 +13,8 @@ export function PublicSectionHeading({
 }) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h2 id={id} className="text-2xl font-semibold tracking-tight sm:text-3xl">
+      <div className="min-w-0">
+        <h2 id={id} className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
           {title}
         </h2>
         {description ? <p className="mt-2 max-w-2xl text-[var(--muted)]">{description}</p> : null}
@@ -22,7 +22,7 @@ export function PublicSectionHeading({
       {action ? (
         <Link
           href={action.href}
-          className="shrink-0 text-sm font-medium text-[var(--primary)] hover:underline"
+          className="shrink-0 self-start text-sm font-medium text-[var(--primary)] hover:underline sm:self-auto"
         >
           {action.label}
         </Link>

@@ -9,7 +9,7 @@ describe("generateDatedSlugFromTitle", () => {
   });
 
   it("removes accents and lowercases", () => {
-    expect(generateDatedSlugFromTitle("Café naïve Résumé", fixedDate)).toBe("2026-06-16-cafe-naive-resume");
+    expect(generateDatedSlugFromTitle("Café naïve façade", fixedDate)).toBe("2026-06-16-cafe-naive-facade");
   });
 
   it("replaces spaces with hyphens and collapses repeated hyphens", () => {

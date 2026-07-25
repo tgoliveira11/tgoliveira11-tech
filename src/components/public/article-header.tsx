@@ -26,9 +26,9 @@ export function ArticleHeader({ bundle }: { bundle: PublicPostBundle }) {
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">{post.title}</h1>
+        <h1 className="break-words text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">{post.title}</h1>
         {post.excerpt ? (
-          <p className="max-w-3xl text-xl leading-relaxed text-[var(--muted)]">{post.excerpt}</p>
+          <p className="max-w-3xl text-lg leading-relaxed text-[var(--muted)] sm:text-xl">{post.excerpt}</p>
         ) : null}
       </div>
 
@@ -51,7 +51,7 @@ export function ArticleHeader({ bundle }: { bundle: PublicPostBundle }) {
             <li key={tag.id}>
               <Link
                 href={`/tags/${tag.slug}`}
-                className="inline-flex rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-sm transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
+                className="inline-flex max-w-full break-words rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-sm transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
               >
                 #{tag.name}
               </Link>

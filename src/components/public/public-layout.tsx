@@ -17,7 +17,7 @@ export async function PublicLayout({
   return (
     <div className="public-site flex min-h-screen flex-col">
       <SiteHeader config={config} showAdminLink={showAdminLink} />
-      <main className={`mx-auto w-full ${PUBLIC_CONTENT_MAX_WIDTH_CLASS} flex-1 px-4 py-10 sm:px-6`}>
+      <main className={`mx-auto min-w-0 w-full ${PUBLIC_CONTENT_MAX_WIDTH_CLASS} flex-1 px-4 py-8 sm:px-6 sm:py-10`}>
         {children}
       </main>
       <SiteFooter config={config} />

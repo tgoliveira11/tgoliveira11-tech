@@ -351,11 +351,11 @@ Branch: `feature/codex-site-rework`
 - Expanded About page into the requested structure: hero, professional summary, four core areas, career progression, selected work, leadership principles, technical experience, and final CTA.
 - About selected work is queried from canonical Featured Insights instead of duplicating article metadata.
 - About metadata now includes the requested title, description, OG title, OG description, and canonical `/about`.
-- Résumé CTA is conditional on `NEXT_PUBLIC_RESUME_URL` or `RESUME_URL`; no URL was invented.
+- Public CTAs focus on selected work, LinkedIn, GitHub, and the existing contact path.
 
 ### Navigation changes
 
-- Footer now prioritizes LinkedIn, GitHub, résumé when configured, email, and RSS before editorial navigation.
+- Footer now prioritizes LinkedIn, GitHub, email, and RSS before editorial navigation.
 - Removed the obsolete SK footer link.
 - Header navigation from the previous rework remains concise and mobile-scrollable.
 
@@ -435,7 +435,7 @@ Branch: `feature/codex-site-rework`
 ### Analytics implementation
 
 - Added public conversion events documented in `docs/analytics-events.md`.
-- Events cover About visit, article entry, Featured Insight clicks, LinkedIn/résumé/GitHub/email CTAs, article CTA, related article click, article scroll depth, article completion, search results, page views, UTM fields, and Web Vitals.
+- Events cover About visit, article entry, Featured Insight clicks, LinkedIn/GitHub/email CTAs, article CTA, related article click, article scroll depth, article completion, search results, page views, UTM fields, and Web Vitals.
 - No duplicate page-view tracking was introduced.
 
 ### GitHub reference-project preparation
@@ -474,7 +474,7 @@ Branch: `feature/codex-site-rework`
 
 - Set `APP_BASE_URL`/blog `baseUrl` consistently to `https://www.tgoliveira11.tech` in production settings if not already.
 - Confirm apex-to-www redirect behavior in the hosting/CDN dashboard after deployment.
-- Configure `NEXT_PUBLIC_RESUME_URL` or `RESUME_URL` only when a verified résumé URL is available.
+- Keep professional contact paths focused on LinkedIn, GitHub, email, selected work, and technical articles.
 - Extract the attached bundle, then apply approved manuscripts to the intended DB with:
   `rm -rf /tmp/tgoliveira-codex-site-rework && unzip -q /Users/thiago.oliveira/Downloads/tgoliveira-codex-site-rework.zip -d /tmp/tgoliveira-codex-site-rework`
   `npm run content:apply-site-rework -- --apply --content-dir /tmp/tgoliveira-codex-site-rework/.codex-site-rework/approved-content`
@@ -485,4 +485,4 @@ Branch: `feature/codex-site-rework`
 
 - The local DB is empty; article body replacement/addition was implemented as a dry-run-safe migrator, not applied locally.
 - The current canonical slug policy preserves date-based public URLs to avoid losing existing URL equity.
-- The résumé CTA is intentionally hidden until a verified URL exists.
+- Public contact CTAs intentionally avoid publishing document downloads.

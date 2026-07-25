@@ -46,3 +46,9 @@ next-env.d.ts
 
 # local upload storage (UPLOAD_PROVIDER=local)
 /storage/uploads/
+
+# personal résumé/CV artifacts for this site
+/Thiago_Goulart_Resume_*.pdf
+/thiago-goulart-de-oliveira-resume.pdf
+/public/files/Thiago_Goulart_Resume_*.pdf
+/public/files/thiago-goulart-de-oliveira-resume.pdf

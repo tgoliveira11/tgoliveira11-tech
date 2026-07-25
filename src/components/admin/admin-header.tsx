@@ -9,15 +9,15 @@ const viewSiteLinkClassName =
 export function AdminHeader({ adminEmail }: { adminEmail: string }) {
   return (
     <header className="border-b border-[var(--border)] bg-[var(--card)]">
-      <div className="mx-auto flex max-w-[1000px] items-center justify-between gap-4 px-4 py-4">
-        <div>
-          <Link href="/admin" className="text-lg font-semibold">
+      <div className="mx-auto flex max-w-[1000px] flex-col items-stretch gap-3 px-3 py-3 sm:px-4 sm:py-4 md:flex-row md:items-center md:justify-between md:gap-4">
+        <div className="min-w-0">
+          <Link href="/admin" className="block truncate text-lg font-semibold">
             PostForge Admin
           </Link>
-          <p className="text-sm text-[var(--muted)]">{adminEmail}</p>
+          <p className="truncate text-sm text-[var(--muted)]">{adminEmail}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <nav aria-label="Admin quick links" className="flex flex-wrap gap-2 md:hidden">
+        <div className="flex flex-wrap items-center gap-2 md:justify-end">
+          <nav aria-label="Admin quick links" className="flex max-w-full flex-wrap gap-2 md:hidden">
             {adminNavItems.slice(0, 4).map((item) => (
               <Link
                 key={item.href}

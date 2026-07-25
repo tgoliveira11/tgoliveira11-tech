@@ -12,9 +12,9 @@ export function AdminLayout({
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <AdminHeader adminEmail={adminEmail} />
-      <div className="mx-auto flex w-full max-w-[1000px] gap-6 px-4 py-6">
+      <div className="mx-auto flex w-full max-w-[1000px] gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6">
         <AdminSidebar />
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1 overflow-hidden">{children}</main>
       </div>
     </div>
   );

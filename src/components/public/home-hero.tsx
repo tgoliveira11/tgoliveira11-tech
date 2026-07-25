@@ -13,7 +13,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
   return (
     <section
       aria-labelledby="home-hero-heading"
-      className="public-hero relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-8 sm:px-10 sm:py-12 lg:py-14"
+      className="public-hero relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-7 sm:rounded-2xl sm:px-10 sm:py-12 lg:py-14"
     >
       <div className="relative z-10 mx-auto max-w-4xl">
         <div className="text-center lg:text-left">
@@ -22,7 +22,7 @@ export function HomeHero({ primaryPostsHref }: { primaryPostsHref: string }) {
           </p>
           <h1
             id="home-hero-heading"
-            className="mt-4 break-words text-3xl font-semibold tracking-tight text-balance sm:text-5xl"
+            className="mt-4 break-words text-[2rem] font-semibold leading-tight tracking-tight text-balance sm:text-5xl"
           >
             {HOME_HERO_CONTENT.title}
           </h1>

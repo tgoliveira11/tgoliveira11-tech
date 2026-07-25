@@ -18,9 +18,9 @@ export function PublicPageHero({
           {eyebrow}
         </p>
       ) : null}
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+      <h1 className="mt-2 break-words text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{title}</h1>
       {description ? (
-        <p className="mt-3 max-w-2xl text-lg leading-relaxed text-[var(--muted)]">{description}</p>
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:text-lg">{description}</p>
       ) : null}
       {children ? <div className="mt-6 max-w-2xl">{children}</div> : null}
     </header>
