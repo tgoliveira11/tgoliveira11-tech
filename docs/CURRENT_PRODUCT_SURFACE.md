@@ -2,7 +2,7 @@
 
 Living inventory of what **tgoliveira11-tech** exposes today. Update this file when routes, endpoints, jobs, integrations, or shipped/planned status change.
 
-**Last reviewed:** 2026-07-25 (privacy cleanup, mobile-first layout audit, static editorial covers, PostForge upstream audit, conversion analytics, redirects, public discovery, and production content cleanup)
+**Last reviewed:** 2026-07-25 (mobile hamburger navigation, profile and favicon refresh, privacy cleanup, static editorial covers, PostForge upstream audit, conversion analytics, redirects, public discovery, and production content cleanup)
 **Canonical deployed domain:** `www.tgoliveira11.tech` (Vercel + Neon)
 
 ---
@@ -181,9 +181,11 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | `AUTH_COOKIE_PREFIX` | `tgoliveira11-tech` |
 | Docker Postgres container | `tgoliveira11-tech-postgres` |
 | Footer priority links | LinkedIn, GitHub, email, RSS |
+| Mobile navigation | Hamburger menus on public and Admin mobile headers |
 | Legacy URL redirects | `src/proxy.ts` + `src/lib/legacy-post-redirect.ts` |
 | Site rework reference project plan | `docs/github-reference-project-plan.md` |
 | Editorial cover assets | Static public images for selected high-priority posts in `/public/images/covers` |
+| Profile and brand assets | About portrait plus generated favicon/app-icon assets under `/public/images/about`, `/public/images/brand`, and `src/app` icon conventions |
 
 ---
 

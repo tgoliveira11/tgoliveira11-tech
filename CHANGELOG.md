@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rebalanced public CTAs and footer links around selected work, LinkedIn, GitHub, email, and RSS while preserving the site's engineering leadership, enterprise AI, architecture, product engineering, and technology strategy positioning.
 - Tightened public and admin layout defaults around mobile-first rendering, including horizontal-safe public navigation and more resilient wrapping for long titles, tags, cards, and admin headers.
+- Replace mobile public and Admin navigation with hamburger menus while preserving desktop public nav and Admin sidebar behavior.
+- Replace the About profile photo and regenerate favicon/app-icon assets from the updated portrait.
 
 ### Removed
 
