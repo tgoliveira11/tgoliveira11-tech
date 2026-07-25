@@ -13,8 +13,8 @@ const sourcePath = path.join(root, "public/images/about/thiago-oliveira.jpg");
 const brandDir = path.join(root, "public/images/brand");
 const appDir = path.join(root, "src/app");
 
-/** Face-focused crop on the profile photo (720×720 source). */
-const FACE_CROP = { left: 72, top: 96, width: 400, height: 400 };
+/** Face-focused crop on the current portrait source. */
+const FACE_CROP = { left: 260, top: 90, width: 600, height: 600 };
 
 async function buildBaseIconBuffer() {
   const size = 512;
@@ -28,7 +28,7 @@ async function buildBaseIconBuffer() {
   return sharp(sourcePath)
     .extract(FACE_CROP)
     .resize(size, size, { fit: "cover", position: "centre" })
-    .modulate({ brightness: 0.9, saturation: 0.82 })
+    .modulate({ brightness: 1.03, saturation: 0.95 })
     .sharpen({ sigma: 0.8 })
     .composite([{ input: mask, blend: "dest-in" }])
     .png()

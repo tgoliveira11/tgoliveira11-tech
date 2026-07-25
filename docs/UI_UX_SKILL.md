@@ -266,6 +266,7 @@ PublicLayout
 ### Header navigation
 
 - `SiteNav` (client): active state for Blog, Tags, Categories, Search
+- Public mobile navigation uses a hamburger button; the full horizontal nav appears from the desktop/tablet breakpoint.
 - Home `/` does not highlight nav items
 - Sticky header with backdrop blur
 - When the visitor has an authenticated session, `PublicLayout` passes `showAdminLink` to `SiteHeader`, which renders a discreet `Admin` link to `/admin` after the main nav and before the theme toggle. This is a convenience link only; `/admin` remains protected by `requireAdminSession()`.
@@ -275,7 +276,8 @@ PublicLayout
 ### Admin header navigation
 
 - `AdminHeader` includes a `View site` link to `/` before the theme toggle
-- Admin sign-out and quick links remain unchanged
+- Admin mobile navigation uses a hamburger button; the desktop sidebar remains the main Admin navigation from the desktop/tablet breakpoint.
+- Admin sign-out remains in the header actions.
 
 ### Public theme
 

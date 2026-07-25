@@ -6,8 +6,8 @@ export const ABOUT_PAGE_PATH = "/about" as const;
 export const ABOUT_PROFILE_IMAGE = {
   src: "/images/about/thiago-oliveira.png",
   alt: "Portrait of Thiago Goulart de Oliveira, Engineering Director.",
-  width: 1254,
-  height: 1254,
+  width: 1122,
+  height: 1402,
 } as const;
 
 export const ABOUT_PAGE_CONTENT = {

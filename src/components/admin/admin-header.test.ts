@@ -18,4 +18,20 @@ describe("admin header view site link", () => {
     expect(themeToggleIndex).toBeGreaterThan(-1);
     expect(viewSiteIndex).toBeLessThan(themeToggleIndex);
   });
+
+  it("uses a hamburger menu for mobile admin navigation", () => {
+    const headerSource = readFileSync(
+      resolve(process.cwd(), "src/components/admin/admin-header.tsx"),
+      "utf8"
+    );
+    const mobileMenuSource = readFileSync(
+      resolve(process.cwd(), "src/components/admin/admin-mobile-menu.tsx"),
+      "utf8"
+    );
+
+    expect(headerSource).toContain("AdminMobileMenu");
+    expect(mobileMenuSource).toContain("Toggle admin navigation");
+    expect(mobileMenuSource).toContain("aria-expanded");
+    expect(mobileMenuSource).toContain("md:hidden");
+  });
 });

@@ -28,4 +28,12 @@ describe("site header admin convenience link", () => {
     expect(source).toContain('href="/admin"');
     expect(source).toContain("Admin");
   });
+
+  it("uses a hamburger menu for mobile public navigation", () => {
+    const source = readSource("src/components/public/site-nav.tsx");
+
+    expect(source).toContain("Toggle navigation");
+    expect(source).toContain("aria-expanded");
+    expect(source).toContain("md:hidden");
+  });
 });
