@@ -23,7 +23,9 @@ export function AdminHeader({ adminEmail }: { adminEmail: string }) {
           <Link href="/" className={viewSiteLinkClassName}>
             View site
           </Link>
-          <ThemeToggle compact />
+          <span className="hidden md:inline-flex">
+            <ThemeToggle compact />
+          </span>
           <AdminSignOutButton />
         </div>
       </div>

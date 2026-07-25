@@ -181,7 +181,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | `AUTH_COOKIE_PREFIX` | `tgoliveira11-tech` |
 | Docker Postgres container | `tgoliveira11-tech-postgres` |
 | Footer priority links | LinkedIn, GitHub, email, RSS |
-| Mobile navigation | Hamburger menus on public and Admin mobile headers |
+| Mobile navigation | Hamburger menus aligned beside the public/Admin titles; mobile headers do not reserve space for theme controls |
 | Legacy URL redirects | `src/proxy.ts` + `src/lib/legacy-post-redirect.ts` |
 | Site rework reference project plan | `docs/github-reference-project-plan.md` |
 | Editorial cover assets | Static public images for selected high-priority posts in `/public/images/covers` |

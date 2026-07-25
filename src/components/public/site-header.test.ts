@@ -30,10 +30,20 @@ describe("site header admin convenience link", () => {
   });
 
   it("uses a hamburger menu for mobile public navigation", () => {
-    const source = readSource("src/components/public/site-nav.tsx");
+    const headerSource = readSource("src/components/public/site-header.tsx");
+    const navSource = readSource("src/components/public/site-nav.tsx");
 
-    expect(source).toContain("Toggle navigation");
-    expect(source).toContain("aria-expanded");
-    expect(source).toContain("md:hidden");
+    expect(navSource).toContain("Toggle navigation");
+    expect(navSource).toContain("aria-expanded");
+    expect(navSource).toContain("md:hidden");
+    expect(navSource).toContain("absolute left-4 right-4 top-full");
+    expect(headerSource).toContain("grid-cols-[minmax(0,1fr)_auto]");
+  });
+
+  it("shows the theme toggle only from the desktop navigation breakpoint", () => {
+    const source = readSource("src/components/public/site-header.tsx");
+
+    expect(source).toContain('className="hidden shrink-0 items-center gap-2 md:flex"');
+    expect(source).not.toContain("lg:hidden");
   });
 });
