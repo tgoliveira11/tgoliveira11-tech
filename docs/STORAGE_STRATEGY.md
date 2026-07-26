@@ -46,7 +46,7 @@ Admin upload (POST /api/admin/posts/[id]/assets)
 | `vercel-blob` | `VercelBlobStorageProvider` |
 | other | Configuration error |
 
-`BLOB_READ_WRITE_TOKEN` is required **only** when `UPLOAD_PROVIDER=vercel-blob`.
+Vercel Blob authentication prefers short-lived OIDC credentials (`VERCEL_OIDC_TOKEN` plus `BLOB_STORE_ID`). `BLOB_READ_WRITE_TOKEN` remains a fallback for runtimes where OIDC is unavailable.
 
 ### Storage key convention
 
@@ -100,12 +100,12 @@ Existing `assets` table columns:
 | Aspect | Behavior |
 |--------|----------|
 | Package | `@vercel/blob` |
-| Upload | `put(pathname, buffer, { access: "public", contentType, token })` |
+| Upload | `put(pathname, buffer, { access: "public", contentType, ...credentials })` |
 | Public URL | Returned by `put()` — stored in `assets.publicUrl` |
 | Storage key | Blob `pathname` — stored in `assets.storageKey` |
 | Serving | **Direct Blob URL** — no `/api/assets` proxy |
-| Delete | `del(storageKey, { token })` |
-| Token | `BLOB_READ_WRITE_TOKEN` **required** |
+| Delete | `del(storageKey, credentials)` |
+| Authentication | OIDC (`VERCEL_OIDC_TOKEN` + `BLOB_STORE_ID`) preferred; `BLOB_READ_WRITE_TOKEN` fallback |
 
 **Ignored env vars:** `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`
 
@@ -113,7 +113,7 @@ Existing `assets` table columns:
 
 ### Vercel production manual test
 
-1. Connect Vercel Blob store (public) → confirm `BLOB_READ_WRITE_TOKEN`.
+1. Connect the public Vercel Blob store to the required environments and confirm `BLOB_STORE_ID`.
 2. Set `UPLOAD_PROVIDER=vercel-blob` → redeploy.
 3. Upload image → `publicUrl` contains `blob.vercel-storage.com`.
 4. Publish post → image renders on public site.
@@ -132,7 +132,9 @@ Full guide: [deployment-vercel-neon.md](deployment-vercel-neon.md)
 | `publicUrl` | `/api/assets/posts/...` | `https://...blob.vercel-storage.com/...` |
 | Serving | `/api/assets/[...path]` | Direct URL |
 | Delete | Filesystem `rm` | `del(storageKey)` |
-| `BLOB_READ_WRITE_TOKEN` | Not required | Required |
+| `BLOB_STORE_ID` | Not required | Required with OIDC |
+| `VERCEL_OIDC_TOKEN` | Not required | Supplied at runtime with OIDC |
+| `BLOB_READ_WRITE_TOKEN` | Not required | Fallback when OIDC is unavailable |
 | `UPLOAD_LOCAL_DIR` | Used | Ignored |
 | `UPLOAD_PUBLIC_BASE_URL` | Used | Ignored |
 | `UPLOAD_MAX_FILE_SIZE_BYTES` | Used | Used |
@@ -186,7 +188,7 @@ Configure Vercel:
 
 ```env
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=...
+BLOB_STORE_ID=...
 ```
 
 - **Existing local assets** — keep `/api/assets/...` URLs in DB

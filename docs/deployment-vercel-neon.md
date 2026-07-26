@@ -104,15 +104,15 @@ Vercel does not run migrations automatically.
 3. Create a store with **public** access (blog images are served via public URLs).
 4. **Connect** the store to your project.
 
-Vercel automatically adds **`BLOB_READ_WRITE_TOKEN`** to environment variables when the store is connected.
+Vercel adds **`BLOB_STORE_ID`** to the connected environments and supplies a short-lived **`VERCEL_OIDC_TOKEN`** at runtime.
 
-### Confirm the token
+### Confirm the OIDC connection
 
 1. Vercel project → **Settings → Environment Variables**.
-2. Verify `BLOB_READ_WRITE_TOKEN` exists for **Production** (and Preview if needed).
-3. The value is set by Vercel — do not commit it to Git.
+2. Verify `BLOB_STORE_ID` exists for **Production** (and Preview/Development when needed).
+3. Do not persist or commit `VERCEL_OIDC_TOKEN`; Vercel injects it into the runtime.
 
-If the token is missing:
+If the store ID is missing:
 
 - Re-connect the Blob store to the project
 - Or create the store from the same Vercel team/account as the project
@@ -137,7 +137,7 @@ AUTH_COOKIE_SECURE=true
 
 # Storage (Vercel Blob)
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<set-by-vercel-when-blob-connected>
+BLOB_STORE_ID=<set-by-vercel-when-blob-connected>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 
 # Email (Resend — each blog owner uses their own account/domain)
@@ -179,7 +179,7 @@ Push to `main` or click **Redeploy** after env vars are set.
 ## 8. Manual upload test (Vercel production)
 
 1. Connect or create a Vercel Blob store (public access).
-2. Confirm `BLOB_READ_WRITE_TOKEN` in Vercel env.
+2. Confirm `BLOB_STORE_ID` in each connected Vercel environment.
 3. Set `UPLOAD_PROVIDER=vercel-blob`.
 4. Redeploy.
 5. Login to `/admin`.
@@ -238,7 +238,7 @@ Then in Vercel env:
 
 ```env
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<from-vercel-blob-store>
+BLOB_STORE_ID=<from-connected-vercel-blob-store>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 ```
 
@@ -256,11 +256,11 @@ See also [UPGRADING_FROM_POSTFORGE.md](UPGRADING_FROM_POSTFORGE.md).
 
 ## Troubleshooting
 
-### Upload fails with “BLOB_READ_WRITE_TOKEN is required”
+### Upload fails with “Vercel Blob credentials are required”
 
-- `UPLOAD_PROVIDER=vercel-blob` is set but token is missing
+- `UPLOAD_PROVIDER=vercel-blob` is set but neither OIDC nor a fallback token is available
 - Connect Blob store to project in Vercel Storage dashboard
-- Redeploy after env var appears
+- Include the environment in the store connection, then redeploy or rerun the CLI command
 
 ### Upload works locally but not on Vercel
 

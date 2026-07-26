@@ -115,7 +115,7 @@ In Vercel:
 
 ```env
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<from-connected-blob-store>
+BLOB_STORE_ID=<from-connected-blob-store>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 ```
 

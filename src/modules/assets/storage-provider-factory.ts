@@ -1,6 +1,8 @@
 import {
   readBlobReadWriteToken,
+  readBlobStoreId,
   readUploadProvider,
+  readVercelOidcToken,
   type UploadProviderName,
 } from "@/lib/env";
 import { LocalStorageProvider } from "./local-storage-provider";
@@ -26,10 +28,19 @@ export function createStorageProvider(providerName?: UploadProviderName): Storag
     return new LocalStorageProvider();
   }
 
-  const token = readBlobReadWriteToken();
-  if (!token) {
-    throw new Error("BLOB_READ_WRITE_TOKEN is required when UPLOAD_PROVIDER=vercel-blob");
+  const oidcToken = readVercelOidcToken();
+  const storeId = readBlobStoreId();
+  if (oidcToken && storeId) {
+    return new VercelBlobStorageProvider({ oidcToken, storeId });
   }
 
-  return new VercelBlobStorageProvider(token);
+  const token = readBlobReadWriteToken();
+  if (token) {
+    return new VercelBlobStorageProvider({ token });
+  }
+
+  throw new Error(
+    "Vercel Blob credentials are required when UPLOAD_PROVIDER=vercel-blob; set " +
+      "VERCEL_OIDC_TOKEN with BLOB_STORE_ID or BLOB_READ_WRITE_TOKEN"
+  );
 }

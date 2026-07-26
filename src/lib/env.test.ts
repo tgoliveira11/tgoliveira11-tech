@@ -3,6 +3,7 @@ import {
   readAdminEmail,
   readAnalyticsStoreRawIp,
   readBlobReadWriteToken,
+  readBlobStoreId,
   readEmailFrom,
   readEmailProvider,
   readEmailReplyTo,
@@ -12,6 +13,7 @@ import {
   readUploadMaxFileSizeBytes,
   readUploadProvider,
   readUploadPublicBaseUrl,
+  readVercelOidcToken,
   requireEnv,
 } from "@/lib/env";
 
@@ -100,6 +102,8 @@ describe("upload configuration readers", () => {
     STORAGE_MAX_UPLOAD_BYTES: process.env.STORAGE_MAX_UPLOAD_BYTES,
     UPLOAD_PROVIDER: process.env.UPLOAD_PROVIDER,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+    BLOB_STORE_ID: process.env.BLOB_STORE_ID,
+    VERCEL_OIDC_TOKEN: process.env.VERCEL_OIDC_TOKEN,
   };
 
   afterEach(() => {
@@ -142,12 +146,21 @@ describe("upload configuration readers", () => {
     expect(readUploadMaxFileSizeBytes()).toBe(5 * 1024 * 1024);
   });
 
-  it("reads upload provider and blob token", () => {
+  it("reads upload provider and Blob credentials", () => {
     process.env.UPLOAD_PROVIDER = "vercel-blob";
     process.env.BLOB_READ_WRITE_TOKEN = "token";
+    process.env.BLOB_STORE_ID = "store-1";
+    process.env.VERCEL_OIDC_TOKEN = "oidc-token";
 
     expect(readUploadProvider()).toBe("vercel-blob");
     expect(readBlobReadWriteToken()).toBe("token");
+    expect(readBlobStoreId()).toBe("store-1");
+    expect(readVercelOidcToken()).toBe("oidc-token");
+  });
+
+  it("ignores the masked value emitted by Vercel CLI pulls", () => {
+    process.env.BLOB_READ_WRITE_TOKEN = "[SENSITIVE]";
+    expect(readBlobReadWriteToken()).toBeUndefined();
   });
 });
 

@@ -169,7 +169,9 @@ Applies to public pages only. Admin theme toggle remains available when forced.
 | `UPLOAD_PROVIDER` | Storage backend selector | `local` | Always — `local` or `vercel-blob` |
 | `UPLOAD_LOCAL_DIR` | Local upload directory | `./storage/uploads` | **`local` only** — ignored for `vercel-blob` |
 | `UPLOAD_PUBLIC_BASE_URL` | Public URL prefix for assets | `/api/assets` | **`local` only** — ignored for `vercel-blob` |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read-write token | — | **`vercel-blob` only** — auto-set when Blob store is connected |
+| `BLOB_STORE_ID` | Connected Vercel Blob store identifier | — | **`vercel-blob` with OIDC** — set by the store connection |
+| `VERCEL_OIDC_TOKEN` | Short-lived Vercel workload identity | — | **`vercel-blob` with OIDC** — injected by Vercel deployments or `vercel env run` |
+| `BLOB_READ_WRITE_TOKEN` | Legacy Vercel Blob read-write token | — | **`vercel-blob` fallback** for non-OIDC runtimes |
 | `UPLOAD_MAX_FILE_SIZE_BYTES` | Max upload size in bytes | `5242880` (5 MB) | Both providers |
 | `UPLOAD_MAX_FILE_SIZE` | Alias for max size | — | Same as above |
 | `STORAGE_MAX_UPLOAD_BYTES` | Another alias | — | Supported in code |
@@ -181,13 +183,15 @@ Applies to public pages only. Admin theme toggle remains available when forced.
 | `UPLOAD_PROVIDER` | `local` | `vercel-blob` |
 | `UPLOAD_LOCAL_DIR` | Required (or default) | **Not used** |
 | `UPLOAD_PUBLIC_BASE_URL` | Required (or default) | **Not used** |
-| `BLOB_READ_WRITE_TOKEN` | **Not used** | **Required** |
+| `BLOB_STORE_ID` | **Not used** | **Required with OIDC** |
+| `VERCEL_OIDC_TOKEN` | **Not used** | Supplied at runtime with OIDC |
+| `BLOB_READ_WRITE_TOKEN` | **Not used** | Fallback when OIDC is unavailable |
 | `UPLOAD_MAX_FILE_SIZE_BYTES` | Optional (default 5 MB) | Optional (default 5 MB) |
 
 ### Provider rules
 
 - `UPLOAD_PROVIDER=local` → files on disk, served via `/api/assets/[...path]`; no Blob token
-- `UPLOAD_PROVIDER=vercel-blob` → files in Vercel Blob, public URLs from `put()`; `BLOB_READ_WRITE_TOKEN` required at upload/delete time
+- `UPLOAD_PROVIDER=vercel-blob` → files in Vercel Blob, public URLs from `put()`; OIDC (`VERCEL_OIDC_TOKEN` + `BLOB_STORE_ID`) is preferred, with `BLOB_READ_WRITE_TOKEN` as a fallback
 - Provider is selected at runtime by `storage-provider-factory.ts` from `UPLOAD_PROVIDER`
 - Storage keys use shared convention: `posts/{postId}/{safeFilename}` via `buildPostAssetStorageKey()`
 - **No database migration** — `assets.storageProvider`, `assets.storageKey`, `assets.publicUrl` are reused
@@ -205,9 +209,11 @@ UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 
 ```env
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<set-by-vercel-when-blob-connected>
+BLOB_STORE_ID=<set-by-vercel-when-blob-connected>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 ```
+
+Vercel supplies `VERCEL_OIDC_TOKEN` at runtime. For local production operations, run the command through `vercel env run -e production -- <command>`; do not persist the OIDC token.
 
 Do **not** set `UPLOAD_LOCAL_DIR` or `UPLOAD_PUBLIC_BASE_URL` for `vercel-blob` — they are ignored.
 
@@ -280,7 +286,7 @@ EMAIL_FROM="PostForge <noreply@localhost>"
 - `APP_BASE_URL` / `NEXTAUTH_URL` set to your HTTPS domain
 - `AUTH_COOKIE_SECURE=true` (HTTPS)
 - Managed PostgreSQL `DATABASE_URL`
-- `UPLOAD_PROVIDER=vercel-blob` + `BLOB_READ_WRITE_TOKEN` (from connected Blob store)
+- `UPLOAD_PROVIDER=vercel-blob` + connected `BLOB_STORE_ID`; Vercel supplies OIDC at runtime
 - **Do not** rely on `UPLOAD_LOCAL_DIR` on serverless — see [STORAGE_STRATEGY.md](STORAGE_STRATEGY.md)
 - OAuth secrets if using social login
 - Transactional email via Resend — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md)
@@ -288,7 +294,7 @@ EMAIL_FROM="PostForge <noreply@localhost>"
 ### Production on VPS (alternative)
 
 - `UPLOAD_PROVIDER=local` with persistent `UPLOAD_LOCAL_DIR` on mounted disk
-- No `BLOB_READ_WRITE_TOKEN` required
+- No Blob credentials required
 
 ---
 

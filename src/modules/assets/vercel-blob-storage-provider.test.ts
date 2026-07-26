@@ -18,8 +18,43 @@ describe("VercelBlobStorageProvider", () => {
     delMock.mockReset();
   });
 
-  it("requires a token at construction", () => {
-    expect(() => new VercelBlobStorageProvider("")).toThrow(/BLOB_READ_WRITE_TOKEN/);
+  it("requires valid credentials at construction", () => {
+    expect(() => new VercelBlobStorageProvider("")).toThrow(/Vercel Blob credentials/);
+    expect(
+      () => new VercelBlobStorageProvider({ oidcToken: "", storeId: "store-1" })
+    ).toThrow(/Vercel Blob credentials/);
+  });
+
+  it("uploads and deletes with OIDC credentials", async () => {
+    putMock.mockResolvedValue({
+      pathname: "posts/post-1/photo.png",
+      url: "https://abc.public.blob.vercel-storage.com/posts/post-1/photo.png",
+    });
+
+    const provider = new VercelBlobStorageProvider({
+      oidcToken: "test-oidc-token",
+      storeId: "store-1",
+    });
+
+    await provider.upload({
+      storageKey: "posts/post-1/photo.png",
+      buffer: Buffer.from("image-bytes"),
+      mimeType: "image/png",
+    });
+    await provider.delete("posts/post-1/photo.png");
+
+    expect(putMock).toHaveBeenCalledWith(
+      "posts/post-1/photo.png",
+      expect.any(Buffer),
+      expect.objectContaining({
+        oidcToken: "test-oidc-token",
+        storeId: "store-1",
+      })
+    );
+    expect(delMock).toHaveBeenCalledWith("posts/post-1/photo.png", {
+      oidcToken: "test-oidc-token",
+      storeId: "store-1",
+    });
   });
 
   it("uploads with public access and returns Blob URL metadata", async () => {

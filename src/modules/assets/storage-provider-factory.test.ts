@@ -11,6 +11,9 @@ describe("storage provider factory", () => {
 
   beforeEach(() => {
     process.env = { ...originalEnv };
+    delete process.env.BLOB_READ_WRITE_TOKEN;
+    delete process.env.BLOB_STORE_ID;
+    delete process.env.VERCEL_OIDC_TOKEN;
   });
 
   afterEach(() => {
@@ -38,9 +41,18 @@ describe("storage provider factory", () => {
     expect(provider.name).toBe("vercel-blob");
   });
 
-  it("requires BLOB_READ_WRITE_TOKEN only for vercel-blob", () => {
-    delete process.env.BLOB_READ_WRITE_TOKEN;
-    expect(() => createStorageProvider("vercel-blob")).toThrow(/BLOB_READ_WRITE_TOKEN/);
+  it("returns VercelBlobStorageProvider for Vercel OIDC credentials", () => {
+    process.env.VERCEL_OIDC_TOKEN = "test-oidc-token";
+    process.env.BLOB_STORE_ID = "store-1";
+
+    const provider = createStorageProvider("vercel-blob");
+
+    expect(provider).toBeInstanceOf(VercelBlobStorageProvider);
+    expect(provider.name).toBe("vercel-blob");
+  });
+
+  it("requires Blob credentials only for vercel-blob", () => {
+    expect(() => createStorageProvider("vercel-blob")).toThrow(/Vercel Blob credentials/);
     expect(() => createStorageProvider("local")).not.toThrow();
   });
 
