@@ -27,9 +27,11 @@ Use **`UPLOAD_PROVIDER=vercel-blob`** with a connected Vercel Blob store:
 
 ```env
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<set-by-vercel>
+BLOB_STORE_ID=<set-by-vercel>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 ```
+
+Vercel injects a short-lived `VERCEL_OIDC_TOKEN` at runtime. A long-lived `BLOB_READ_WRITE_TOKEN` is supported only as a fallback for environments without OIDC.
 
 The default `LocalStorageProvider` (`UPLOAD_PROVIDER=local`) writes to disk — ephemeral on serverless.
 
@@ -70,7 +72,7 @@ DATABASE_URL="postgres://..." npm run db:migrate
 Re-run after pulling analytics enrichment changes if `/admin/analytics` shows a migration warning.
 
 5. **Vercel Blob** — Vercel project → **Storage** → create/connect **Blob** store (public access).
-6. **Confirm token** — `BLOB_READ_WRITE_TOKEN` appears in env when store is connected.
+6. **Confirm OIDC connection** — `BLOB_STORE_ID` appears for each connected environment; Vercel supplies `VERCEL_OIDC_TOKEN` at runtime.
 7. **Set production env vars:**
 
 ```env
@@ -82,7 +84,7 @@ ADMIN_EMAIL=you@example.com
 CRON_SECRET=<long-random-secret>
 AUTH_COOKIE_SECURE=true
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<set-by-vercel>
+BLOB_STORE_ID=<set-by-vercel>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=<from-resend-dashboard>
@@ -119,7 +121,7 @@ npm run build
 npm run db:generate
 ```
 
-Then set Vercel env (`UPLOAD_PROVIDER=vercel-blob`, `BLOB_READ_WRITE_TOKEN=...`) and redeploy.
+Then connect the Blob store, set `UPLOAD_PROVIDER=vercel-blob`, confirm `BLOB_STORE_ID`, and redeploy.
 
 - Existing local assets keep `/api/assets/...` URLs in the database
 - New uploads use Blob URLs

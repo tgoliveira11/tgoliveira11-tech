@@ -162,12 +162,12 @@ Then in Vercel → **Settings → Environment Variables** (Production):
 
 ```env
 UPLOAD_PROVIDER=vercel-blob
-BLOB_READ_WRITE_TOKEN=<from-connected-blob-store>
+BLOB_STORE_ID=<from-connected-blob-store>
 UPLOAD_MAX_FILE_SIZE_BYTES=5242880
 ```
 
 1. Create/connect a **Vercel Blob** store (public access) in Vercel **Storage**.
-2. Confirm `BLOB_READ_WRITE_TOKEN` is set automatically.
+2. Confirm `BLOB_STORE_ID` is connected; Vercel supplies `VERCEL_OIDC_TOKEN` at runtime.
 3. Redeploy.
 
 **No DB migration** — existing `assets` table fields (`storageProvider`, `storageKey`, `publicUrl`) are sufficient.

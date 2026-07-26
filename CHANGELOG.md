@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Prefer short-lived Vercel OIDC credentials for Blob uploads and deletes while retaining `BLOB_READ_WRITE_TOKEN` as a compatibility fallback.
 - Rebalanced public CTAs and footer links around selected work, LinkedIn, GitHub, and RSS while preserving the site's engineering leadership, enterprise AI, architecture, product engineering, and technology strategy positioning.
 - Tightened public and admin layout defaults around mobile-first rendering, including horizontal-safe public navigation and more resilient wrapping for long titles, tags, cards, and admin headers.
 - Replace mobile public and Admin navigation with hamburger menus while preserving desktop public nav and Admin sidebar behavior.

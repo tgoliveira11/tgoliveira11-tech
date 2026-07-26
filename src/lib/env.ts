@@ -80,7 +80,16 @@ export function readUploadProvider(): string | undefined {
 }
 
 export function readBlobReadWriteToken(): string | undefined {
-  return readEnv("BLOB_READ_WRITE_TOKEN");
+  const value = readEnv("BLOB_READ_WRITE_TOKEN");
+  return value === "[SENSITIVE]" ? undefined : value;
+}
+
+export function readBlobStoreId(): string | undefined {
+  return readEnv("BLOB_STORE_ID");
+}
+
+export function readVercelOidcToken(): string | undefined {
+  return readEnv("VERCEL_OIDC_TOKEN");
 }
 
 const DEFAULT_PUBLIC_POSTS_PAGE_SIZE = 5;

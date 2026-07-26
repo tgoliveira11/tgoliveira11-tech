@@ -148,7 +148,7 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | PostgreSQL (Drizzle) | shipped | Neon in prod; Docker `5434` locally |
 | `@tgoliveira/secure-auth` | shipped | `^0.5.0` — production rate limit + forwarded headers via env |
 | `@tgoliveira/outpost` | shipped | `^1.2.0` — transactional email outbox + admin UI |
-| Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER` |
+| Vercel Blob / local storage | shipped | `UPLOAD_PROVIDER`; short-lived Vercel OIDC preferred for Blob, legacy read-write token fallback supported |
 | Static public cover assets | shipped | Selected editorial covers are stored under `/public/images/covers` and referenced from production asset metadata. |
 | Vercel Speed Insights | shipped | Optional |
 | Email providers | shipped | Resend / SMTP / console — see [EMAIL_PROVIDERS.md](EMAIL_PROVIDERS.md) |

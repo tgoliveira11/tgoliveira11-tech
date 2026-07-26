@@ -329,7 +329,7 @@ All actions call `requireAdminSession()` before handling requests.
 
 - Storage uses `StorageProvider` with env-driven provider selection (`UPLOAD_PROVIDER`: `local` | `vercel-blob`).
 - **Local:** `LocalStorageProvider` + `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`.
-- **Vercel Blob:** `VercelBlobStorageProvider` (`@vercel/blob` put/del) + `BLOB_READ_WRITE_TOKEN`; shared keys via `buildPostAssetStorageKey()`.
+- **Vercel Blob:** `VercelBlobStorageProvider` (`@vercel/blob` put/del) with OIDC preferred and `BLOB_READ_WRITE_TOKEN` fallback; shared keys via `buildPostAssetStorageKey()`.
 - Factory: `storage-provider-factory.ts`; no DB schema changes.
 - Upload: `POST /api/admin/posts/[id]/assets` (multipart) → `uploadPostAsset()` in `assets.service.ts`.
 - Serving: `GET /api/assets/[...path]` streams files from local storage with cache headers.
@@ -357,7 +357,7 @@ All actions call `requireAdminSession()` before handling requests.
 - [x] `VercelBlobStorageProvider` (`@vercel/blob`, `access: "public"`)
 - [x] `storage-provider-factory.ts` — `UPLOAD_PROVIDER` env switch (`local` | `vercel-blob`)
 - [x] `storage-keys.ts` — shared `buildPostAssetStorageKey()` → `posts/{postId}/{safeFilename}`
-- [x] Env config: `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`, `BLOB_READ_WRITE_TOKEN`
+- [x] Env config: `UPLOAD_LOCAL_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `UPLOAD_MAX_FILE_SIZE_BYTES`, `BLOB_STORE_ID`, optional `BLOB_READ_WRITE_TOKEN` fallback
 - [x] Remote URL rendering (`isRemoteAssetUrl`, `PostImage` unoptimized, `next.config.ts` remotePatterns)
 - [x] No DB migration — reuses `assets.storageProvider`, `storageKey`, `publicUrl`
 
