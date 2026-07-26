@@ -42,7 +42,7 @@ Template source lives in `src/lib/email/templates/`.
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=<from Resend dashboard>
 EMAIL_FROM="Thiago Goulart de Oliveira <noreply@mail.tgoliveira11.tech>"
-EMAIL_REPLY_TO="thiago@tgoliveira11.tech"
+EMAIL_REPLY_TO="reply-to@your-domain.com"
 APP_BASE_URL=https://tgoliveira11-tech.vercel.app
 ```
 

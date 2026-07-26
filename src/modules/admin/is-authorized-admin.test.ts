@@ -15,7 +15,7 @@ describe("isAuthorizedAdmin", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.ADMIN_EMAIL = "tgoliveira11@gmail.com";
+    process.env.ADMIN_EMAIL = "admin@example.com";
     selectMock.mockReturnValue({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
@@ -31,7 +31,7 @@ describe("isAuthorizedAdmin", () => {
 
   it("allows configured bootstrap admin email", async () => {
     await expect(
-      isAuthorizedAdmin({ id: "u1", email: "tgoliveira11@gmail.com" })
+      isAuthorizedAdmin({ id: "u1", email: "admin@example.com" })
     ).resolves.toBe(true);
     expect(selectMock).not.toHaveBeenCalled();
   });

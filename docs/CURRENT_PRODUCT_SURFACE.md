@@ -180,8 +180,9 @@ API security env vars: see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 | Dev port | `3011` |
 | `AUTH_COOKIE_PREFIX` | `tgoliveira11-tech` |
 | Docker Postgres container | `tgoliveira11-tech-postgres` |
-| Footer priority links | LinkedIn, GitHub, email, RSS |
+| Footer priority links | LinkedIn, GitHub, RSS; no public email address or direct email action |
 | Mobile navigation | Hamburger menus aligned beside the public/Admin titles; mobile headers do not reserve space for theme controls |
+| Privacy-sensitive public feeds | `/rss.xml`, `/llms.txt`, and `/llms-full.txt` use `no-store` so content removals do not remain in shared caches |
 | Legacy URL redirects | `src/proxy.ts` + `src/lib/legacy-post-redirect.ts` |
 | Site rework reference project plan | `docs/github-reference-project-plan.md` |
 | Editorial cover assets | Static public images for selected high-priority posts in `/public/images/covers` |

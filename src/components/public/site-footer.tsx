@@ -52,16 +52,6 @@ export function SiteFooter({ config }: { config: BlogConfig }) {
               </li>
               <li>
                 <a
-                  href={`mailto:${PUBLIC_AUTHOR_PROFILE.email}`}
-                  className="hover:text-[var(--primary)]"
-                  data-analytics-event="email_contact_click"
-                  data-analytics-component="site_footer"
-                >
-                  Email
-                </a>
-              </li>
-              <li>
-                <a
                   href="/rss.xml"
                   target="_blank"
                   rel="noopener noreferrer"

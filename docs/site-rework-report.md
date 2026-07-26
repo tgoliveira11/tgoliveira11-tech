@@ -351,11 +351,11 @@ Branch: `feature/codex-site-rework`
 - Expanded About page into the requested structure: hero, professional summary, four core areas, career progression, selected work, leadership principles, technical experience, and final CTA.
 - About selected work is queried from canonical Featured Insights instead of duplicating article metadata.
 - About metadata now includes the requested title, description, OG title, OG description, and canonical `/about`.
-- Public CTAs focus on selected work, LinkedIn, GitHub, and the existing contact path.
+- Public CTAs focus on selected work, LinkedIn, and GitHub.
 
 ### Navigation changes
 
-- Footer now prioritizes LinkedIn, GitHub, email, and RSS before editorial navigation.
+- Footer now prioritizes LinkedIn, GitHub, and RSS before editorial navigation.
 - Removed the obsolete SK footer link.
 - Header navigation from the previous rework remains concise and mobile-scrollable.
 
@@ -373,7 +373,7 @@ Branch: `feature/codex-site-rework`
 
 - Added native permanent redirects in `next.config.ts` for:
   - apex host to canonical `www`;
-  - strategic article aliases for Text-to-SQL, architecture, TecleTaxi, and career articles;
+  - strategic article aliases for Text-to-SQL, architecture, mobility-platform, and career articles;
   - legacy category aliases to the five canonical editorial categories.
 - Existing DB-backed and route-level redirect handling remains for dynamic legacy paths and tag aliases.
 
@@ -395,7 +395,7 @@ Branch: `feature/codex-site-rework`
   - Text-to-SQL
   - Architecture
   - Career
-  - TecleTaxi
+  - B2B mobility platform
   - API security
   - Distributed cache
   - AI evaluation
@@ -404,7 +404,7 @@ Branch: `feature/codex-site-rework`
 
 ### Image changes and missing images
 
-- Added required alt text fallbacks for Text-to-SQL, TecleTaxi, architecture, career, API security, and cache strategic articles.
+- Added required alt text fallbacks for Text-to-SQL, the B2B mobility platform, architecture, career, API security, and cache strategic articles.
 - No fake bitmap or unrelated stock art was added.
 - Article-specific production image assets remain a database/Vercel Blob content operation.
 
@@ -435,7 +435,7 @@ Branch: `feature/codex-site-rework`
 ### Analytics implementation
 
 - Added public conversion events documented in `docs/analytics-events.md`.
-- Events cover About visit, article entry, Featured Insight clicks, LinkedIn/GitHub/email CTAs, article CTA, related article click, article scroll depth, article completion, search results, page views, UTM fields, and Web Vitals.
+- Events cover About visit, article entry, Featured Insight clicks, LinkedIn/GitHub CTAs, article CTA, related article click, article scroll depth, article completion, search results, page views, UTM fields, and Web Vitals.
 - No duplicate page-view tracking was introduced.
 
 ### GitHub reference-project preparation
@@ -474,7 +474,7 @@ Branch: `feature/codex-site-rework`
 
 - Set `APP_BASE_URL`/blog `baseUrl` consistently to `https://www.tgoliveira11.tech` in production settings if not already.
 - Confirm apex-to-www redirect behavior in the hosting/CDN dashboard after deployment.
-- Keep professional contact paths focused on LinkedIn, GitHub, email, selected work, and technical articles.
+- Keep professional contact paths focused on LinkedIn, GitHub, selected work, and technical articles.
 - Extract the attached bundle, then apply approved manuscripts to the intended DB with:
   `rm -rf /tmp/tgoliveira-codex-site-rework && unzip -q /Users/thiago.oliveira/Downloads/tgoliveira-codex-site-rework.zip -d /tmp/tgoliveira-codex-site-rework`
   `npm run content:apply-site-rework -- --apply --content-dir /tmp/tgoliveira-codex-site-rework/.codex-site-rework/approved-content`

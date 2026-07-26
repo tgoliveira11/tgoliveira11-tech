@@ -20,8 +20,7 @@ export async function GET() {
   return new NextResponse(buildLlmsFullTxt({ config, posts, tags, categories }), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      "Cache-Control": "private, no-cache, no-store, max-age=0, must-revalidate",
     },
   });
 }
-

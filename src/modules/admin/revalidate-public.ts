@@ -8,6 +8,8 @@ export function revalidatePublicPaths(slug?: string) {
   revalidatePath("/categories");
   revalidatePath("/search");
   revalidatePath("/rss.xml");
+  revalidatePath("/llms.txt");
+  revalidatePath("/llms-full.txt");
   revalidatePath("/sitemap.xml");
 
   if (slug) {
