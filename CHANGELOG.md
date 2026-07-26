@@ -9,15 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rebalanced public CTAs and footer links around selected work, LinkedIn, GitHub, email, and RSS while preserving the site's engineering leadership, enterprise AI, architecture, product engineering, and technology strategy positioning.
+- Rebalanced public CTAs and footer links around selected work, LinkedIn, GitHub, and RSS while preserving the site's engineering leadership, enterprise AI, architecture, product engineering, and technology strategy positioning.
 - Tightened public and admin layout defaults around mobile-first rendering, including horizontal-safe public navigation and more resilient wrapping for long titles, tags, cards, and admin headers.
 - Replace mobile public and Admin navigation with hamburger menus while preserving desktop public nav and Admin sidebar behavior.
 - Align the public mobile hamburger beside the site title and hide public/Admin theme controls on mobile without reserving header space.
 - Replace the About profile photo and regenerate favicon/app-icon assets from the updated portrait.
+- Disable shared caching for RSS and AI-readable full-content endpoints so privacy edits are reflected immediately after deployment.
 
 ### Removed
 
 - Removed public CV/résumé exposure from the site surface, download CTAs, custom PDF route headers, analytics event documentation, and the repository asset.
+- Removed the public email address, `mailto:` contact action, and related analytics event; professional contact now routes through public profile links only.
+- Removed employer-identifying references from published article content and historical post revisions.
 
 ## [0.1.3] - 2026-07-25
 
@@ -28,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default branded Open Graph image route for social previews.
 - Google Analytics 4 measurement on public pages with SPA page views, site-search events, and Web Vitals forwarding.
 - AI-readable public content maps at `/llms.txt` and `/llms-full.txt`.
-- Conversion-oriented public analytics events for hero CTAs, Featured Insights, About visits, article entry, related articles, GitHub/email/LinkedIn CTAs, and article scroll/completion.
+- Conversion-oriented public analytics events for hero CTAs, Featured Insights, About visits, article entry, related articles, GitHub/LinkedIn CTAs, and article scroll/completion.
 - Dry-run approved-content migrator for the site rework manuscripts (`npm run content:apply-site-rework`).
 - Reference plan for the future `production-text-to-sql-reference` GitHub project.
 - Static public cover images for the distributed cache, enterprise AI evaluation, and agentic observability articles.
@@ -41,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Normalize public tag display/archive behavior to lowercase kebab-case with migration documentation.
 - Define `https://www.tgoliveira11.tech` as the canonical default origin and redirect the apex hostname to `www`.
 - Apply short no-store caching to public HTML routes and short shared caching to public metadata endpoints.
-- Reorder footer links around LinkedIn, GitHub, email, and RSS, and remove the obsolete SK footer link.
+- Reorder footer links around LinkedIn, GitHub, and RSS, and remove the obsolete SK footer link.
 - Use the approved square profile photo on About surfaces and apply circular presentation in CSS.
 - Preserve RSS and AI-readable alternate links, canonical metadata, and advanced Googlebot indexing directives across public pages.
 - Complete article metadata with canonical URLs, author profile links, Open Graph Article tags, fallback social images, Twitter cards, and BlogPosting JSON-LD.

@@ -152,7 +152,7 @@ export const ABOUT_PAGE_CONTENT = {
     heading: "Building systems and organizations that can evolve",
     paragraphs: [
       "I am interested in engineering leadership and architecture opportunities involving enterprise AI, cloud platforms, distributed systems, product engineering, and organizational growth.",
-      "For professional conversations, connect with me on LinkedIn, explore selected work, or use the existing contact links.",
+      "For professional conversations, connect with me on LinkedIn or explore selected work.",
     ],
   },
   ctas: {

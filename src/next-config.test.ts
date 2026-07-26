@@ -50,7 +50,7 @@ describe("Next public deployment configuration", () => {
     expect(redirects.every((redirect) => redirect.source !== redirect.destination)).toBe(true);
   });
 
-  it("sets short public HTML caching without changing metadata endpoints to no-store", async () => {
+  it("prevents caching public HTML and content-bearing feeds", async () => {
     const headers = (await nextConfig.headers?.()) ?? [];
 
     expect(headers).toEqual(
@@ -69,7 +69,16 @@ describe("Next public deployment configuration", () => {
           headers: [
             expect.objectContaining({
               key: "Cache-Control",
-              value: expect.stringContaining("s-maxage=300"),
+              value: expect.stringContaining("no-store"),
+            }),
+          ],
+        }),
+        expect.objectContaining({
+          source: "/llms-full.txt",
+          headers: [
+            expect.objectContaining({
+              key: "Cache-Control",
+              value: expect.stringContaining("no-store"),
             }),
           ],
         }),

@@ -38,12 +38,12 @@ describe("buildSecureAuthConfigFromEnv admin panel", () => {
   it("enables admin panel with bootstrap email from ADMIN_EMAIL", () => {
     const config = buildSecureAuthConfigFromEnv(defaults, {
       ...secrets,
-      ADMIN_EMAIL: "tgoliveira11@gmail.com",
+      ADMIN_EMAIL: "admin@example.com",
     });
 
     expect(config.admin?.enabled).toBe(true);
     expect(config.admin?.path).toBe("/admin/core");
-    expect(config.admin?.bootstrapEmail).toBe("tgoliveira11@gmail.com");
+    expect(config.admin?.bootstrapEmail).toBe("admin@example.com");
   });
 });
 

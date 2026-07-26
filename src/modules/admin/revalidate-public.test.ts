@@ -19,6 +19,8 @@ describe("revalidatePublicPaths", () => {
     expect(revalidatePathMock).toHaveBeenCalledWith("/categories");
     expect(revalidatePathMock).toHaveBeenCalledWith("/search");
     expect(revalidatePathMock).toHaveBeenCalledWith("/rss.xml");
+    expect(revalidatePathMock).toHaveBeenCalledWith("/llms.txt");
+    expect(revalidatePathMock).toHaveBeenCalledWith("/llms-full.txt");
     expect(revalidatePathMock).toHaveBeenCalledWith("/sitemap.xml");
   });
 

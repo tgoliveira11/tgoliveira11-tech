@@ -14,7 +14,7 @@ const publicMetadataCacheHeader = {
   value: "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
 };
 
-const tecleTaxiCanonicalPath =
+const mobilityPlatformCanonicalPath =
   "/blog/2026-07-24-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform";
 
 const strategicPostRedirects = [
@@ -56,39 +56,39 @@ const strategicPostRedirects = [
   },
   {
     source: "/blog/building-scaling-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source: "/building-scaling-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source: "/blog/building-and-scaling-a-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source: "/building-and-scaling-a-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source:
       "/blog/from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source:
       "/from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source:
       "/blog/2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
   {
     source:
       "/2026-07-25-from-concept-to-commercialization-building-and-scaling-a-b2b-mobility-platform",
-    destination: tecleTaxiCanonicalPath,
+    destination: mobilityPlatformCanonicalPath,
   },
 ];
 
@@ -202,7 +202,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/rss.xml",
-        headers: [publicMetadataCacheHeader],
+        headers: [publicHtmlCacheHeader],
       },
       {
         source: "/sitemap.xml",
@@ -214,11 +214,11 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/llms.txt",
-        headers: [publicMetadataCacheHeader],
+        headers: [publicHtmlCacheHeader],
       },
       {
         source: "/llms-full.txt",
-        headers: [publicMetadataCacheHeader],
+        headers: [publicHtmlCacheHeader],
       },
     ];
   },

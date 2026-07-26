@@ -9,7 +9,6 @@ export const PUBLIC_AUTHOR_PROFILE = {
   fullName: "Thiago Goulart de Oliveira",
   title: "Engineering Director",
   location: "Santos, Brazil",
-  email: "thiago@tgoliveira11.tech",
   github: "https://github.com/tgoliveira11",
   linkedIn: "https://www.linkedin.com/in/tgoliveira",
   website: "https://www.tgoliveira11.tech",

@@ -18,7 +18,7 @@ export async function GET() {
   return new NextResponse(xml, {
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
+      "Cache-Control": "private, no-cache, no-store, max-age=0, must-revalidate",
     },
   });
 }

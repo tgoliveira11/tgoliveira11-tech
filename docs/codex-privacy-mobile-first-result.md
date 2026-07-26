@@ -29,7 +29,7 @@ Branch: `fix/privacy-mobile-first`
 - Removed profile constants and public author profile fields that exposed the document URL.
 - Removed About-page and footer download CTAs, labels, `download` attributes, and download analytics wiring.
 - Removed custom Next.js PDF headers for the old static asset route.
-- Updated footer tests so the professional-link order is LinkedIn, GitHub, Email, RSS, then editorial navigation.
+- Updated footer tests so the professional-link order is LinkedIn, GitHub, RSS, then editorial navigation.
 - Added targeted `.gitignore` rules for the removed personal document filenames/paths without ignoring all PDFs.
 - Sanitized documentation that previously described the public document implementation.
 - Updated README, analytics documentation, product-surface inventory, UI/UX notes, and changelog.
