@@ -106,15 +106,18 @@ If upstream and local `main` have conflicts, the workflow **fails** and you must
 
 ## Current audit: PostForge 0.1.2
 
-Reviewed on 2026-07-24.
+Reviewed on 2026-08-13. The audited upstream ancestry was recorded on the
+`fix/postforge-sync` branch after confirming that the local implementations below
+are equivalent or stricter. This is intentionally an ancestry-only merge: no
+PostForge defaults replaced the personalized blog surface.
 
 | Check | Result |
 |-------|--------|
-| Local `VERSION` / `package.json` | `0.1.2` / `0.1.2` |
+| Local `VERSION` / `package.json` | `0.1.3` / `0.1.3` |
 | Upstream `VERSION` / `package.json` | `0.1.2` / `0.1.2` |
 | Upstream branch | `upstream/main` at `af7ebc1` (`chore: release 0.1.2`) |
-| Origin alignment | `main` and `origin/main` are aligned at the time of audit |
-| Direct merge dry-run | Not clean; manual conflict review required |
+| Origin alignment | Local branch contains all commits from `upstream/main` |
+| Direct merge result | Reviewed ancestry anchor; personalized files preserved |
 
 PostForge `0.1.2` includes the generic public discovery / SEO / analytics work from
 `622f69c`. This fork already carries site-specific equivalents or supersets:

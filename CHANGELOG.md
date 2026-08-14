@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Recorded the reviewed PostForge `0.1.2` ancestry without replacing the blog's site-specific SEO, analytics, authentication, branding, and content implementations, allowing future upstream sync runs to compare only new template commits.
 - Prefer short-lived Vercel OIDC credentials for Blob uploads and deletes while retaining `BLOB_READ_WRITE_TOKEN` as a compatibility fallback.
 - Rebalanced public CTAs and footer links around selected work, LinkedIn, GitHub, and RSS while preserving the site's engineering leadership, enterprise AI, architecture, product engineering, and technology strategy positioning.
 - Tightened public and admin layout defaults around mobile-first rendering, including horizontal-safe public navigation and more resilient wrapping for long titles, tags, cards, and admin headers.
@@ -22,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed public CV/résumé exposure from the site surface, download CTAs, custom PDF route headers, analytics event documentation, and the repository asset.
 - Removed the public email address, `mailto:` contact action, and related analytics event; professional contact now routes through public profile links only.
 - Removed employer-identifying references from published article content and historical post revisions.
+
+### Security
+
+- Updated compatible lockfile resolutions for `js-yaml` 4.3.1, Nano ID 3.3.18, and Undici 6.28.0/7.29.0, clearing the high-severity production dependency audit findings that blocked the upstream-sync PR.
 
 ## [0.1.3] - 2026-07-25
 
