@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the public email address, `mailto:` contact action, and related analytics event; professional contact now routes through public profile links only.
 - Removed employer-identifying references from published article content and historical post revisions.
 
+### Security
+
+- Updated compatible lockfile resolutions for `js-yaml` 4.3.1, Nano ID 3.3.18, and Undici 6.28.0/7.29.0, clearing the high-severity production dependency audit findings that blocked the upstream-sync PR.
+
 ## [0.1.3] - 2026-07-25
 
 ### Added
